@@ -1,18 +1,31 @@
+// src/components/Popups/GeneralSettingsPopup.jsx
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
+import { updateSettings } from "../../redux/slices/settingsSlice";
 
-function GeneralSettingsPopup({ settings, onSave, onClose }) {
+function GeneralSettingsPopup({ onClose }) {
+  const dispatch = useDispatch();
+  const settings = useSelector((state) => state.settings);
   const [currency, setCurrency] = useState(settings.currency);
   const [timezone, setTimezone] = useState(settings.timezone);
 
   const handleSave = () => {
-    onSave({ currency, timezone });
+    dispatch(updateSettings({ currency, timezone }));
     onClose();
   };
 
   return (
-    <div className="popup-overlay">
-      <div className="popup-content bg-white p-6 rounded shadow-lg">
+    <div className="popup-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="popup-content bg-white p-6 rounded shadow-lg relative">
+        {/* Close Button */}
+        <button
+          className="absolute top-2 right-2 text-tycheGray"
+          onClick={onClose}
+        >
+          &times;
+        </button>
+
         <h3 className="text-2xl font-bold text-tycheBlue mb-4">
           General Settings
         </h3>
@@ -58,11 +71,6 @@ function GeneralSettingsPopup({ settings, onSave, onClose }) {
 }
 
 GeneralSettingsPopup.propTypes = {
-  settings: PropTypes.shape({
-    currency: PropTypes.string.isRequired,
-    timezone: PropTypes.string.isRequired,
-  }).isRequired,
-  onSave: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

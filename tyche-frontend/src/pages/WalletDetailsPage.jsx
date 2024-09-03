@@ -26,6 +26,7 @@ function WalletDetailsPage() {
         setLoading(true);
         setError(null);
 
+        // Fetch transactions, tokens, and NFTs data concurrently
         const [txData, tokenData, nftData] = await Promise.all([
           getAddressTransactions(network, address),
           getAddressTokens(network, address),
@@ -33,8 +34,8 @@ function WalletDetailsPage() {
         ]);
 
         setTransactions(txData.data?.[0]?.transactionList || []);
-        setTokens(tokenData.data?.[0]?.tokens || []);
-        setNfts(nftData.data?.[0]?.nfts || []);
+        setTokens(tokenData.data?.[0]?.tokenList || []);
+        setNfts(nftData.data?.[0]?.tokenList || []);
       } catch (error) {
         console.error("Error fetching blockchain data:", error);
         setError("Failed to fetch blockchain data");

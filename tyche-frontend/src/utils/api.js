@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getNetworkShortName } from "../utils/NetworkManager";
 
 const OKLINK_API_KEY = import.meta.env.VITE_OKLINK_API_KEY;
 
@@ -10,7 +11,8 @@ const apiClient = axios.create({
 });
 
 // Function to get address information
-export const getAddressInfo = async (chainShortName, address) => {
+export const getAddressInfo = async (network, address) => {
+  const chainShortName = getNetworkShortName(network);
   try {
     const response = await apiClient.get(`/address/information-evm`, {
       params: {
@@ -27,10 +29,11 @@ export const getAddressInfo = async (chainShortName, address) => {
 
 // Function to get address token balances
 export const getAddressTokens = async (
-  chainShortName,
+  network,
   address,
   protocolType = "token_20"
 ) => {
+  const chainShortName = getNetworkShortName(network);
   try {
     const response = await apiClient.get(`/address/token-balance`, {
       params: {
@@ -48,10 +51,11 @@ export const getAddressTokens = async (
 
 // Function to get address NFTs
 export const getAddressNFTs = async (
-  chainShortName,
+  network,
   address,
   protocolType = "token_721"
 ) => {
+  const chainShortName = getNetworkShortName(network);
   try {
     const response = await apiClient.get(`/address/token-balance`, {
       params: {
@@ -68,7 +72,11 @@ export const getAddressNFTs = async (
 };
 
 // Function to get address transactions
-export const getAddressTransactions = async (chainShortName, address) => {
+export const getAddressTransactions = async (network, address) => {
+  console.log("network", network);
+
+  const chainShortName = getNetworkShortName(network);
+  console.log("chainShortName", chainShortName);
   try {
     const response = await apiClient.get(`/address/normal-transaction-list`, {
       params: {
@@ -84,7 +92,8 @@ export const getAddressTransactions = async (chainShortName, address) => {
 };
 
 // Function to get address token transactions
-export const getAddressTokenTransactions = async (chainShortName, address) => {
+export const getAddressTokenTransactions = async (network, address) => {
+  const chainShortName = getNetworkShortName(network);
   try {
     const response = await apiClient.get(`/address/token-transaction-list`, {
       params: {
@@ -117,10 +126,11 @@ export const getTokenMarketData = async (chainId, tokenContractAddress) => {
 
 // Function to get NFT market data by ID
 export const getNftMarketDataById = async (
-  chainShortName,
+  network,
   tokenContractAddress,
   tokenId
 ) => {
+  const chainShortName = getNetworkShortName(network);
   try {
     const response = await apiClient.get(`/nft/nft-details`, {
       params: {

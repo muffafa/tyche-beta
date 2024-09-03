@@ -1,10 +1,11 @@
-// src/components/Content/DAppList.jsx
 import PropTypes from "prop-types";
 import DAppCard from "./DAppCard";
 import { DappMetadata } from "../../blockchain/DappMetadata";
+import { getDappsByNetwork } from "../../utils/NetworkManager";
 
 function DAppList({ network }) {
-  const dApps = DappMetadata[network] || [];
+  // Fetch the dApps for the network using getDappsByNetwork function
+  const dApps = getDappsByNetwork(network, DappMetadata);
 
   if (dApps.length === 0) {
     return <div>No dApps available for this network.</div>;

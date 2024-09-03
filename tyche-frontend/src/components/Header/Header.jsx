@@ -7,7 +7,6 @@ import GeneralSettingsPopup from "../Popups/GeneralSettingsPopup";
 import usePopupState from "../../hooks/usePopupState";
 
 function Header() {
-  const networks = ["Ethereum", "Bitcoin", "Avalanche", "BNB Smart Chain"];
   const [lastSearchedAddress, setLastSearchedAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("Ethereum");
   const navigate = useNavigate();
@@ -43,7 +42,6 @@ function Header() {
         lastSearchedAddress={lastSearchedAddress}
       />
       <NetworkSelect
-        networks={networks}
         selectedNetwork={selectedNetwork}
         onSelectNetwork={handleNetworkSelect}
       />

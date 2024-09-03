@@ -19,8 +19,8 @@ function TxHistory({ transactions }) {
 TxHistory.propTypes = {
   transactions: PropTypes.arrayOf(
     PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      hash: PropTypes.string.isRequired,
+      transactionTime: PropTypes.string.isRequired,
+      txId: PropTypes.string.isRequired,
       from: PropTypes.string.isRequired,
       to: PropTypes.string.isRequired,
       amount: PropTypes.string.isRequired,

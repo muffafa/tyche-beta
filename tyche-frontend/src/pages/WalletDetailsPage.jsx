@@ -15,26 +15,44 @@ function WalletDetailsPage() {
   const [transactions, setTransactions] = useState([]);
   const [tokens, setTokens] = useState([]);
   const [nfts, setNfts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const settings = useSelector((state) => state.settings);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const txData = await getAddressTransactions(network, address);
-        const tokenData = await getAddressTokens(network, address);
-        const nftData = await getAddressNFTs(network, address);
+        setLoading(true);
+        setError(null);
 
-        setTransactions(txData.data);
-        setTokens(tokenData.data);
-        setNfts(nftData.data);
+        const [txData, tokenData, nftData] = await Promise.all([
+          getAddressTransactions(network, address),
+          getAddressTokens(network, address),
+          getAddressNFTs(network, address),
+        ]);
+
+        setTransactions(txData.data?.[0]?.transactionList || []);
+        setTokens(tokenData.data?.[0]?.tokens || []);
+        setNfts(nftData.data?.[0]?.nfts || []);
       } catch (error) {
         console.error("Error fetching blockchain data:", error);
+        setError("Failed to fetch blockchain data");
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchData();
   }, [network, address]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="wallet-details-page p-6">

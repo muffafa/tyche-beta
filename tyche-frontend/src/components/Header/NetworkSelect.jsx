@@ -1,6 +1,9 @@
 import PropTypes from "prop-types";
+import { getSupportedNetworks } from "../../utils/NetworkManager";
 
-function NetworkSelect({ networks = [], selectedNetwork, onSelectNetwork }) {
+function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
+  const networks = getSupportedNetworks();
+
   return (
     <select
       value={selectedNetwork}

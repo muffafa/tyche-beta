@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import TxHistory from "../components/Content/TxHistory";
 import Portfolio from "../components/Content/Portfolio";
 import DAppList from "../components/Content/DAppList";
+import shortenAddress from "../utils/shortenAddress";
 import {
   getAddressTransactions,
   getAddressTokens,
@@ -51,7 +52,7 @@ function WalletDetailsPage() {
     <div className="min-h-screen flex flex-col">
       <header className="p-4 bg-gray-800 text-white text-center">
         <h1 className="text-2xl font-semibold">
-          Wallet Details for {address} on {network}
+          Wallet Details for {shortenAddress(address)} on {network}
         </h1>
       </header>
 

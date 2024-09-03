@@ -1,16 +1,22 @@
-// src/components/Content/DAppCard.jsx
 import PropTypes from "prop-types";
 
 function DAppCard({ dapp }) {
   return (
-    <div className="dapp-card border p-4 rounded-lg shadow-md">
-      <img
-        src={dapp.image}
-        alt={dapp.name}
-        className="h-16 w-16 object-contain mb-4"
-      />
-      <h3 className="text-lg font-bold">{dapp.name}</h3>
-      <p className="text-sm text-gray-600">{dapp.description}</p>
+    <div className="flex items-center bg-tycheWhite rounded p-4 shadow-md">
+      <div className="flex-shrink-0">
+        <img
+          src={dapp.image}
+          alt={dapp.name}
+          className="h-8 w-8 object-contain"
+        />
+      </div>
+      <div className="ml-4 flex-grow">
+        <h3 className="text-md font-semibold">{dapp.name}</h3>
+        <p className="text-sm text-tycheGray">{dapp.description}</p>
+      </div>
+      <a href={dapp.link} className="text-tycheBlue ml-4">
+        Visit
+      </a>
     </div>
   );
 }
@@ -21,6 +27,7 @@ DAppCard.propTypes = {
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     image: PropTypes.string.isRequired,
+    link: PropTypes.string.isRequired, // Ensure link is passed
   }).isRequired,
 };
 

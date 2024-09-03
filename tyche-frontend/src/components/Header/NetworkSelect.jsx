@@ -8,7 +8,7 @@ function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
     <select
       value={selectedNetwork}
       onChange={(e) => onSelectNetwork(e.target.value)}
-      className="network-select p-2 border rounded"
+      className="p-2 border rounded"
     >
       {networks.map((network) => (
         <option key={network} value={network}>
@@ -20,7 +20,6 @@ function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
 }
 
 NetworkSelect.propTypes = {
-  networks: PropTypes.arrayOf(PropTypes.string),
   selectedNetwork: PropTypes.string.isRequired,
   onSelectNetwork: PropTypes.func.isRequired,
 };

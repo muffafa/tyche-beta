@@ -47,28 +47,40 @@ function WalletDetailsPage() {
     fetchData();
   }, [network, address]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
   return (
-    <div className="wallet-details-page p-6">
-      <div className="wallet-details-page">
-        <h1>
+    <div className="min-h-screen flex flex-col">
+      <header className="p-4 bg-gray-800 text-white text-center">
+        <h1 className="text-2xl font-semibold">
           Wallet Details for {address} on {network}
         </h1>
-        <div>
-          <p>Current Currency: {settings.currency}</p>
-          <p>Current Timezone: {settings.timezone}</p>
-        </div>
-      </div>
-      <Portfolio tokens={tokens} nfts={nfts} />
-      <TxHistory transactions={transactions} />
-      <DAppList network={network} />
+      </header>
+
+      <main className="flex-grow container mx-auto p-4 grid grid-cols-12 gap-4">
+        {loading ? (
+          <div className="col-span-12 text-center">
+            <p className="text-lg font-semibold mb-4">Loading...</p>
+          </div>
+        ) : error ? (
+          <div className="col-span-12 text-center">
+            <p className="text-lg font-semibold text-red-500 mb-4">{error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="lg:col-span-4 col-span-12 space-y-4">
+              <div className="bg-white p-4 rounded-lg shadow">
+                <h2 className="text-xl font-bold">Account Details</h2>
+                <p>Current Currency: {settings.currency}</p>
+                <p>Current Timezone: {settings.timezone}</p>
+              </div>
+              <Portfolio tokens={tokens} nfts={nfts} network={network} />
+              <DAppList network={network} />
+            </div>
+            <div className="lg:col-span-8 col-span-12">
+              <TxHistory transactions={transactions} />
+            </div>
+          </>
+        )}
+      </main>
     </div>
   );
 }

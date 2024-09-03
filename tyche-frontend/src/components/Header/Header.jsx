@@ -9,9 +9,9 @@ import usePopupState from "../../hooks/usePopupState";
 function Header() {
   const [lastSearchedAddress, setLastSearchedAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("Ethereum");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Use the custom hook for managing the General Settings popup state
   const {
     isOpen: isSettingsOpen,
     openPopup: openSettings,
@@ -29,29 +29,61 @@ function Header() {
 
   const handleSaveSettings = (settings) => {
     console.log("Settings saved:", settings);
-    // Here you can also save the settings locally or in the global state
+  };
+
+  const handleLogoClick = () => {
+    navigate("/");
   };
 
   return (
-    <header className="header bg-tycheBlue p-4 flex justify-between items-center">
-      <div className="logo">
-        <img src="/tyche.png" alt="Tyche Logo" />
-      </div>
-      <SearchBar
-        onSearch={handleSearch}
-        lastSearchedAddress={lastSearchedAddress}
-      />
-      <NetworkSelect
-        selectedNetwork={selectedNetwork}
-        onSelectNetwork={handleNetworkSelect}
-      />
-      <WalletConnect />
-      <button
-        className="ml-4 px-4 py-2 bg-tycheGray text-white rounded"
-        onClick={openSettings}
+    <header className="flex flex-wrap items-center justify-between p-4 bg-tycheWhite shadow">
+      <div
+        className="relative h-12 w-12 cursor-pointer"
+        onClick={handleLogoClick}
       >
-        Settings
-      </button>
+        <img
+          src="/tyche.png"
+          alt="Tyche Logo"
+          className="h-full w-full object-contain"
+        />
+      </div>
+      <div className="flex-grow mx-2 min-w-0">
+        <SearchBar
+          onSearch={handleSearch}
+          lastSearchedAddress={lastSearchedAddress}
+        />
+      </div>
+      <div className="flex items-center space-x-2 mt-2 md:mt-0">
+        <div className="hidden sm:flex items-center space-x-2">
+          <NetworkSelect
+            selectedNetwork={selectedNetwork}
+            onSelectNetwork={handleNetworkSelect}
+          />
+          <WalletConnect />
+        </div>
+        <button
+          className="sm:hidden px-2 py-1 bg-tycheGray text-white rounded"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          Menu
+        </button>
+        <button
+          className="px-2 py-1 bg-tycheGray text-white rounded"
+          onClick={openSettings}
+        >
+          Settings
+        </button>
+      </div>
+
+      {isMenuOpen && (
+        <div className="w-full mt-2 flex flex-col space-y-2 sm:hidden">
+          <NetworkSelect
+            selectedNetwork={selectedNetwork}
+            onSelectNetwork={handleNetworkSelect}
+          />
+          <WalletConnect />
+        </div>
+      )}
 
       {isSettingsOpen && (
         <GeneralSettingsPopup

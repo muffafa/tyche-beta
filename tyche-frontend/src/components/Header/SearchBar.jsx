@@ -9,13 +9,13 @@ function SearchBar({ onSearch, lastSearchedAddress }) {
   };
 
   return (
-    <div className="search-bar flex">
+    <div className="flex">
       <input
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         placeholder="Enter blockchain address"
-        className="p-2 border rounded-l"
+        className="p-2 border rounded-l flex-grow"
       />
       <button
         onClick={handleSearch}

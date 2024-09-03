@@ -3,9 +3,13 @@ import PropTypes from "prop-types";
 function TokenCard({ token }) {
   return (
     <div className="token-card bg-tycheBeige p-4 mb-4 rounded shadow flex justify-between items-center">
-      <div className="token-info">
-        <h5 className="text-tycheBlue font-bold">{token.symbol}</h5>
-        <p className="text-tycheGray">Contract: {token.tokenContractAddress}</p>
+      <div className="token-info flex items-center">
+        <div className="mr-4">
+          <h5 className="text-tycheBlue font-bold">{token.symbol}</h5>
+          <p className="text-tycheGray">
+            Contract: {token.tokenContractAddress}
+          </p>
+        </div>
       </div>
       <div className="token-amount">
         <span className="text-tycheBlue font-bold">{token.holdingAmount}</span>

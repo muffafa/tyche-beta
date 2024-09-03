@@ -4,7 +4,6 @@ import { DappMetadata } from "../../blockchain/DappMetadata";
 import { getDappsByNetwork } from "../../utils/NetworkManager";
 
 function DAppList({ network }) {
-  // Fetch the dApps for the network using getDappsByNetwork function
   const dApps = getDappsByNetwork(network, DappMetadata);
 
   if (dApps.length === 0) {

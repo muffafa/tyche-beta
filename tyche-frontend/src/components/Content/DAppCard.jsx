@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 
 function DAppCard({ dapp }) {
+  const dappLink = dapp.link || "#"; // Fallback to "#" if the link is undefined
+
   return (
     <div className="flex items-center bg-tycheWhite rounded p-4 shadow-md">
       <div className="flex-shrink-0">
@@ -14,7 +16,7 @@ function DAppCard({ dapp }) {
         <h3 className="text-md font-semibold">{dapp.name}</h3>
         <p className="text-sm text-tycheGray">{dapp.description}</p>
       </div>
-      <a href={dapp.link} className="text-tycheBlue ml-4">
+      <a href={dappLink} className="text-tycheBlue ml-4">
         Visit
       </a>
     </div>

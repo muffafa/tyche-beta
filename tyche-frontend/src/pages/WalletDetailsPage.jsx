@@ -77,7 +77,11 @@ function WalletDetailsPage() {
               <DAppList network={network} />
             </div>
             <div className="lg:col-span-8 col-span-12">
-              <TxHistory transactions={transactions} />
+              <TxHistory
+                transactions={transactions}
+                currentNetwork={network} // Pass the network as currentNetwork
+                currentAddress={address} // Pass the address as currentAddress
+              />
             </div>
           </>
         )}

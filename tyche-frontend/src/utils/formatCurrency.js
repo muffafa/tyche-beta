@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const formatCurrency = async (amountInUSDT, selectedCurrency) => {
-  console.log(amountInUSDT, selectedCurrency);
   try {
     // Fetch exchange rates from the API
     const response = await axios.get(

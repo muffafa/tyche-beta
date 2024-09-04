@@ -1,9 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getTokenMarketData } from "../../utils/api";
 import formatCurrency from "../../utils/formatCurrency";
-import { getChainIdByNetwork } from "../../utils/NetworkManager";
 
 function TokenCard({ token }) {
   const [formattedValue, setFormattedValue] = useState(null);
@@ -14,28 +12,8 @@ function TokenCard({ token }) {
   useEffect(() => {
     const fetchTokenValue = async () => {
       try {
-        // Step 1: Get the chainId using the network name
-        const chainId = getChainIdByNetwork(selectedNetwork);
-        if (!chainId) {
-          console.error("Unsupported network:", selectedNetwork);
-          return;
-        }
-
-        // Step 2: Fetch token market data
-        const marketData = await getTokenMarketData(
-          chainId,
-          token.tokenContractAddress
-        );
-        console.log(marketData);
-        const lastPrice = marketData?.data?.[0]?.lastPrice || 0;
-        console.log(lastPrice);
-
-        // Step 3: Calculate the token value in USDT
-        const valueInUSDT = parseFloat(token.holdingAmount) * lastPrice;
-
-        // Step 4: Convert the value to the selected currency
         const convertedValue = await formatCurrency(
-          valueInUSDT,
+          token.valueUsd,
           selectedCurrency
         );
 

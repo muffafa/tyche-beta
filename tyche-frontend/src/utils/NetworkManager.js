@@ -8,14 +8,24 @@ const networkMappings = {
   // Add other networks as needed
 };
 
+const chainIdMappings = {
+  eth: "1",
+  bsc: "56",
+  avaxc: "43114",
+  btc: "0",
+};
+
 export function getNetworkShortName(networkName) {
-  // Convert the network name to lowercase to handle case sensitivity
   const normalizedNetworkName = networkName.toLowerCase();
   return networkMappings[normalizedNetworkName] || "";
 }
 
+export function getChainIdByNetwork(networkName) {
+  const shortName = getNetworkShortName(networkName);
+  return chainIdMappings[shortName] || null;
+}
+
 export function getSupportedNetworks() {
-  // Return the original case network names
   return Object.keys(networkMappings);
 }
 

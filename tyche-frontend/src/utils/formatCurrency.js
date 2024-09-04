@@ -1,8 +1,7 @@
-// src/utils/formatCurrency.js
 import axios from "axios";
 
-// Fetch exchange rates and convert the amount
 const formatCurrency = async (amountInUSDT, selectedCurrency) => {
+  console.log(amountInUSDT, selectedCurrency);
   try {
     // Fetch exchange rates from the API
     const response = await axios.get(
@@ -12,12 +11,9 @@ const formatCurrency = async (amountInUSDT, selectedCurrency) => {
     // Extract exchange rates from the response
     const rates = response.data.rates;
 
-    // 1 USDT is always equal to 1 USD
-    const amountInUSD = amountInUSDT;
-
     // Convert USD to the selected currency
     const exchangeRate = rates[selectedCurrency];
-    const convertedAmount = amountInUSD * exchangeRate;
+    const convertedAmount = amountInUSDT * exchangeRate;
 
     return convertedAmount.toFixed(2); // Format to two decimal places
   } catch (error) {

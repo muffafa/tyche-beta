@@ -117,6 +117,7 @@ export const getTokenMarketData = async (chainId, tokenContractAddress) => {
         tokenContractAddress,
       },
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching token market data:", error);

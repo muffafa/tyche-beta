@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import TxHistory from "../components/Content/TxHistory";
 import Portfolio from "../components/Content/Portfolio";
 import DAppList from "../components/Content/DAppList";
@@ -10,9 +10,13 @@ import {
   getAddressTokens,
   getAddressNFTs,
 } from "../utils/api";
+import { setNetwork, setWalletAddress } from "../redux/slices/globalSlice";
+import { getSupportedNetworks } from "../utils/NetworkManager";
+import NotFound from "./NotFound"; // Import the 404 component
 
 function WalletDetailsPage() {
   const { network, address } = useParams();
+  const dispatch = useDispatch();
   const [transactions, setTransactions] = useState([]);
   const [tokens, setTokens] = useState([]);
   const [nfts, setNfts] = useState([]);
@@ -21,7 +25,19 @@ function WalletDetailsPage() {
 
   const settings = useSelector((state) => state.settings);
 
+  // Check if the network is supported
+  const supportedNetworks = getSupportedNetworks();
+  const isNetworkSupported = supportedNetworks.includes(network.toLowerCase());
+
   useEffect(() => {
+    if (!isNetworkSupported) {
+      return; // Early exit if network is not supported
+    }
+
+    // Initialize global state with URL params
+    dispatch(setNetwork(network));
+    dispatch(setWalletAddress(address));
+
     async function fetchData() {
       try {
         setLoading(true);
@@ -46,7 +62,12 @@ function WalletDetailsPage() {
     }
 
     fetchData();
-  }, [network, address]);
+  }, [network, address, dispatch, isNetworkSupported]);
+
+  // Render 404 page if network is not supported
+  if (!isNetworkSupported) {
+    return <NotFound />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -79,8 +100,8 @@ function WalletDetailsPage() {
             <div className="lg:col-span-8 col-span-12">
               <TxHistory
                 transactions={transactions}
-                currentNetwork={network} // Pass the network as currentNetwork
-                currentAddress={address} // Pass the address as currentAddress
+                currentNetwork={network}
+                currentAddress={address}
               />
             </div>
           </>

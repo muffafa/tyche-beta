@@ -13,7 +13,7 @@ function TxCard({ tx, currentAddress }) {
     settings.timezone
   );
 
-  console.log(formattedTime);
+  // console.log(tx);
 
   const formatEthValue = (value) => {
     const ethValue = parseFloat(value) / 10 ** 18;

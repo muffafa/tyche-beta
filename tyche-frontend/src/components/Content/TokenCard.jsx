@@ -17,7 +17,6 @@ function TokenCard({ token }) {
           selectedCurrency
         );
 
-        // Step 5: Set the formatted value
         setFormattedValue(convertedValue);
       } catch (error) {
         console.error("Error calculating token value:", error);

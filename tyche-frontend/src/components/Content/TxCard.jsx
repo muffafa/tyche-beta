@@ -13,6 +13,8 @@ function TxCard({ tx, currentAddress }) {
     settings.timezone
   );
 
+  console.log(formattedTime);
+
   const formatEthValue = (value) => {
     const ethValue = parseFloat(value) / 10 ** 18;
     return ethValue.toFixed(6);
@@ -32,8 +34,10 @@ function TxCard({ tx, currentAddress }) {
       }`}
     >
       <div>
-        <p className="text-lg font-semibold">{formattedTime.split(" ")[0]}</p>
-        <p className="text-sm text-tycheGray">{formattedTime.split(" ")[1]}</p>
+        <p className="text-lg font-semibold">
+          {formattedTime.split(" ").slice(0, 3).join(" ")}
+        </p>
+        <p className="text-sm text-tycheGray">{formattedTime.split(" ")[3]}</p>
         <p className="text-tycheBlue">{shortenAddress(tx.txId)}</p>
       </div>
       <div className="text-center">

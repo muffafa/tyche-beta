@@ -22,8 +22,8 @@ const saveState = (state) => {
 };
 
 const initialState = loadState() || {
-  currency: "USD",
-  timezone: "GMT+0",
+  currency: "TRY",
+  timezone: "Europe/Istanbul",
 };
 
 const settingsSlice = createSlice({

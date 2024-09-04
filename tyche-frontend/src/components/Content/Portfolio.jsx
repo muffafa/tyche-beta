@@ -33,8 +33,8 @@ function Portfolio({ tokens, nfts }) {
       </div>
 
       {activeTab === "tokens" ? (
-        <div className="relative">
-          <div className="sticky top-0 bg-tycheBeige z-10">
+        <>
+          <div className="top-0 bg-tycheBeige">
             <table className="w-full text-left">
               <thead>
                 <tr>
@@ -66,10 +66,10 @@ function Portfolio({ tokens, nfts }) {
               <p className="text-center text-tycheGray">No tokens found.</p>
             )}
           </div>
-        </div>
+        </>
       ) : (
-        <div className="relative">
-          <div className="sticky top-0 bg-tycheBeige z-10">
+        <>
+          <div className="top-0 bg-tycheBeige">
             <table className="w-full text-left">
               <thead>
                 <tr>
@@ -101,7 +101,7 @@ function Portfolio({ tokens, nfts }) {
               <p className="text-center text-tycheGray">No NFTs found.</p>
             )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

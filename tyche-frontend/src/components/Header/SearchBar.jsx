@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 
 function SearchBar({ onSearch, lastSearchedAddress }) {
-  const [searchTerm, setSearchTerm] = useState(lastSearchedAddress || "");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Update the search term when lastSearchedAddress changes (for example, when set by Redux)
+  useEffect(() => {
+    if (lastSearchedAddress) {
+      setSearchTerm(lastSearchedAddress); // Set search term to pre-fill input
+    }
+  }, [lastSearchedAddress]);
 
   const handleSearch = () => {
     onSearch(searchTerm);

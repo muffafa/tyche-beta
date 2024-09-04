@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux"; // For accessing Redux state
 import { useNavigate } from "react-router-dom";
 import NetworkSelect from "./NetworkSelect";
 import SearchBar from "./SearchBar";
@@ -7,16 +8,37 @@ import GeneralSettingsPopup from "../Popups/GeneralSettingsPopup";
 import usePopupState from "../../hooks/usePopupState";
 
 function Header() {
+  const navigate = useNavigate();
+
+  // Access the selectedNetwork and walletAddress from Redux (but don't dispatch changes)
+  const storedNetwork = useSelector((state) => state.global.selectedNetwork);
+  const storedWalletAddress = useSelector(
+    (state) => state.global.walletAddress
+  );
+
   const [lastSearchedAddress, setLastSearchedAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("Ethereum");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   const {
     isOpen: isSettingsOpen,
     openPopup: openSettings,
     closePopup: closeSettings,
   } = usePopupState();
+
+  // Set initial selectedNetwork based on the Redux state (run only once on mount)
+  useEffect(() => {
+    if (storedNetwork) {
+      setSelectedNetwork(storedNetwork);
+    }
+  }, [storedNetwork]);
+
+  // Set initial lastSearchedAddress based on the Redux state (run only once on mount)
+  useEffect(() => {
+    if (storedWalletAddress) {
+      setLastSearchedAddress(storedWalletAddress);
+    }
+  }, [storedWalletAddress]);
 
   const handleSearch = (address) => {
     setLastSearchedAddress(address);
@@ -50,7 +72,7 @@ function Header() {
       <div className="flex-grow mx-2 min-w-0">
         <SearchBar
           onSearch={handleSearch}
-          lastSearchedAddress={lastSearchedAddress}
+          lastSearchedAddress={lastSearchedAddress} // Pass Redux-stored address to SearchBar
         />
       </div>
       <div className="flex items-center space-x-2 mt-2 md:mt-0">

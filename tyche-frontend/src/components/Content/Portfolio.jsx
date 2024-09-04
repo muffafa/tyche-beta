@@ -6,6 +6,10 @@ import NftCard from "./NftCard";
 function Portfolio({ tokens, nfts }) {
   const [activeTab, setActiveTab] = useState("tokens");
 
+  // Determine the height to apply consistently to both tabs
+  const consistentHeightClass =
+    tokens.length > 3 || nfts.length > 3 ? "max-h-[142px]" : "min-h-[142px]";
+
   return (
     <div className="p-4 bg-tycheBeige shadow rounded col-span-4">
       <h2 className="text-lg font-semibold mb-4">Portfolio</h2>
@@ -45,11 +49,7 @@ function Portfolio({ tokens, nfts }) {
               </thead>
             </table>
           </div>
-          <div
-            className={`overflow-y-scroll ${
-              tokens.length > 3 ? "max-h-[142px]" : "min-h-[142px]"
-            }`}
-          >
+          <div className={`overflow-y-scroll ${consistentHeightClass}`}>
             {tokens.length > 0 ? (
               <table className="w-full text-left">
                 <tbody>
@@ -80,11 +80,7 @@ function Portfolio({ tokens, nfts }) {
               </thead>
             </table>
           </div>
-          <div
-            className={`overflow-y-scroll ${
-              nfts.length > 3 ? "max-h-[142px]" : "min-h-[142px]"
-            }`}
-          >
+          <div className={`overflow-y-scroll ${consistentHeightClass}`}>
             {nfts.length > 0 ? (
               <table className="w-full text-left">
                 <tbody>

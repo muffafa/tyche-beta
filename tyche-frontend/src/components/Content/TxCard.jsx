@@ -2,43 +2,30 @@ import PropTypes from "prop-types";
 import shortenAddress from "../../utils/shortenAddress";
 import { convertTimestampToTimezone } from "../../utils/convertTimestampToTimezone";
 import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
 
 const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
-const USD_TO_TRY = 32.81; // Replace with the current USD/TRY rate
+//const USD_TO_TRY = 32.81; // Replace with the current USD/TRY rate
 
 function TxCard({ tx, currentAddress }) {
   const settings = useSelector((state) => state.settings);
 
+  console.log(tx.attributes.mined_at);
   const formattedTime = convertTimestampToTimezone(
-    tx.transactionTime,
+    tx.attributes.mined_at,
     settings.timezone
   );
 
-  // console.log(tx);
-
-
-  const calculateTryValue = (ethValue) => {
-    const ethAmount = parseFloat(ethValue) / 10 ** 18;
-    const usdValue = ethAmount * ETH_TO_USD;
-    const tryValue = usdValue * USD_TO_TRY;
-    return tryValue.toFixed(2);
-  };
-
   function getRandomFloat(min, max) {
-    return (Math.random() * (max - min) + min).toFixed(3)
+    return (Math.random() * (max - min) + min).toFixed(3);
   }
 
-
-
-
   let symbol = tx.attributes.transfers?.[0]?.fungible_info?.symbol;
-  let icon = tx.attributes.transfers?.[0]?.fungible_info?.icon;
+  //let icon = tx.attributes.transfers?.[0]?.fungible_info?.icon;
   let value = tx.attributes.transfers?.[0]?.value;
   let amount = tx.attributes.transfers?.[0]?.quantity.float;
 
   if (symbol === undefined || symbol === null) {
-    symbol = 'ETH';
+    symbol = "ETH";
   }
 
   if (amount === undefined || amount === null) {
@@ -47,31 +34,20 @@ function TxCard({ tx, currentAddress }) {
   }
 
   if (value === undefined || value === null) {
-
     value = amount * ETH_TO_USD;
   }
-  const address_to = String(tx.attributes.sent_to).trim().toLowerCase();
-  console.log("address_to", address_to);
 
+  const address_to = String(tx.attributes.sent_to).trim().toLowerCase();
   const stringcurrentAddress = String(currentAddress).trim().toLowerCase();
-  console.log("stringcurrentAddress", stringcurrentAddress);
 
   let isGreen = false;
 
   if (address_to === stringcurrentAddress) {
     isGreen = true;
-    console.log("ayniii");
-  } else {
-    isGreen = false;
-    console.log("farkli");
   }
 
-
-
   return (
-    <div
-      className={`grid grid-cols-3 items-center ${isGreen ? "bg-tycheGreen" : "bg-tycheRed"} rounded p-4 shadow-md`}
-    >
+    <div className="grid grid-cols-3 items-center bg-white rounded p-4 shadow-md">
       <div>
         <p className="text-lg font-semibold">
           {formattedTime.split(" ").slice(0, 3).join(" ")}
@@ -82,14 +58,25 @@ function TxCard({ tx, currentAddress }) {
       <div className="text-center">
         <p className="text-sm">
           From:{" "}
-          <span className="text-tycheBlue">{shortenAddress(tx.attributes.sent_from)}</span>
+          <span className="text-tycheBlue">
+            {shortenAddress(tx.attributes.sent_from)}
+          </span>
         </p>
         <p className="text-sm">
-          To: <span className="text-tycheBlue">{shortenAddress(tx.attributes.sent_to)}</span>
+          To:{" "}
+          <span className="text-tycheBlue">
+            {shortenAddress(tx.attributes.sent_to)}
+          </span>
         </p>
       </div>
-      <div className="text-right p-2 rounded h-full flex flex-col justify-center">
-        <p className="font-semibold">Amount: {amount} - {symbol}</p>
+      <div
+        className={`text-right p-2 rounded h-full flex flex-col justify-center ${
+          isGreen ? "bg-tycheGreen" : "bg-tycheRed"
+        } text-white`}
+      >
+        <p className="font-semibold">
+          Amount: {amount} - {symbol}
+        </p>
         <p>Value: {value} USD</p>
       </div>
     </div>
@@ -99,14 +86,26 @@ function TxCard({ tx, currentAddress }) {
 TxCard.propTypes = {
   tx: PropTypes.shape({
     transactionTime: PropTypes.string.isRequired,
-    txId: PropTypes.string.isRequired,
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-    amount: PropTypes.string.isRequired,
-    symbol: PropTypes.string.isRequired,
+    attributes: PropTypes.shape({
+      hash: PropTypes.string.isRequired,
+      sent_from: PropTypes.string.isRequired,
+      sent_to: PropTypes.string.isRequired,
+      transfers: PropTypes.arrayOf(
+        PropTypes.shape({
+          fungible_info: PropTypes.shape({
+            symbol: PropTypes.string,
+            icon: PropTypes.string,
+          }),
+          quantity: PropTypes.shape({
+            float: PropTypes.number,
+          }),
+          value: PropTypes.number,
+        })
+      ),
+    }).isRequired,
   }).isRequired,
-  currentNetwork: PropTypes.string.isRequired,
   currentAddress: PropTypes.string.isRequired,
+  currentNetwork: PropTypes.string.isRequired,
 };
 
 export default TxCard;

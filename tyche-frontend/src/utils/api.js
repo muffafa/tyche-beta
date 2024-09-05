@@ -96,6 +96,9 @@ export const getAddressTransactions = async (network, address) => {
 
 
 export const getAddressTransactions2 = async (network, address, currency, filterTrash, fungible) => {
+  if (network === "bnb smart chain") {
+    network = "binance-smart-chain";
+  }
   // if (fungible == null) { return fungible = ""; }
   // if (filterTrash == null) { return filterTrash = "no_filter"; }
   // if (currency == null) { return currency = "usd"; }

@@ -9,10 +9,15 @@ import {
   getAddressTransactions2,
   getAddressTokens,
   getAddressNFTs,
+  getAddressInfo,
 } from "../utils/api";
 import { setNetwork, setWalletAddress } from "../redux/slices/globalSlice";
 import { getSupportedNetworks } from "../utils/NetworkManager";
 import NotFound from "./NotFound"; // Import the 404 component
+import {
+  processNativeTokenData,
+  concatNativeTokenWithTokenData,
+} from "../utils/nativeToken";
 
 function WalletDetailsPage() {
   const { network, address } = useParams();
@@ -42,16 +47,19 @@ function WalletDetailsPage() {
       try {
         setLoading(true);
         setError(null);
-
         // Fetch transactions, tokens, and NFTs data concurrently
         const [txData, tokenData, nftData] = await Promise.all([
           getAddressTransactions2(network, address),
           getAddressTokens(network, address),
           getAddressNFTs(network, address),
         ]);
-
         setTransactions(txData.data? txData.data : []);
-        console.log("txData", txData.data);
+        const addressInfo = await getAddressInfo(network, address);
+        const procedNativeTokenData = await processNativeTokenData(
+          addressInfo.data[0],
+          network
+        );
+        concatNativeTokenWithTokenData(procedNativeTokenData, tokenData);
         setTokens(tokenData.data?.[0]?.tokenList || []);
         setNfts(nftData.data?.[0]?.tokenList || []);
       } catch (error) {

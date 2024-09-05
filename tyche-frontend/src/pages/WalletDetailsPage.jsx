@@ -6,7 +6,7 @@ import Portfolio from "../components/Content/Portfolio";
 import DAppList from "../components/Content/DAppList";
 import shortenAddress from "../utils/shortenAddress";
 import {
-  getAddressTransactions,
+  getAddressTransactions2,
   getAddressTokens,
   getAddressNFTs,
   getAddressInfo,
@@ -49,20 +49,17 @@ function WalletDetailsPage() {
         setError(null);
         // Fetch transactions, tokens, and NFTs data concurrently
         const [txData, tokenData, nftData] = await Promise.all([
-          getAddressTransactions(network, address),
+          getAddressTransactions2(network, address),
           getAddressTokens(network, address),
           getAddressNFTs(network, address),
         ]);
-
+        setTransactions(txData.data? txData.data : []);
         const addressInfo = await getAddressInfo(network, address);
         const procedNativeTokenData = await processNativeTokenData(
           addressInfo.data[0],
           network
         );
-
         concatNativeTokenWithTokenData(procedNativeTokenData, tokenData);
-
-        setTransactions(txData.data?.[0]?.transactionList || []);
         setTokens(tokenData.data?.[0]?.tokenList || []);
         setNfts(nftData.data?.[0]?.tokenList || []);
       } catch (error) {

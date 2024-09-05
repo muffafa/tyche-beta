@@ -1,10 +1,8 @@
 import axios from "axios";
 
-// const ALCHEMY_API_KEY = import.meta.env.ALCHEMY_API_KEY;
-
+// Function to fetch price data from the CoinGecko API
 const fetchPriceUsd = async (symbol) => {
   try {
-    // Fetch price data from the CoinGecko API (or any other API you prefer)
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/simple/price`,
       {
@@ -14,38 +12,61 @@ const fetchPriceUsd = async (symbol) => {
         },
       }
     );
-
-    // Return the price in USD
-    return response.data[symbol]?.usd || 1; // Return 1 if price data is unavailable
+    return response.data[symbol]?.usd || 1;
   } catch (error) {
     console.error(`Error fetching price for ${symbol}:`, error);
-    return 1; // Default to 1 USD if there is an error
+    return 1;
   }
 };
 
 export const processNativeTokenData = async (addressInfo, network) => {
-  // Extract necessary fields from the getAddressInfo response
+  // Log addressInfo to inspect its structure
+  console.log("addressInfo:", addressInfo);
+
+  // Add defensive checks to ensure addressInfo and necessary properties exist
+  if (!addressInfo || !addressInfo.balance || !addressInfo.balanceSymbol) {
+    console.error("Missing balance or balanceSymbol in addressInfo");
+    return null;
+  }
+
   const { balance, balanceSymbol } = addressInfo;
 
-  // Fetch the price of the native token (ETH, BTC, etc.)
-  const priceUsd = await fetchPriceUsd(network);
+  try {
+    // Fetch the price of the native token (ETH, BTC, etc.)
+    const priceUsd = await fetchPriceUsd(network);
 
-  console.log(balanceSymbol);
+    console.log(
+      "balanceSymbol:",
+      balanceSymbol,
+      "balance:",
+      balance,
+      "priceUsd:",
+      priceUsd
+    );
 
-  const nativeTokenData = {
-    symbol: balanceSymbol, // Native token symbol (e.g., ETH)
-    tokenContractAddress: "", // Native tokens don't have contract addresses
-    holdingAmount: balance, // The balance of the native token
-    priceUsd: priceUsd.toString(), // Convert priceUsd to string
-    valueUsd: (parseFloat(balance) * priceUsd).toFixed(2).toString(), // Convert valueUsd to string
-    tokenId: "", // No tokenId for native tokens
-  };
+    // Prepare the native token data
+    const nativeTokenData = {
+      symbol: balanceSymbol, // Native token symbol (e.g., ETH)
+      tokenContractAddress: "", // Native tokens don't have contract addresses
+      holdingAmount: balance, // The balance of the native token
+      priceUsd: priceUsd.toString(), // Price in USD as string
+      valueUsd: (parseFloat(balance) * priceUsd).toFixed(2).toString(), // Value in USD as string
+      tokenId: "", // No tokenId for native tokens
+    };
 
-  return nativeTokenData;
+    return nativeTokenData;
+  } catch (error) {
+    console.error("Error processing native token data:", error);
+    return null;
+  }
 };
 
 export const concatNativeTokenWithTokenData = (nativeTokenData, tokenData) => {
-  // Ensure tokenData structure is valid before appending
+  if (!nativeTokenData) {
+    console.error("Native token data is missing, skipping concat.");
+    return tokenData;
+  }
+
   if (
     tokenData &&
     tokenData.data &&

@@ -1,7 +1,11 @@
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAddress } from "../../redux/slices/walletSlice";
 import PropTypes from "prop-types";
-import shortenAddress from "../../utils/shortenAddress";
 
-function AddressTablePopup({ addresses, onEdit, onDelete, onClose }) {
+function AddressTablePopup({ onEdit, onClose }) {
+  const addresses = useSelector((state) => state.wallet.addresses);
+  const dispatch = useDispatch();
+
   return (
     <div className="popup-overlay">
       <div className="popup-container bg-tycheBeige p-6 rounded shadow-lg">
@@ -19,9 +23,7 @@ function AddressTablePopup({ addresses, onEdit, onDelete, onClose }) {
             {addresses.map((address, index) => (
               <tr key={index}>
                 <td className="text-tycheGray">{address.alias}</td>
-                <td className="text-tycheGray">
-                  {shortenAddress(address.address)}
-                </td>
+                <td className="text-tycheGray">{address.address}</td>
                 <td className="text-tycheGray">{address.network}</td>
                 <td className="text-right">
                   <button
@@ -32,7 +34,7 @@ function AddressTablePopup({ addresses, onEdit, onDelete, onClose }) {
                   </button>
                   <button
                     className="bg-tycheRed text-white p-2 rounded"
-                    onClick={() => onDelete(address)}
+                    onClick={() => dispatch(deleteAddress(address.id))}
                   >
                     Delete
                   </button>
@@ -53,15 +55,7 @@ function AddressTablePopup({ addresses, onEdit, onDelete, onClose }) {
 }
 
 AddressTablePopup.propTypes = {
-  addresses: PropTypes.arrayOf(
-    PropTypes.shape({
-      alias: PropTypes.string.isRequired,
-      address: PropTypes.string.isRequired,
-      network: PropTypes.string.isRequired,
-    })
-  ).isRequired,
   onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

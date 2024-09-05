@@ -1,12 +1,16 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
+import { updateAddress } from "../../redux/slices/walletSlice";
 
-function AddressSettingsPopup({ address, onSave, onClose }) {
+function AddressSettingsPopup({ address, onClose }) {
   const [alias, setAlias] = useState(address.alias || "");
   const [network, setNetwork] = useState(address.network || "");
+  const dispatch = useDispatch();
 
   const handleSave = () => {
-    onSave({ ...address, alias, network });
+    dispatch(updateAddress({ ...address, alias, network }));
+    onClose();
   };
 
   return (
@@ -21,7 +25,6 @@ function AddressSettingsPopup({ address, onSave, onClose }) {
             onChange={(e) => setAlias(e.target.value)}
             className="mb-4 p-2 bg-white border border-tycheGray rounded w-full"
           />
-
           <label className="block text-tycheGray mb-2">Network</label>
           <select
             value={network}
@@ -32,7 +35,6 @@ function AddressSettingsPopup({ address, onSave, onClose }) {
             <option value="Bitcoin">Bitcoin</option>
             <option value="BNB Smart Chain">BNB Smart Chain</option>
             <option value="Avalanche">Avalanche</option>
-            {/* Diğer ağları ekleyebilirsiniz */}
           </select>
         </div>
         <button
@@ -57,7 +59,6 @@ AddressSettingsPopup.propTypes = {
     alias: PropTypes.string,
     network: PropTypes.string,
   }),
-  onSave: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

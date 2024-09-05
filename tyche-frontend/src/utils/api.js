@@ -2,6 +2,7 @@ import axios from "axios";
 import { getNetworkShortName } from "../utils/NetworkManager";
 
 const OKLINK_API_KEY = import.meta.env.VITE_OKLINK_API_KEY;
+const ZERION_API_KEY = import.meta.env.VITE_ZERION_API_KEY;
 
 const apiClient = axios.create({
   baseURL: "https://www.oklink.com/api/v5/explorer",
@@ -9,6 +10,7 @@ const apiClient = axios.create({
     "Ok-Access-Key": OKLINK_API_KEY,
   },
 });
+
 
 // Function to get address information
 export const getAddressInfo = async (network, address) => {
@@ -90,6 +92,33 @@ export const getAddressTransactions = async (network, address) => {
     throw error;
   }
 };
+
+
+
+export const getAddressTransactions2 = async (network, address, currency, filterTrash, fungible) => {
+  // if (fungible == null) { return fungible = ""; }
+  // if (filterTrash == null) { return filterTrash = "no_filter"; }
+  // if (currency == null) { return currency = "usd"; }
+  const options = {
+    method: 'GET',
+    url: `https://api.zerion.io/v1/wallets/${address}/transactions/`,
+    params: { currency: currency, 'page[size]': '100', 'filter[trash]': filterTrash, 'filter[chain_ids]': network, 'filter[asset_types]': fungible, },
+    headers: {
+      accept: 'application/json',
+      authorization: `Basic ${ZERION_API_KEY}`
+    }
+  };
+
+  try {
+    const response = await axios.request(options);
+    return response.data;
+  }
+  catch (error) {
+    console.error("Error fetching address transactions:", error);
+    throw error;
+  }
+
+}
 
 // Function to get address token transactions
 export const getAddressTokenTransactions = async (network, address) => {

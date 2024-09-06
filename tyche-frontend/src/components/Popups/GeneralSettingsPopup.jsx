@@ -63,8 +63,21 @@ function GeneralSettingsPopup({ onClose }) {
             className="w-full p-2 border rounded"
           >
             {/* Zaman dilimi seçenekleri */}
-            <option value="GMT+0">GMT+0</option>
-            <option value="GMT+1">GMT+1</option>
+            <option value="Pacific/Honolulu">Pacific/Honolulu (HST)</option>
+            <option value="America/Anchorage">America/Anchorage (AKST)</option>
+            <option value="America/Los_Angeles">
+              America/Los Angeles (PST)
+            </option>
+            <option value="America/Denver">America/Denver (MST)</option>
+            <option value="America/Chicago">America/Chicago (CST)</option>
+            <option value="America/New_York">America/New York (EST)</option>
+            <option value="Europe/London">Europe/London (GMT+0)</option>
+            <option value="Europe/Paris">Europe/Paris (CET)</option>
+            <option value="Europe/Berlin">Europe/Berlin (CET)</option>
+            <option value="Europe/Istanbul">Europe/Istanbul (TRT)</option>
+            <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+            <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+            <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
           </select>
         </div>
 

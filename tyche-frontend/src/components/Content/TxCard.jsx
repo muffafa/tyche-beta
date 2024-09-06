@@ -9,7 +9,6 @@ const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
 function TxCard({ tx, currentAddress }) {
   const settings = useSelector((state) => state.settings);
 
-  console.log(tx.attributes.mined_at);
   const formattedTime = convertTimestampToTimezone(
     tx.attributes.mined_at,
     settings.timezone
@@ -90,6 +89,7 @@ TxCard.propTypes = {
       hash: PropTypes.string.isRequired,
       sent_from: PropTypes.string.isRequired,
       sent_to: PropTypes.string.isRequired,
+      mined_at: PropTypes.string.isRequired,
       transfers: PropTypes.arrayOf(
         PropTypes.shape({
           fungible_info: PropTypes.shape({

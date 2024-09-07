@@ -4,6 +4,8 @@ const networkMappings = {
   ethereum: "eth",
   "bnb smart chain": "bsc",
   avalanche: "avaxc",
+  base: "base",
+  bitcoin: "btc",
   // Add other networks as needed
 };
 

@@ -11,7 +11,6 @@ const apiClient = axios.create({
   },
 });
 
-
 // Function to get address information
 export const getAddressInfo = async (network, address) => {
   const chainShortName = getNetworkShortName(network);
@@ -93,9 +92,13 @@ export const getAddressTransactions = async (network, address) => {
   }
 };
 
-
-
-export const getAddressTransactions2 = async (network, address, currency, filterTrash, fungible) => {
+export const getAddressTransactions2 = async (
+  network,
+  address,
+  currency,
+  filterTrash,
+  fungible
+) => {
   if (network === "bnb smart chain") {
     network = "binance-smart-chain";
   }
@@ -103,25 +106,29 @@ export const getAddressTransactions2 = async (network, address, currency, filter
   // if (filterTrash == null) { return filterTrash = "no_filter"; }
   // if (currency == null) { return currency = "usd"; }
   const options = {
-    method: 'GET',
-    url: `https://api.zerion.io/v1/wallets/${address}/transactions/`,
-    params: { currency: currency, 'page[size]': '100', 'filter[trash]': filterTrash, 'filter[chain_ids]': network, 'filter[asset_types]': fungible, },
+    method: "GET",
+    url: `/api/v1/wallets/${address}/transactions/`,
+    params: {
+      currency: currency,
+      "page[size]": "100",
+      "filter[trash]": filterTrash,
+      "filter[chain_ids]": network,
+      "filter[asset_types]": fungible,
+    },
     headers: {
-      accept: 'application/json',
-      authorization: `Basic ${ZERION_API_KEY}`
-    }
+      accept: "application/json",
+      authorization: `Basic ${ZERION_API_KEY}`,
+    },
   };
 
   try {
     const response = await axios.request(options);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error fetching address transactions:", error);
     throw error;
   }
-
-}
+};
 
 // Function to get address token transactions
 export const getAddressTokenTransactions = async (network, address) => {

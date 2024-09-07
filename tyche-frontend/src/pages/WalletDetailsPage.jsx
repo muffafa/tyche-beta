@@ -18,6 +18,10 @@ import {
   processNativeTokenData,
   concatNativeTokenWithTokenData,
 } from "../utils/nativeToken";
+import tyche_abi from "../utils/TychePremiumContractABI";
+import { ethers } from "ethers";
+import { useWeb3ModalAccount } from '@web3modal/ethers/react'
+import { useWeb3ModalProvider } from '@web3modal/ethers/react'
 
 function WalletDetailsPage() {
   const { network, address } = useParams();
@@ -27,8 +31,12 @@ function WalletDetailsPage() {
   const [nfts, setNfts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const { isConnected } = useWeb3ModalAccount()
 
   const settings = useSelector((state) => state.settings);
+
+  const { walletProvider } = useWeb3ModalProvider()
 
   // Check if the network is supported
   const supportedNetworks = getSupportedNetworks();
@@ -53,7 +61,7 @@ function WalletDetailsPage() {
           getAddressTokens(network, address),
           getAddressNFTs(network, address),
         ]);
-        setTransactions(txData.data? txData.data : []);
+        setTransactions(txData.data ? txData.data : []);
         const addressInfo = await getAddressInfo(network, address);
         const procedNativeTokenData = await processNativeTokenData(
           addressInfo.data[0],
@@ -62,6 +70,23 @@ function WalletDetailsPage() {
         concatNativeTokenWithTokenData(procedNativeTokenData, tokenData);
         setTokens(tokenData.data?.[0]?.tokenList || []);
         setNfts(nftData.data?.[0]?.tokenList || []);
+        console.log("isConnected:", isConnected);
+        if (isConnected && walletProvider) {
+          try {
+            const signer = await walletProvider.getSigner(); // Use the wallet provider to get the signer
+            const contractAddress = "0x915A0e3211C45Fc0BDF32A4c3a121ddCb0D77583";
+            const contract = new ethers.Contract(contractAddress, tyche_abi, signer);
+            
+            const premiumTime = await contract.checkMembershipStatus(address);
+            console.log("Premium Time:", premiumTime);
+            if (premiumTime > 0) {
+              setIsPremium(true);
+            }
+          } catch (error) {
+            console.error("Error fetching blockchain data:", error);
+          }
+        }
+
       } catch (error) {
         console.error("Error fetching blockchain data:", error);
         setError("Failed to fetch blockchain data");
@@ -71,7 +96,7 @@ function WalletDetailsPage() {
     }
 
     fetchData();
-  }, [network, address, dispatch, isNetworkSupported]);
+  }, [network, address, dispatch, isNetworkSupported, isPremium, isConnected]);
 
   // Render 404 page if network is not supported
   if (!isNetworkSupported) {
@@ -102,6 +127,7 @@ function WalletDetailsPage() {
                 <h2 className="text-xl font-bold">Account Details</h2>
                 <p>Current Currency: {settings.currency}</p>
                 <p>Current Timezone: {settings.timezone}</p>
+                <p>Is Premium: {isPremium ? "Yes" : "No"}</p>
               </div>
               <Portfolio tokens={tokens} nfts={nfts} network={network} />
               <DAppList network={network} />

@@ -3,9 +3,11 @@ import { useSelector } from "react-redux"; // For accessing Redux state
 import { useNavigate } from "react-router-dom";
 import NetworkSelect from "./NetworkSelect";
 import SearchBar from "./SearchBar";
-import WalletConnect from "./WalletConnect";
 import GeneralSettingsPopup from "../Popups/GeneralSettingsPopup";
 import usePopupState from "../../hooks/usePopupState";
+import tyche_abi from "../../utils/TychePremiumContractABI";
+import { ethers } from "ethers";
+import { useWeb3ModalProvider } from '@web3modal/ethers/react'
 
 function Header() {
   const navigate = useNavigate();
@@ -19,6 +21,8 @@ function Header() {
   const [lastSearchedAddress, setLastSearchedAddress] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState("Ethereum");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { walletProvider } = useWeb3ModalProvider()
 
   const {
     isOpen: isSettingsOpen,
@@ -56,6 +60,25 @@ function Header() {
   const handleLogoClick = () => {
     navigate("/");
   };
+  const handleButtonClick = async () => {
+    try {
+      const wProvider = new ethers.BrowserProvider(walletProvider);
+      const contractAddress = "0x915A0e3211C45Fc0BDF32A4c3a121ddCb0D77583";
+      const signer = await wProvider.getSigner();
+      const contract = new ethers.Contract(contractAddress, tyche_abi, signer);
+
+      const premiumFee = await contract.premiumFee();
+
+      const tx = await contract.buyPremium({ value: String(premiumFee) });
+
+      await tx.wait();
+      alert("Premium membership purchased successfully!");
+    } catch (error) {
+      alert("Error purchasing premium membership:", error);
+    }
+
+  };
+
 
   return (
     <header className="flex flex-wrap items-center justify-between p-4 bg-tycheWhite shadow">
@@ -81,7 +104,13 @@ function Header() {
             selectedNetwork={selectedNetwork}
             onSelectNetwork={handleNetworkSelect}
           />
-          <WalletConnect />
+          <button
+            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg shadow-lg hover:from-green-500 hover:to-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
+            onClick={handleButtonClick}
+          >
+            Go Premium Member
+          </button>
+          <w3m-button />
         </div>
         <button
           className="sm:hidden px-2 py-1 bg-tycheGray text-white rounded"
@@ -103,7 +132,13 @@ function Header() {
             selectedNetwork={selectedNetwork}
             onSelectNetwork={handleNetworkSelect}
           />
-          <WalletConnect />
+          <button
+            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg shadow-lg hover:from-green-500 hover:to-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
+            onClick={handleButtonClick}
+          >
+            Go Premium Member
+          </button>
+          <w3m-button />
         </div>
       )}
 

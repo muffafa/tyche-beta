@@ -4,13 +4,12 @@ import { convertTimestampToTimezone } from "../../utils/convertTimestampToTimezo
 import { useSelector } from "react-redux";
 
 const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
-//const USD_TO_TRY = 32.81; // Replace with the current USD/TRY rate
 
 function TxCard({ tx, currentAddress }) {
   const settings = useSelector((state) => state.settings);
 
   const formattedTime = convertTimestampToTimezone(
-    tx.attributes.mined_at,
+    tx.transactionTime,
     settings.timezone
   );
 
@@ -19,9 +18,14 @@ function TxCard({ tx, currentAddress }) {
   }
 
   let symbol = tx.attributes.transfers?.[0]?.fungible_info?.symbol;
-  //let icon = tx.attributes.transfers?.[0]?.fungible_info?.icon;
   let value = tx.attributes.transfers?.[0]?.value;
-  let amount = tx.attributes.transfers?.[0]?.quantity.float;
+  let amount = tx.attributes.transfers?.[0]?.quantity?.float;
+
+  // Ensure icon is a string or provide a fallback value
+  let icon = tx.attributes.transfers?.[0]?.fungible_info?.icon;
+  if (typeof icon !== "string") {
+    icon = "default-icon-url"; // Fallback to a default icon URL if icon is not a string
+  }
 
   if (symbol === undefined || symbol === null) {
     symbol = "ETH";
@@ -84,17 +88,18 @@ function TxCard({ tx, currentAddress }) {
 
 TxCard.propTypes = {
   tx: PropTypes.shape({
-    transactionTime: PropTypes.string.isRequired,
+    txId: PropTypes.string.isRequired, // Ensure txId is passed correctly
+    transactionTime: PropTypes.string, // Updated to allow null or undefined values
     attributes: PropTypes.shape({
       hash: PropTypes.string.isRequired,
       sent_from: PropTypes.string.isRequired,
       sent_to: PropTypes.string.isRequired,
-      mined_at: PropTypes.string.isRequired,
+      mined_at: PropTypes.string,
       transfers: PropTypes.arrayOf(
         PropTypes.shape({
           fungible_info: PropTypes.shape({
             symbol: PropTypes.string,
-            icon: PropTypes.string,
+            icon: PropTypes.string, // Ensure icon is of type string
           }),
           quantity: PropTypes.shape({
             float: PropTypes.number,

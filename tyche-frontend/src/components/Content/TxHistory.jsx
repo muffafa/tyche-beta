@@ -12,14 +12,24 @@ function TxHistory({ transactions, currentNetwork, currentAddress }) {
             : "min-h-[578px]"
         }`}
       >
-        {transactions.map((tx, index) => (
-          <TxCard
-            key={index}
-            tx={tx}
-            currentNetwork={currentNetwork}
-            currentAddress={currentAddress}
-          />
-        ))}
+        {transactions.map((tx, index) => {
+          // Ensure txId is present, use fallback if missing
+          const txId = tx.attributes?.hash || `tx-${index}`;
+          const transactionTime = tx.attributes?.mined_at || null;
+
+          return (
+            <TxCard
+              key={txId} // txId is now guaranteed
+              tx={{
+                ...tx,
+                transactionTime,
+                txId, // Pass the transaction ID
+              }}
+              currentNetwork={currentNetwork}
+              currentAddress={currentAddress}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -28,12 +38,12 @@ function TxHistory({ transactions, currentNetwork, currentAddress }) {
 TxHistory.propTypes = {
   transactions: PropTypes.arrayOf(
     PropTypes.shape({
-      transactionTime: PropTypes.string.isRequired,
-      txId: PropTypes.string.isRequired,
-      from: PropTypes.string.isRequired,
-      to: PropTypes.string.isRequired,
-      amount: PropTypes.string.isRequired,
-      symbol: PropTypes.string.isRequired,
+      txId: PropTypes.string.isRequired, // txId must be provided and is required
+      transactionTime: PropTypes.string,
+      from: PropTypes.string,
+      to: PropTypes.string,
+      amount: PropTypes.string,
+      symbol: PropTypes.string,
     })
   ).isRequired,
   currentNetwork: PropTypes.string.isRequired,

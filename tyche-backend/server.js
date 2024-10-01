@@ -1,12 +1,12 @@
+import "dotenv/config"; // Automatically loads environment variables
+// Load environment variables
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import colors from "colors";
 import connectDB from "./config/db.js";
-
-// Load environment variables
-dotenv.config({ path: "./config/config.env" });
+import auth from "./routes/auth.js";
+import wallet from "./routes/wallet.js";
 
 // Connect to database
 connectDB();
@@ -25,6 +25,10 @@ if (process.env.NODE_ENV === "development") {
 app.get("/", (req, res) => {
 	res.send("Welcome to Tyche Backend API");
 });
+
+// Mount routers
+app.use("/api/v1/auth", auth);
+app.use("/api/v1/wallet", wallet);
 
 // Define the port
 const PORT = process.env.PORT || 5000;

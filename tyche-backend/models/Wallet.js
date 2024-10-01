@@ -1,30 +1,53 @@
 import mongoose from "mongoose";
+import encrypt from "mongoose-encryption";
 
-const walletSchema = new mongoose.Schema({
-	userId: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "User",
-		required: true,
-	},
+// Ensure the environment variables are properly loaded
+if (!process.env.WALLET_ENCRYPTION_SECRET) {
+	throw new Error(
+		"WALLET_ENCRYPTION_SECRET is not set in the environment variables"
+	);
+}
+
+if (!process.env.WALLET_SIGNING_KEY) {
+	throw new Error("WALLET_SIGNING_KEY is not set in the environment variables");
+}
+
+const WalletSchema = new mongoose.Schema({
 	address: {
 		type: String,
 		required: [true, "Please add a wallet address"],
-		unique: true,
 	},
 	network: {
 		type: String,
 		required: [true, "Please specify the blockchain network"],
+		enum: ["Ethereum", "Solana", "Binance Smart Chain", "Polygon", "Other"],
+		default: "Ethereum",
 	},
 	nickname: {
 		type: String,
-		required: [true, "Please add a nickname for this wallet"],
+		maxlength: [30, "Nickname can not exceed 30 characters"],
+		trim: true,
 	},
-	createdAt: {
+	user: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User",
+		required: true,
+	},
+	addedAt: {
 		type: Date,
 		default: Date.now,
 	},
 });
 
-const Wallet = mongoose.model("Wallet", walletSchema);
+// Encryption setup
+const encKey = Buffer.from(process.env.WALLET_ENCRYPTION_SECRET, "hex"); // 32 bytes for AES-256
+const sigKey = Buffer.from(process.env.WALLET_SIGNING_KEY, "base64"); // Convert base64 string to Buffer
 
+WalletSchema.plugin(encrypt, {
+	encryptionKey: encKey,
+	signingKey: sigKey,
+	encryptedFields: ["address"],
+});
+
+const Wallet = mongoose.model("Wallet", WalletSchema);
 export default Wallet;

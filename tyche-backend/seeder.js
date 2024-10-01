@@ -1,106 +1,105 @@
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+// seeder.js
+
+import "dotenv/config";
 import colors from "colors";
-import Wallet from "./models/Wallet.js";
-import Transaction from "./models/Transaction.js";
-import User from "./models/User.js"; // Assuming you have a User model
 import connectDB from "./config/db.js";
+import User from "./models/User.js";
+import Wallet from "./models/Wallet.js";
 
-// Load environment variables
-dotenv.config({ path: "./config/config.env" });
-
-// Connect to the database
+// Connect to MongoDB
 connectDB();
 
-// Sample user data
+// Define dummy users data
 const users = [
 	{
-		email: "admin@admin.com",
+		fullname: "Arda Altinors",
+		email: "arda@example.com",
 		password: "password123",
 	},
 	{
-		email: "arda@altinors.com",
+		fullname: "Jane Smith",
+		email: "jane@example.com",
 		password: "password123",
 	},
 ];
 
-// Sample wallet data (we will add userId later)
-let wallets = [
+// Define dummy wallets data
+const wallets = [
 	{
-		address: "0x1234567890abcdef1234567890abcdef12345678",
+		address: "0xARDA01a7D398351b8bE11C439e05C5B3259aec9B",
 		network: "Ethereum",
-		nickname: "Main Wallet",
+		nickname: "arda eth",
+		userEmail: "arda@example.com",
 	},
 	{
-		address: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
-		network: "Ethereum",
-		nickname: "Backup Wallet",
-	},
-];
-
-// Sample transaction data
-let transactions = [
-	{
-		walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-		transactionHash: "0xabcdefabcdefabcdefabcdefabcdefabcdef12345678",
-		network: "Ethereum",
-		amount: 1.5,
-		status: "confirmed",
+		address: "So11111111111111111111111111111111111111112", // Example Solana address
+		network: "Solana",
+		nickname: "John's Solana Wallet",
+		userEmail: "arda@example.com",
 	},
 	{
-		walletAddress: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
-		transactionHash: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdabcd",
+		address: "0xmufaffa5Cc6634C0532925a3b844Bc4544438f44e", // Example Ethereum address
 		network: "Ethereum",
-		amount: 2.2,
-		status: "pending",
+		nickname: "Jane's Ethereum Wallet",
+		userEmail: "jane@example.com",
+	},
+	{
+		address: "Bnb1grpf0955h0ykm4cx3g0tyky0e0kuxn3qwun70a", // Example Binance Smart Chain address
+		network: "Binance Smart Chain",
+		nickname: "Jane's BSC Wallet",
+		userEmail: "jane@example.com",
 	},
 ];
 
-// Insert data into MongoDB
+// Function to import data into the database
 const importData = async () => {
 	try {
+		// Delete existing data
 		await Wallet.deleteMany();
-		await Transaction.deleteMany();
-		await User.deleteMany(); // Clear users
+		await User.deleteMany();
 
-		const createdUsers = await User.insertMany(users); // Insert users
-		const user1 = createdUsers[0]._id; // Get user ID from the created users
-		const user2 = createdUsers[1]._id;
+		console.log("Existing data deleted.".red.inverse);
 
-		// Assign user IDs to wallets
-		wallets = wallets.map((wallet, index) => {
-			return { ...wallet, userId: index % 2 === 0 ? user1 : user2 };
-		});
+		// Create users
+		const createdUsers = await User.create(users);
+		console.log("Dummy users created.".green.inverse);
 
-		await Wallet.insertMany(wallets);
-		await Transaction.insertMany(transactions);
+		// Create wallets and associate them with users
+		for (const walletData of wallets) {
+			// Find the user by email
+			const user = createdUsers.find(
+				(user) => user.email === walletData.userEmail
+			);
+			if (!user) {
+				console.error(`User with email ${walletData.userEmail} not found`.red);
+				continue; // Skip if user not found
+			}
 
-		console.log("Data Imported!".green.inverse);
+			// Create wallet
+			const wallet = await Wallet.create({
+				address: walletData.address,
+				network: walletData.network,
+				nickname: walletData.nickname,
+				user: user._id,
+			});
+
+			// Add wallet to user's wallets array
+			user.wallets.push(wallet._id);
+		}
+
+		// Save all users after adding wallets
+		await Promise.all(createdUsers.map((user) => user.save()));
+
+		console.log(
+			"Dummy wallets created and associated with users.".green.inverse
+		);
+
 		process.exit();
-	} catch (error) {
-		console.error(`${error}`.red.inverse);
+	} catch (err) {
+		console.error(`${err}`.red);
 		process.exit(1);
 	}
 };
 
-// Delete data from MongoDB
-const deleteData = async () => {
-	try {
-		await Wallet.deleteMany();
-		await Transaction.deleteMany();
-		await User.deleteMany(); // Clear users
-
-		console.log("Data Deleted!".red.inverse);
-		process.exit();
-	} catch (error) {
-		console.error(`${error}`.red.inverse);
-		process.exit(1);
-	}
-};
-
-// Check command-line arguments
-if (process.argv[2] === "-i") {
-	importData();
-} else if (process.argv[2] === "-d") {
-	deleteData();
-}
+// Execute the importData function
+importData();

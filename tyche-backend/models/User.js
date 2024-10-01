@@ -1,3 +1,5 @@
+// tyche-backend/models/User.js
+
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -25,6 +27,12 @@ const UserSchema = new mongoose.Schema({
 		minlength: 6,
 		select: false,
 	},
+	wallets: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Wallet",
+		},
+	],
 	resetPasswordToken: String,
 	resetPasswordExpire: Date,
 	createdAt: {
@@ -39,7 +47,7 @@ UserSchema.pre("save", async function (next) {
 		next();
 	}
 
-	const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_SALT));
+	const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_SALT, 10));
 	this.password = await bcrypt.hash(this.password, salt);
 	next();
 });

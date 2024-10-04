@@ -1,7 +1,7 @@
 function LandingPage() {
   return (
     <div className="landing-page-container p-6 text-center">
-      <h1 className="text-4xl font-bold text-tycheBlue mb-4">
+      <h1 className="text-4xl font-bold text-tycheGreen mb-4">
         Welcome to Tyche
       </h1>
       <p className="text-lg text-tycheGray">

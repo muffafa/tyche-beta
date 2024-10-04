@@ -13,40 +13,45 @@ import tycheLogo from "../../assets/images/tyche.svg"; // logoyu svg olarak ald�
 
 
 //current routeninin adresine göre burası değişecek
-function Header(){
+function Header() {
   const navigate = useNavigate();
   let currentRoute = window.location.pathname;
   console.log(currentRoute);
   return (
     <>
-      { currentRoute === "/login" || currentRoute === "/register" || currentRoute === "/username" || currentRoute === "/resetPassword" ?
+      {currentRoute === "/" ||
+      currentRoute === "/login" ||
+      currentRoute === "/register" ||
+      currentRoute === "/username" ||
+      currentRoute === "/resetPassword" ? (
         <header className="flex items-center justify-center">
-        <div className="flex flex-row bg-tycheBeige w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
-          <div className="flex flex-row items-center pr-[27px] w-full justify-between">
-            <div className="flex flex-row items-center">
-              <img src={tycheLogo} alt="Tyche Logo" />
-              <div className="flex flex-col ml-[52px]">
-                <h1 className="text-tycheGreen text-[48px] font-[850] tracking-wide">
-                  TYCHE
-                </h1>
-                <p className="text-tycheGreen text-[24px] font-[310] tracking-wide">
-                  TRACK YOUR ASSETS
-                </p>
+          <div className="flex flex-row bg-tycheBeige w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
+            <div className="flex flex-row items-center pr-[27px] w-full justify-between">
+              <div className="flex flex-row items-center">
+                <img src={tycheLogo} alt="Tyche Logo" />
+                <div className="flex flex-col ml-[52px]">
+                  <h1 className="text-tycheGreen text-[48px] font-[850] tracking-wide">
+                    TYCHE
+                  </h1>
+                  <p className="text-tycheGreen text-[24px] font-[310] tracking-wide">
+                    TRACK YOUR ASSETS
+                  </p>
+                </div>
               </div>
+              {currentRoute === "/" && (
+                <button
+                  className="flex items-center justify-center bg-tycheGreen text-white text-[24px] font-[300] w-[142px] h-[54px] tracking-wide rounded-[60px]"
+                  onClick={() => navigate("/login")}
+                >
+                  Login
+                </button>
+              )}
             </div>
-            {currentRoute === "/" && (
-              <button className="flex items-center justify-center bg-tycheGreen text-white text-[24px] font-[300] w-[142px] h-[54px] tracking-wide rounded-[60px]" onClick={() => navigate("/login")}>
-                Login
-              </button>
-            )}
           </div>
-        </div>
-      </header>
-      :
-      <header className="flex items-center justify-center">
-        
-      </header>
-      }
+        </header>
+      ) : (
+        <header className="flex items-center justify-center"></header>
+      )}
     </>
   );
 }

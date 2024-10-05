@@ -10,6 +10,9 @@
 // import { useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { useNavigate } from "react-router-dom";
 import tycheLogo from "../../assets/images/tyche.svg"; // logoyu svg olarak aldım png çözünürlüğü düşük
+import greenEth from "../../assets/images/coin/eth.svg"; 
+import settingsIcon from "../../assets/images/icons/settingsIcon.svg";
+import searchIcon from "../../assets/images/icons/searchIcon.svg";
 
 
 //current routeninin adresine göre burası değişecek
@@ -17,6 +20,7 @@ function Header() {
   const navigate = useNavigate();
   let currentRoute = window.location.pathname;
   console.log(currentRoute);
+  let searchValue = "";
   return (
     <>
       {currentRoute === "/" ||
@@ -50,7 +54,46 @@ function Header() {
           </div>
         </header>
       ) : (
-        <header className="flex items-center justify-center"></header>
+        <header className="flex items-center justify-between mt-[71px] max-w-[915px] w-full mx-auto gap-[20px]">
+          {/* Logo */}
+          <img src={tycheLogo} alt="Tyche Logo" className="min-w-[84px] min-h-[71px]" />
+
+          <div className="flex items-center w-full relative">
+            {/* Dropdown */}
+            <div className="flex items-center h-[54px] rounded-full bg-tycheGreen p-[10px] absolute z-10">
+              <img src={greenEth} alt="Ethereum" className="border-[4px] border-tycheWhite rounded-full" />
+              <select className="flex items-center bg-tycheGreen text-white text-[20px] px-4 py-1 h-[54px] rounded-r-full">
+                <option value="Ethereum">Ethereum</option>
+              </select>
+            </div>
+            {/* Search Field */}
+            <input
+              type="text"
+              onChange={(e) => searchValue = e.target.value}
+              placeholder="Wallet address or tx hash"
+              className="bg-tycheBeige w-full text-tycheGray placeholder-gray-500 placeholder-[20px] px-4 py-1 h-[54px] rounded-full relative z-0 pl-[210px]"
+            />
+            <button
+              className="flex items-center justify-center h-full  bg-tycheGreen font-[300] text-white text-[20px] min-w-[80px] px-[24px] py-[14px] tracking-wide rounded-r-[60px] absolute right-0"
+              onClick={() => navigate("/transaction/" + searchValue)}
+            >
+              <img src={searchIcon} alt="Search" className="flex" />
+            </button>
+          </div>
+
+          {/* Settings Icon */}
+          <button>
+            <img src={settingsIcon} alt="Settings" className="flex min-w-[44px] min-h-[44px]" />
+          </button>
+
+          {/* Login Button */}
+          <button
+            className="flex items-center justify-center bg-tycheGreen font-[300] text-white text-[20px] px-[24px] py-[14px] tracking-wide rounded-[60px]"
+            onClick={() => navigate("/login")}
+          >
+            <p>Login</p>
+          </button>
+        </header>
       )}
     </>
   );

@@ -57,9 +57,9 @@ createWeb3Modal({
 
 function App() {
   return (
-    <div className="app-container bg-tycheWhite min-h-screen flex flex-col">
+    <div className="app-container bg-tycheWhite min-h-screen flex-grow w-full flex flex-col">
       <Header />
-      <main className="flex-grow">
+      <main className="">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchPage />} />

@@ -1,5 +1,3 @@
-// import { useState, useEffect } from "react";
-// import { useSelector } from "react-redux"; // For accessing Redux state
 // import { useNavigate } from "react-router-dom";
 // import NetworkSelect from "./NetworkSelect";
 // import SearchBar from "./SearchBar";
@@ -10,20 +8,25 @@
 // import { useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { useNavigate } from "react-router-dom";
 import tycheLogo from "../../assets/images/tyche.svg"; // logoyu svg olarak aldım png çözünürlüğü düşük
-import greenEth from "../../assets/images/coin/eth.svg"; 
 import settingsIcon from "../../assets/images/icons/settingsIcon.svg";
-import searchIcon from "../../assets/images/icons/searchIcon.svg";
-
+import SearchBar from "./SearchBar";
 
 //current routeninin adresine göre burası değişecek
 function Header() {
+  //const [lastSearchedAddress, setLastSearchedAddress] = useState("");
+
+  // const handleSearch = (address) => {
+  //   setLastSearchedAddress(address);
+  //   navigate(`/${selectedNetwork.toLowerCase()}/${address}`);
+  // };
+
   const navigate = useNavigate();
   let currentRoute = window.location.pathname;
   console.log(currentRoute);
-  let searchValue = "";
   return (
     <>
-      {currentRoute === "/" ||
+      {currentRoute === "/search" ? (<> </>) :
+      currentRoute === "/" ||
       currentRoute === "/login" ||
       currentRoute === "/register" ||
       currentRoute === "/username" ||
@@ -64,41 +67,8 @@ function Header() {
             />
           </button>
 
-          <div className="flex items-center w-full relative">
-            {/* Dropdown */}
-            <div className="flex items-center h-[54px] rounded-full bg-tycheGreen p-[10px] absolute z-10">
-              <img
-                src={greenEth}
-                alt="Ethereum"
-                className="border-[4px] border-tycheWhite rounded-full"
-              />
-              <select className="flex items-center bg-tycheGreen text-white text-[20px] px-4 py-1 h-[54px] rounded-r-full">
-                <option value="Ethereum">Ethereum</option>
-              </select>
-            </div>
-            {/* Search Field */}
-            <div className="flex items-center w-full">
-              <input
-                type="text"
-                onChange={(e) => (searchValue = e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    navigate("/transaction/" + searchValue);
-                  }
-                }}
-                placeholder="Wallet address or tx hash"
-                className="bg-tycheBeige w-full text-tycheGray placeholder-gray-500 placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[210px]"
-              />
-              <button
-                className="flex items-center justify-center h-full  bg-tycheGreen font-[300] text-white text-[20px] min-w-[80px] px-[24px] py-[14px] tracking-wide rounded-r-[60px] right-0"
-                onClick={() => navigate("/transaction/" + searchValue)}
-              >
-                <img src={searchIcon} alt="Search" className="flex" />
-              </button>
-            </div>
-          </div>
-
-          {/* Search Button */}
+          {/* Search Bar */}
+          <SearchBar />
 
           {/* Settings Icon */}
           <button>
@@ -125,7 +95,7 @@ function Header() {
 
 
 
-// function Header() {
+// function OLDHeader() {
 //   const navigate = useNavigate();
 
 //   // Access the selectedNetwork and walletAddress from Redux (but don't dispatch changes)

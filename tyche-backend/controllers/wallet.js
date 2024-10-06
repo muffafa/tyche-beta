@@ -172,8 +172,6 @@ export const deleteWallet = asyncHandler(async (req, res, next) => {
 ////
 // Web3 actions
 ////
-
-// controllers/wallet.js
 import createNetwork from "../web3/index.js";
 import { getCurrentPrices } from "../web3/utils/price.js";
 import networkConfig from "../web3/networks/networkConfig.js";
@@ -275,6 +273,69 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 				walletAddress,
 				network,
 				tokens,
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
+});
+
+/**
+ * @desc    Get wallet transactions
+ * @route   GET /api/v1/wallet/transactions
+ * @access  Public
+ */
+export const getWalletTransactions = asyncHandler(async (req, res, next) => {
+	const { walletAddress, network } = req.query;
+
+	if (!walletAddress || !network) {
+		return next(
+			new ErrorResponse(
+				"walletAddress and network are required parameters.",
+				400
+			)
+		);
+	}
+
+	const networkLower = network.toLowerCase();
+	const config = networkConfig[networkLower];
+
+	if (!config) {
+		return next(
+			new ErrorResponse(`Network "${network}" is not supported.`, 400)
+		);
+	}
+
+	try {
+		const networkService = createNetwork(networkLower);
+
+		// Fetch first and last transactions
+		const transactions = await networkService.getAllTransactions(walletAddress);
+		const firstTransaction = await networkService.getFirstTransaction(
+			walletAddress
+		);
+		const lastTransaction = await networkService.getLastTransaction(
+			walletAddress
+		);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				walletAddress,
+				network: networkLower,
+				firstTransaction: firstTransaction
+					? {
+							transactionId: firstTransaction.transactionId,
+							date: firstTransaction.date,
+					  }
+					: null,
+				lastTransaction: lastTransaction
+					? {
+							transactionId: lastTransaction.transactionId,
+							date: lastTransaction.date,
+					  }
+					: null,
+				transactions: transactions,
 			},
 		});
 	} catch (error) {

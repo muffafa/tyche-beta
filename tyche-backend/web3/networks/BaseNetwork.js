@@ -14,7 +14,9 @@ class BaseNetwork {
 		throw new Error("Method 'getWalletTokenAccounts()' must be implemented.");
 	}
 
-	// Add other common methods if necessary
+	async getWalletTransactions(walletAddress) {
+		throw new Error("Method 'getWalletTransactions()' must be implemented.");
+	}
 }
 
 export default BaseNetwork;

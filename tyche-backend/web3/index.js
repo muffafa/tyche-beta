@@ -1,4 +1,3 @@
-// web3/index.js
 import SolanaNetwork from "./networks/solana.js";
 
 const networks = {

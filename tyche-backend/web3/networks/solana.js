@@ -1,4 +1,3 @@
-// web3/networks/solana.js
 import BaseNetwork from "./BaseNetwork.js";
 import createAxiosInstance from "../utils/axiosInstance.js";
 
@@ -192,41 +191,76 @@ class SolanaNetwork extends BaseNetwork {
 
 			const tx = response.data.result;
 
-			console.log(`Transaction details for ${txid}:`, tx);
-
 			if (!tx) {
+				console.log(`No transaction details found for ${txid}`);
 				return null;
 			}
 
-			// Extract relevant details
+			// Extract block time and fees
 			const date = tx.blockTime ? new Date(tx.blockTime * 1000) : null;
 			const feeLamports = tx.meta?.fee || 0;
-			const feeSOL = feeLamports / 1e9;
+			const feeSOL = feeLamports / 1e9; // Convert lamports to SOL
 
-			// Assuming there is at least one instruction
-			const instructions = tx.transaction.message.instructions;
+			// Initialize variables to store transfer information
 			let from = null;
 			let to = null;
 			let asset = null;
 			let amount = null;
 
+			// Instructions array from the transaction
+			const instructions = tx.transaction.message.instructions;
+			const accountKeys = tx.transaction.message.accountKeys;
+
 			console.log("Instructions:", instructions);
 
-			if (instructions && instructions.length > 0) {
-				const instruction = instructions[0];
-				from = instruction.accounts ? instruction.accounts[0] : null;
-				to = instruction.accounts ? instruction.accounts[1] : null;
-				asset = "SOL";
-				amount =
-					tx.transaction.message.instructions.reduce((acc, curr) => {
-						// Example: Sum of lamports transferred
-						if (curr.parsed && curr.parsed.type === "transfer") {
-							return acc + (curr.parsed.info.lamports || 0);
-						}
-						return acc;
-					}, 0) / 1e9; // Convert lamports to SOL
+			// Loop through the instructions to find the transfer instruction
+			for (const instruction of instructions) {
+				const programId = accountKeys[instruction.programIdIndex]; // Program ID
+
+				// Handle native SOL transfers (System Program ID)
+				if (programId === "11111111111111111111111111111111") {
+					// Assuming accounts[0] is the sender and accounts[1] is the receiver
+					from = accountKeys[instruction.accounts[0]];
+					to = accountKeys[instruction.accounts[1]];
+					asset = "SOL";
+
+					// Decode amount of SOL transferred from instruction's data (in lamports)
+					if (instruction.data) {
+						const lamports = parseInt(instruction.data, 16); // Hex to integer (lamports)
+						amount = lamports / 1e9; // Convert lamports to SOL
+					}
+
+					console.log(
+						`SOL Transfer - From: ${from}, To: ${to}, Amount: ${amount} SOL`
+					);
+					break; // Assuming one transfer per transaction; otherwise, remove this.
+				}
+
+				// Handle SPL token transfers (Token Program ID)
+				if (programId === "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") {
+					const fromAccount = accountKeys[instruction.accounts[0]]; // Sender
+					const toAccount = accountKeys[instruction.accounts[1]]; // Receiver
+					const tokenMint = accountKeys[instruction.accounts[2]]; // Token mint address (SPL Token)
+
+					from = fromAccount;
+					to = toAccount;
+					asset = tokenMint;
+
+					// Parse SPL token amount from parsed instruction data
+					if (instruction.parsed && instruction.parsed.info) {
+						const parsedInstruction = instruction.parsed.info;
+						amount = parsedInstruction.tokenAmount.uiAmount; // Already adjusted for decimals
+					}
+
+					console.log(
+						`SPL Token Transfer - From: ${from}, To: ${to}, Asset (Mint): ${asset}, Amount: ${amount}`
+					);
+					break;
+					// Transaction basina 1 transfer varsa
+				}
 			}
 
+			// Return the structured data
 			return {
 				transactionId: txid,
 				date,
@@ -238,7 +272,6 @@ class SolanaNetwork extends BaseNetwork {
 				to,
 				asset,
 				amount,
-				// Additional details can be added here
 			};
 		} catch (error) {
 			console.error("Error fetching Solana transaction details:", error);

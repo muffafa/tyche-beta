@@ -7,6 +7,7 @@ import colors from "colors";
 import connectDB from "./config/db.js";
 import auth from "./routes/auth.js";
 import wallet from "./routes/wallet.js";
+import transactions from "./routes/transactions.js";
 
 // Connect to database
 connectDB();
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 // Mount routers
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/wallet", wallet);
+app.use("/api/v1/transactions", transactions);
 
 // Define the port
 const PORT = process.env.PORT || 5000;

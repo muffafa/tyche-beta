@@ -168,6 +168,83 @@ class SolanaNetwork extends BaseNetwork {
 			throw error;
 		}
 	}
+
+	/**
+	 * Fetches detailed transaction information by transaction ID.
+	 * @param {string} txid - The transaction ID.
+	 * @returns {Object} - Detailed transaction information.
+	 */
+	async getTransactionDetails(txid) {
+		try {
+			const response = await this.axios.post("", {
+				jsonrpc: "2.0",
+				id: 1,
+				method: "getTransaction",
+				params: [
+					txid,
+					{
+						encoding: "json",
+						commitment: "finalized",
+						maxSupportedTransactionVersion: 0,
+					},
+				],
+			});
+
+			const tx = response.data.result;
+
+			console.log(`Transaction details for ${txid}:`, tx);
+
+			if (!tx) {
+				return null;
+			}
+
+			// Extract relevant details
+			const date = tx.blockTime ? new Date(tx.blockTime * 1000) : null;
+			const feeLamports = tx.meta?.fee || 0;
+			const feeSOL = feeLamports / 1e9;
+
+			// Assuming there is at least one instruction
+			const instructions = tx.transaction.message.instructions;
+			let from = null;
+			let to = null;
+			let asset = null;
+			let amount = null;
+
+			console.log("Instructions:", instructions);
+
+			if (instructions && instructions.length > 0) {
+				const instruction = instructions[0];
+				from = instruction.accounts ? instruction.accounts[0] : null;
+				to = instruction.accounts ? instruction.accounts[1] : null;
+				asset = "SOL";
+				amount =
+					tx.transaction.message.instructions.reduce((acc, curr) => {
+						// Example: Sum of lamports transferred
+						if (curr.parsed && curr.parsed.type === "transfer") {
+							return acc + (curr.parsed.info.lamports || 0);
+						}
+						return acc;
+					}, 0) / 1e9; // Convert lamports to SOL
+			}
+
+			return {
+				transactionId: txid,
+				date,
+				gasFee: {
+					lamports: feeLamports,
+					sol: feeSOL,
+				},
+				from,
+				to,
+				asset,
+				amount,
+				// Additional details can be added here
+			};
+		} catch (error) {
+			console.error("Error fetching Solana transaction details:", error);
+			throw error;
+		}
+	}
 }
 
 export default SolanaNetwork;

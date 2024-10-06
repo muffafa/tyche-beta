@@ -175,11 +175,11 @@ export const deleteWallet = asyncHandler(async (req, res, next) => {
 
 // controllers/wallet.js
 import createNetwork from "../web3/index.js";
-import { getCurrentPriceUSD } from "../web3/utils/price.js";
+import { getCurrentPrices } from "../web3/utils/price.js";
 import networkConfig from "../web3/networks/networkConfig.js";
 
 /**
- * @desc    Get wallet balance with USD equivalent
+ * @desc    Get wallet balance with USD, EUR, and TRY equivalents
  * @route   GET /api/v1/wallet/balance
  * @access  Public
  */
@@ -208,11 +208,17 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 		const networkService = createNetwork(networkLower);
 		const balance = await networkService.getWalletBalance(walletAddress);
 
-		// Fetch the current price in USD
-		const currentPriceUSD = await getCurrentPriceUSD(config.coinGeckoId);
+		// Fetch the current prices in USD, EUR, and TRY
+		const currentPrices = await getCurrentPrices(config.coinGeckoId, [
+			"usd",
+			"eur",
+			"try",
+		]);
 
-		// Calculate USD equivalent
-		const balanceUSD = balance * currentPriceUSD;
+		// Calculate USD, EUR, and TRY equivalents
+		const balanceUSD = balance * currentPrices.usd;
+		const balanceEUR = balance * currentPrices.eur;
+		const balanceTRY = balance * currentPrices.try;
 
 		res.status(200).json({
 			success: true,
@@ -223,9 +229,19 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 					amount: balance,
 					symbol: config.symbol,
 				},
-				usdEquivalent: {
-					amount: balanceUSD,
-					currency: "USD",
+				equivalents: {
+					USD: {
+						amount: balanceUSD,
+						currency: "USD",
+					},
+					EUR: {
+						amount: balanceEUR,
+						currency: "EUR",
+					},
+					TRY: {
+						amount: balanceTRY,
+						currency: "TRY",
+					},
 				},
 			},
 		});

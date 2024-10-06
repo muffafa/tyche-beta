@@ -1,30 +1,46 @@
+// web3/utils/price.js
 import Axios from "axios";
+import dotenv from "dotenv";
 
 /**
- * Fetches the current price of a given cryptocurrency in USD using CoinGecko API.
+ * Fetches the current prices of a given cryptocurrency in specified fiat currencies using CoinGecko API.
  * @param {string} coinId - The CoinGecko ID of the cryptocurrency (e.g., 'solana').
- * @returns {number} - The current price in USD.
+ * @param {Array<string>} vsCurrencies - An array of fiat currency codes (e.g., ['usd', 'eur', 'try']).
+ * @returns {Object} - An object containing the current prices in the specified fiat currencies.
  */
-export const getCurrentPriceUSD = async (coinId) => {
+export const getCurrentPrices = async (
+	coinId,
+	vsCurrencies = ["usd", "eur", "try"]
+) => {
 	try {
 		const response = await Axios.get(
 			"https://api.coingecko.com/api/v3/simple/price",
 			{
 				params: {
 					ids: coinId,
-					vs_currencies: "usd",
+					vs_currencies: vsCurrencies.join(","),
 				},
 			}
 		);
 
-		const price = response.data[coinId]?.usd;
-		if (price === undefined) {
-			throw new Error(`Price for ${coinId} not found.`);
+		const prices = response.data[coinId];
+		if (!prices) {
+			throw new Error(`Prices for ${coinId} not found.`);
 		}
 
-		return price;
+		// Validate that all requested currencies are present
+		const missingCurrencies = vsCurrencies.filter(
+			(currency) => prices[currency] === undefined
+		);
+		if (missingCurrencies.length > 0) {
+			throw new Error(
+				`Prices for currencies [${missingCurrencies.join(", ")}] not found.`
+			);
+		}
+
+		return prices;
 	} catch (error) {
-		console.error(`Error fetching price for ${coinId}:`, error.message);
-		throw new Error("Failed to fetch current price.");
+		console.error(`Error fetching prices for ${coinId}:`, error.message);
+		throw new Error("Failed to fetch current prices.");
 	}
 };

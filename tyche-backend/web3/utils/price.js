@@ -1,8 +1,4 @@
 import Axios from "axios";
-import dotenv from "dotenv";
-
-// Load environment variables
-dotenv.config({ path: "../../.env" });
 
 /**
  * Fetches the current price of a given cryptocurrency in USD using CoinGecko API.

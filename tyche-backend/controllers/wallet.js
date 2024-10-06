@@ -168,3 +168,100 @@ export const deleteWallet = asyncHandler(async (req, res, next) => {
 		data: {},
 	});
 });
+
+////
+// Web3 actions
+////
+
+// controllers/wallet.js
+import createNetwork from "../web3/index.js";
+import { getCurrentPriceUSD } from "../web3/utils/price.js";
+import networkConfig from "../web3/networks/networkConfig.js";
+
+/**
+ * @desc    Get wallet balance with USD equivalent
+ * @route   GET /api/v1/wallet/balance
+ * @access  Public
+ */
+export const getWalletBalance = asyncHandler(async (req, res, next) => {
+	const { walletAddress, network } = req.query;
+
+	if (!walletAddress || !network) {
+		return next(
+			new ErrorResponse(
+				"walletAddress and network are required parameters.",
+				400
+			)
+		);
+	}
+
+	const networkLower = network.toLowerCase();
+	const config = networkConfig[networkLower];
+
+	if (!config) {
+		return next(
+			new ErrorResponse(`Network "${network}" is not supported.`, 400)
+		);
+	}
+
+	try {
+		const networkService = createNetwork(networkLower);
+		const balance = await networkService.getWalletBalance(walletAddress);
+
+		// Fetch the current price in USD
+		const currentPriceUSD = await getCurrentPriceUSD(config.coinGeckoId);
+
+		// Calculate USD equivalent
+		const balanceUSD = balance * currentPriceUSD;
+
+		res.status(200).json({
+			success: true,
+			data: {
+				walletAddress,
+				network: networkLower,
+				balance: {
+					amount: balance,
+					symbol: config.symbol,
+				},
+				usdEquivalent: {
+					amount: balanceUSD,
+					currency: "USD",
+				},
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
+});
+
+// @desc    Get wallet token accounts
+// @route   GET /api/v1/wallet/tokens
+// @access  Public
+export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
+	const { walletAddress, network } = req.query;
+
+	if (!walletAddress || !network) {
+		return next(
+			new ErrorResponse(
+				"walletAddress and network are required parameters.",
+				400
+			)
+		);
+	}
+
+	try {
+		const networkService = createNetwork(network);
+		const tokens = await networkService.getWalletTokenAccounts(walletAddress);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				walletAddress,
+				network,
+				tokens,
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
+});

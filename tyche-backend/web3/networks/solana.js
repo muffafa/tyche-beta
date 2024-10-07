@@ -107,6 +107,12 @@ class SolanaNetwork extends BaseNetwork {
 			});
 
 			const transactions = response.data.result;
+
+			// Convert Unix timestamps to JavaScript Date objects, add as 'date' field
+			transactions.forEach((tx) => {
+				tx.date = new Date(tx.blockTime * 1000); // Convert Unix timestamp to JavaScript Date
+			});
+
 			return transactions;
 		} catch (error) {
 			console.error("Error fetching Solana transactions:", error);

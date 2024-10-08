@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import tycheLogo from "../../assets/images/tyche.svg"; // logoyu svg olarak aldım png çözünürlüğü düşük
 import settingsIcon from "../../assets/images/icons/settingsIcon.svg";
 import SearchBar from "./SearchBar";
+import { useState } from "react";
+import SettingsPopup from "../Content/SettingsPopup";
 
 //current routeninin adresine göre burası değişecek
 function Header() {
@@ -23,6 +25,7 @@ function Header() {
   const navigate = useNavigate();
   let currentRoute = window.location.pathname;
   console.log(currentRoute);
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
   return (
     <>
       {currentRoute === "/search" ? (<> </>) :
@@ -71,13 +74,15 @@ function Header() {
           <SearchBar />
 
           {/* Settings Icon */}
-          <button>
+          <button onClick={() => setShowSettingsPopup(true)}>
             <img
               src={settingsIcon}
               alt="Settings"
               className="flex min-w-[44px] min-h-[44px]"
             />
           </button>
+          {showSettingsPopup && <SettingsPopup onClose={() => setShowSettingsPopup(false)} />}
+
 
           {/* Login Button */}
           <button

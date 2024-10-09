@@ -27,9 +27,7 @@ function SearchPage() {
 
         {/* Search Bar */}
         <div className="w-[915px]">
-          <SearchBar
-            onSearch={(searchTerm) => navigate("/transaction/" + searchTerm)}
-          />
+          <SearchBar/>
         </div>
       </div>
     </>

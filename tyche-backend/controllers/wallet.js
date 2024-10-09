@@ -178,7 +178,7 @@ import networkConfig from "../web3/networks/networkConfig.js";
 
 /**
  * @desc    Get wallet balance with USD, EUR, and TRY equivalents
- * @route   GET /api/v1/wallet/balance
+ * @route   GET /api/v1/wallets/balance
  * @access  Public
  */
 export const getWalletBalance = asyncHandler(async (req, res, next) => {
@@ -249,7 +249,7 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get wallet token accounts
-// @route   GET /api/v1/wallet/tokens
+// @route   GET /api/v1/wallets/tokens
 // @access  Public
 export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 	const { walletAddress, network } = req.query;
@@ -282,7 +282,7 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 
 /**
  * @desc    Get wallet transactions
- * @route   GET /api/v1/wallet/transactions
+ * @route   GET /api/v1/wallets/transactions
  * @access  Public
  */
 export const getWalletTransactions = asyncHandler(async (req, res, next) => {

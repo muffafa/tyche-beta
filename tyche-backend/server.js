@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 
 // Mount routers
 app.use("/api/v1/auth", auth);
-app.use("/api/v1/wallet", wallet);
+app.use("/api/v1/wallets", wallet);
 app.use("/api/v1/transactions", transactions);
 
 // Define the port

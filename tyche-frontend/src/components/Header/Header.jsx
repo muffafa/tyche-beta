@@ -32,7 +32,7 @@ function Header() {
       currentRoute === "/" ||
       currentRoute === "/login" ||
       currentRoute === "/register" ||
-      currentRoute === "/username" ||
+      currentRoute === "/register/username" ||
       currentRoute === "/resetPassword" ? (
         <header className="flex items-center justify-center">
           <div className="flex flex-row bg-tycheLightGray w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
@@ -43,7 +43,7 @@ function Header() {
                   <h1 className="text-tychePrimary text-[48px] font-[850] tracking-wide">
                     TYCHE
                   </h1>
-                  <p className="text-tychePrimary text-[24px] font-[310] tracking-wide">
+                  <p className="text-black text-[24px] font-[310] tracking-wide">
                     TRACK YOUR ASSETS
                   </p>
                 </div>

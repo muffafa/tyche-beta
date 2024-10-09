@@ -20,6 +20,7 @@ export default {
         tycheNewSurgeGreen: "#00FFA3",
         tycheNewOceanBlue: "#03E1FF",
         tycheNewPurpleDino: "#DC1FFF",
+        tycheGrayBlack: "#646464",
 
 
         //old colors

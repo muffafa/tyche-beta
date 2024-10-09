@@ -42,7 +42,7 @@ function SearchBar() {
             }
           }}
           placeholder="Wallet address or tx hash"
-          className="bg-tycheLightGray w-full placeholder-[#444444] text-black placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[220px]"
+          className="bg-tycheLightGray w-full placeholder-[#444444] text-black placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[220px] focus:outline-none focus:ring-tychePrimary focus:border-tychePrimary focus:border-[1px]"
         />
         <button
           className="flex items-center justify-center h-full  bg-tychePrimary font-[300] text-white text-[20px] min-w-[80px] px-[24px] py-[14px] tracking-wide rounded-r-[60px] right-0"

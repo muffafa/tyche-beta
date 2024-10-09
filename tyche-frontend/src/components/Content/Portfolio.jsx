@@ -8,97 +8,98 @@ function Portfolio({ tokens, nfts }) {
 
   // Determine the height to apply consistently to both tabs
   const consistentHeightClass =
-    tokens.length > 3 || nfts.length > 3 ? "max-h-[142px]" : "min-h-[142px]";
+    tokens.length > 3 || nfts.length > 3 ? "max-h-[258px]" : "min-h-[258px]";
 
   return (
-    <div className="p-4 bg-tycheBeige shadow rounded col-span-4">
-      <h2 className="text-lg font-semibold mb-4">Portfolio</h2>
-      <div className="flex justify-between mb-4">
-        <button
-          className={`w-1/2 ${
-            activeTab === "tokens"
-              ? "bg-tycheGreen text-white"
-              : "bg-tycheGray text-white"
-          } px-4 py-2 rounded-l`}
-          onClick={() => setActiveTab("tokens")}
-        >
-          Tokens
-        </button>
-        <button
-          className={`w-1/2 ${
-            activeTab === "nfts"
-              ? "bg-tycheGreen text-white"
-              : "bg-tycheGray text-white"
-          } px-4 py-2 rounded-r`}
-          onClick={() => setActiveTab("nfts")}
-        >
-          NFTs
-        </button>
+    <div className="flex flex-col gap-[8px]">
+      <h2 className="text-[24px] text-tychePrimary tracking-wide font-[300]">Portfolio</h2>
+      <div className="bg-tycheLightGray shadow rounded-[20px] col-span-4">
+        <div className="flex justify-between mb-4">
+          <button
+            className={`w-1/2 ${
+              activeTab === "tokens"
+                ? "bg-tychePrimary text-white"
+                : "bg-tycheLightGray text-black"
+            } px-4 py-2 rounded-tl-[20px]`}
+            onClick={() => setActiveTab("tokens")}
+          >
+            Tokens
+          </button>
+          <button
+            className={`w-1/2 ${
+              activeTab === "nfts"
+                ? "bg-tychePrimary text-white"
+                : "bg-tycheLightGray text-black"
+            } px-4 py-2 rounded-tr-[20px]`}
+            onClick={() => setActiveTab("nfts")}
+          >
+            NFTs
+          </button>
+        </div>
+        {activeTab === "tokens" ? (
+          <>
+            <div className="top-0 bg-tycheLightGray">
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Amount</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div className={`overflow-y-scroll ${consistentHeightClass}`}>
+              {tokens.length > 0 ? (
+                <table className="w-full text-left">
+                  <tbody>
+                    {tokens.map((token, index) => (
+                      <tr key={index} className="bg-tycheWhite rounded">
+                        <td className="p-2">
+                          <TokenCard token={token} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center text-tycheGray">No tokens found.</p>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="top-0 bg-tycheBeige">
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Token ID</th>
+                    <th>Contract</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div className={`overflow-y-scroll ${consistentHeightClass}`}>
+              {nfts.length > 0 ? (
+                <table className="w-full text-left">
+                  <tbody>
+                    {nfts.map((nft, index) => (
+                      <tr key={index} className="bg-tycheWhite rounded">
+                        <td className="p-2">
+                          <NftCard nft={nft} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center text-tycheGray">No NFTs found.</p>
+              )}
+            </div>
+          </>
+        )}
       </div>
-
-      {activeTab === "tokens" ? (
-        <>
-          <div className="top-0 bg-tycheBeige">
-            <table className="w-full text-left">
-              <thead>
-                <tr>
-                  <th>Asset</th>
-                  <th>Amount</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-          <div className={`overflow-y-scroll ${consistentHeightClass}`}>
-            {tokens.length > 0 ? (
-              <table className="w-full text-left">
-                <tbody>
-                  {tokens.map((token, index) => (
-                    <tr key={index} className="bg-tycheWhite rounded">
-                      <td className="p-2">
-                        <TokenCard token={token} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-center text-tycheGray">No tokens found.</p>
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="top-0 bg-tycheBeige">
-            <table className="w-full text-left">
-              <thead>
-                <tr>
-                  <th>Asset</th>
-                  <th>Token ID</th>
-                  <th>Contract</th>
-                </tr>
-              </thead>
-            </table>
-          </div>
-          <div className={`overflow-y-scroll ${consistentHeightClass}`}>
-            {nfts.length > 0 ? (
-              <table className="w-full text-left">
-                <tbody>
-                  {nfts.map((nft, index) => (
-                    <tr key={index} className="bg-tycheWhite rounded">
-                      <td className="p-2">
-                        <NftCard nft={nft} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p className="text-center text-tycheGray">No NFTs found.</p>
-            )}
-          </div>
-        </>
-      )}
     </div>
   );
 }

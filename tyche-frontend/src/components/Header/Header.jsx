@@ -26,6 +26,8 @@ function Header() {
   let currentRoute = window.location.pathname;
   console.log(currentRoute);
   const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  //check cookie for login status
+  const loggedIn = document.cookie.includes("loggedIn=true");
   return (
     <>
       {currentRoute === "/search" ? (<> </>) :
@@ -37,7 +39,7 @@ function Header() {
         <header className="flex items-center justify-center">
           <div className="flex flex-row bg-tycheLightGray w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
             <div className="flex flex-row items-center pr-[27px] w-full justify-between">
-              <div className="flex flex-row items-center">
+              <div className="flex flex-row items-center cursor-pointer" onClick={() => navigate("/")}>
                 <img src={tycheLogo} alt="Tyche Logo" width={96} height={96} />
                 <div className="flex flex-col ml-[52px]">
                   <h1 className="text-tychePrimary text-[48px] font-[850] tracking-wide">
@@ -62,12 +64,11 @@ function Header() {
       ) : (
         <header className="flex items-center justify-between mt-[71px] max-w-[915px] w-full mx-auto gap-[20px]">
           {/* Logo */}
-          <button onClick={() => navigate("/")}>
+          <button onClick={() => navigate("/")} className="flex items-center min-w-[52px] min-h-[52px] max-w-[52px] max-h-[52px]">
             <img
               src={tycheLogo}
               alt="Tyche Logo"
-              width={52}
-              height={52}
+              
             />
           </button>
 
@@ -86,12 +87,17 @@ function Header() {
 
 
           {/* Login Button */}
-          <button
+          { loggedIn ? <button>
+            <div className="flex items-center justify-center bg-tycheDarkGray text-black text-[20px] font-[300] w-[52px] h-[52px] p-[14px] rounded-full" onClick={() => { document.cookie = "loggedIn=false"; navigate("/login") }}>
+              <p>A</p>
+            </div>
+          </button>:
+            <button
             className="flex items-center justify-center bg-tychePrimary font-[300] text-white text-[20px] px-[24px] py-[14px] tracking-wide rounded-[60px]"
             onClick={() => navigate("/login")}
           >
             <p>Login</p>
-          </button>
+          </button>}
         </header>
       )}
     </>

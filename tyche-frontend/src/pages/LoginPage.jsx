@@ -2,6 +2,11 @@ import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const navigate = useNavigate();
+
+  const handleLogin = () => {
+    document.cookie = "loggedIn=true;max-age=60*1000"; // Set cookie to expire in 1 minute
+    navigate("/home");
+  }
     return (
       <>
       <div className="flex flex-col items-center justify-center mt-[76px] gap-[15px]">
@@ -42,7 +47,7 @@ function LoginPage() {
             </div>
             <button
               className="flex items-center justify-center bg-tychePrimary font-[300] text-white text-[24px] py-[9px] px-[52px] tracking-wide rounded-[60px] w-full"
-              onClick={() => navigate("/")}
+              onClick={handleLogin}
             >
               Login
             </button>

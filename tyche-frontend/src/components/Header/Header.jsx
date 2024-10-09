@@ -35,22 +35,22 @@ function Header() {
       currentRoute === "/username" ||
       currentRoute === "/resetPassword" ? (
         <header className="flex items-center justify-center">
-          <div className="flex flex-row bg-tycheBeige w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
+          <div className="flex flex-row bg-tycheLightGray w-[915px] h-[152px] mt-[71px] rounded-[60px] items-center pl-[35px] justify-between">
             <div className="flex flex-row items-center pr-[27px] w-full justify-between">
               <div className="flex flex-row items-center">
-                <img src={tycheLogo} alt="Tyche Logo" />
+                <img src={tycheLogo} alt="Tyche Logo" width={96} height={96} />
                 <div className="flex flex-col ml-[52px]">
-                  <h1 className="text-tycheGreen text-[48px] font-[850] tracking-wide">
+                  <h1 className="text-tychePrimary text-[48px] font-[850] tracking-wide">
                     TYCHE
                   </h1>
-                  <p className="text-tycheGreen text-[24px] font-[310] tracking-wide">
+                  <p className="text-tychePrimary text-[24px] font-[310] tracking-wide">
                     TRACK YOUR ASSETS
                   </p>
                 </div>
               </div>
               {currentRoute === "/" && (
                 <button
-                  className="flex items-center justify-center bg-tycheGreen text-white text-[24px] font-[300] w-[142px] h-[54px] tracking-wide rounded-[60px]"
+                  className="flex items-center justify-center bg-tychePrimary text-white text-[24px] font-[300] w-[142px] h-[54px] tracking-wide rounded-[60px]"
                   onClick={() => navigate("/login")}
                 >
                   Login
@@ -66,7 +66,8 @@ function Header() {
             <img
               src={tycheLogo}
               alt="Tyche Logo"
-              className="min-w-[84px] min-h-[71px]"
+              width={52}
+              height={52}
             />
           </button>
 
@@ -86,7 +87,7 @@ function Header() {
 
           {/* Login Button */}
           <button
-            className="flex items-center justify-center bg-tycheGreen font-[300] text-white text-[20px] px-[24px] py-[14px] tracking-wide rounded-[60px]"
+            className="flex items-center justify-center bg-tychePrimary font-[300] text-white text-[20px] px-[24px] py-[14px] tracking-wide rounded-[60px]"
             onClick={() => navigate("/login")}
           >
             <p>Login</p>

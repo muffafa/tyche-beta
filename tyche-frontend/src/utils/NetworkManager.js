@@ -1,4 +1,10 @@
 // src/utils/NetworkManager.js
+import solIcon from "./../assets/images/coin/sol.svg";
+import ethIcon from "../assets/images/coin/eth.svg";
+import btcIcon from "../assets/images/coin/btc.svg";
+import avaxcIcon from "../assets/images/coin/avaxc.svg";
+import bscIcon from "../assets/images/coin/bnb.svg";
+import baseIcon from "../assets/images/coin/base.svg";
 
 const networkMappings = {
   ethereum: "eth",
@@ -6,6 +12,7 @@ const networkMappings = {
   avalanche: "avaxc",
   base: "base",
   bitcoin: "btc",
+  solana: "sol",
   // Add other networks as needed
 };
 
@@ -16,6 +23,15 @@ const chainIdMappings = {
   btc: "0",
 };
 
+const networkIcons = {
+  eth: ethIcon,
+  bsc: bscIcon,
+  avaxc: avaxcIcon,
+  base: baseIcon,
+  btc: btcIcon,
+  sol: solIcon,
+};
+
 export function getNetworkShortName(networkName) {
   const normalizedNetworkName = networkName.toLowerCase();
   return networkMappings[normalizedNetworkName] || "";
@@ -24,6 +40,11 @@ export function getNetworkShortName(networkName) {
 export function getChainIdByNetwork(networkName) {
   const shortName = getNetworkShortName(networkName);
   return chainIdMappings[shortName] || null;
+}
+
+export function getNetworkIcon(networkName) {
+  const shortName = getNetworkShortName(networkName);
+  return networkIcons[shortName] || null;
 }
 
 export function getSupportedNetworks() {

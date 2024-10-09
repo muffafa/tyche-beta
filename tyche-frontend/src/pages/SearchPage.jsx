@@ -6,20 +6,21 @@ function SearchPage() {
   const navigate = useNavigate();
   return (
     <>
-      <div className="flex flex-col items-center justify-center w-full h-screen mx-auto gap-[56px]">
+      <div className="flex flex-col items-center justify-center w-full h-screen mx-auto gap-[25px]">
         {/* Logo */}
         <button onClick={() => navigate("/")}>
           <img
             src={tycheLogo}
             alt="Tyche Logo"
-            className="min-w-[84px] min-h-[71px]"
+            width={96}
+            height={96}
           />
         </button>
         <div className="flex flex-col text-center gap-[25px]">
-          <h1 className="text-tycheGreen text-[48px] font-[850] tracking-wide">
+          <h1 className="text-tychePrimary text-[48px] font-[850] tracking-wide">
             TYCHE
           </h1>
-          <p className="text-tycheGreen text-[24px] font-[310] tracking-wide">
+          <p className="text-black text-[24px] font-[310] tracking-wide">
             TRACK YOUR ASSETS
           </p>
         </div>

@@ -1,41 +1,34 @@
 // import { useState, useEffect } from "react";
 // import PropTypes from "prop-types";
 import searchIcon from "../../assets/images/icons/searchIcon.svg";
-import greenEth from "../../assets/images/coin/eth.svg";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setNetwork } from "../../redux/slices/globalSlice";
+import NetworkSelect from "./NetworkSelect";
+import { getNetworkIcon } from "../../utils/NetworkManager";
 
 function SearchBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const storedNetwork = useSelector((state) => state.global.selectedNetwork);
+  const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
   //take searchterm from window.location.pathname
   let searchTerm = window.location.pathname.split("/")[2];
   const handleSearch = () => {
-    navigate("/" + storedNetwork + "/" + searchTerm);
+    navigate("/" + selectedNetwork + "/" + searchTerm);
   }
+
   return (
     <div className="flex items-center w-full relative">
       {/* Dropdown */}
-      <div className="flex items-center h-[54px] rounded-full bg-tycheGreen p-[10px] absolute z-10">
+      <div className="flex items-center h-[54px] rounded-full bg-tycheDarkGray p-[10px] absolute z-10">
         <img
-          src={greenEth}
-          alt="Ethereum"
-          className="border-[4px] border-tycheWhite rounded-full"
+          src={getNetworkIcon(selectedNetwork)}
+          alt={selectedNetwork}
+          className="border-[4px] border-white rounded-full"
         />
-        <select className="flex items-center bg-tycheGreen text-white text-[20px] px-4 py-1 h-[54px] rounded-r-full"
-        onChange={
-          (e) => {
-            dispatch(setNetwork(e.target.value));
-          }
-        }
-        >
-          <option value="ethereum">ethereum</option>
-          <option value="sol">Solana</option>
-        </select>
+        <NetworkSelect selectedNetwork={selectedNetwork} onSelectNetwork={(network) => dispatch(setNetwork(network))} />
       </div>
       {/* Search Field */}
       <div className="flex items-center w-full">
@@ -49,10 +42,10 @@ function SearchBar() {
             }
           }}
           placeholder="Wallet address or tx hash"
-          className="bg-tycheBeige w-full text-tycheGray placeholder-gray-500 placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[210px]"
+          className="bg-tycheLightGray w-full placeholder-[#444444] text-black placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[220px]"
         />
         <button
-          className="flex items-center justify-center h-full  bg-tycheGreen font-[300] text-white text-[20px] min-w-[80px] px-[24px] py-[14px] tracking-wide rounded-r-[60px] right-0"
+          className="flex items-center justify-center h-full  bg-tychePrimary font-[300] text-white text-[20px] min-w-[80px] px-[24px] py-[14px] tracking-wide rounded-r-[60px] right-0"
           onClick={() => handleSearch()}
         >
           <img src={searchIcon} alt="Search" className="flex" />

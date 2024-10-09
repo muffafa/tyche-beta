@@ -8,12 +8,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        tycheGreen: "#435334",
-        tycheBeige: "#FAF1E4",
-        tycheBlue: "#627EEA",
-        tycheRed: "#F21616",
+        tychePrimary: "#652C7D",
+        tycheGreen: "#61A179",
         tycheWhite: "#FFFAF3",
-        tycheGray: "#646464",
+        tycheLightGray: "#F7F7F7",
+        tycheDarkGray: "#D1D1CF",
+        tycheRed: "#CF3830",
+        tycheOrange: "#F58C38",
+        tycheBlue: "#627EEA",
+        tycheDarkBlue: "#03178C",
+        tycheNewSurgeGreen: "#00FFA3",
+        tycheNewOceanBlue: "#03E1FF",
+        tycheNewPurpleDino: "#DC1FFF",
+
+
+        //old colors
+        // tycheGreen: "#435334",
+        // tycheBeige: "#FAF1E4",
+        // tycheBlue: "#627EEA",
+        // tycheRed: "#F21616",
+        // tycheWhite: "#FFFAF3",
+        // tycheGray: "#646464",
       },
     },
   },

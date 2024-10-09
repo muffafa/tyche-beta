@@ -7,7 +7,7 @@ function SettingsPopup({ onClose }) {
     return (
         <>
             <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
-                <div className="fixed bg-tycheBeige rounded-[40px] w-[50%] h-[80%] items-center">
+                <div className="fixed bg-white rounded-[40px] w-[50%] h-[80%] items-center">
                     {PopupTabs(activeTab, setActiveTab, onClose)}
                     <div className="flex flex-col w-full justify-center p-8">
                         {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets />}
@@ -34,7 +34,7 @@ function GeneralSettings() {
             <select
                 id="currency"
                 name="currency"
-                className="flex items-center bg-tycheGreen text-white text-[20px] px-6 py-1 h-[50px] rounded-full w-fit focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+                className="flex items-center bg-tychePrimary text-white text-[20px] px-6 py-1 h-[50px] rounded-full w-fit focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
             >
                 <option>USD</option>
                 <option>EUR</option>
@@ -48,7 +48,7 @@ function GeneralSettings() {
             <select
                 id="timezone"
                 name="timezone"
-                className="flex items-center bg-tycheGreen text-white text-[20px] px-6 py-1 h-[50px] w-fit rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+                className="flex items-center bg-tychePrimary text-white text-[20px] px-6 py-1 h-[50px] w-fit rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
             >
                 <option>Europe/Berlin (CET)</option>
                 <option>Europe/London (GMT)</option>
@@ -60,19 +60,32 @@ function GeneralSettings() {
 }
 
 function SavedWallets(){
+    const wallets = [
+        {
+            address: "0x1234567890",
+            tag: "My Wallet",
+            network: "Ethereum"
+        },
+        {
+            address: "0x0987654321",
+            tag: "My Wallet",
+            network: "Solana"
+        }
+    ];
     return (
         <>
             <div className="flex flex-col gap-[35px] w-full">
                 <select
                     id="currency"
                     name="currency"
-                    className="flex items-center bg-tycheGreen text-white text-[20px] py-[13px] w-fit px-[20px] h-[50px] rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+                    className="flex items-center bg-tychePrimary text-white text-[20px] py-[13px] w-fit px-[20px] h-[50px] rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
                 >
                     <option>All Networks</option>
                     <option>Ethereum</option>
                     <option>Solana</option>
                 </select>
                 <div className="flex flex-col gap-[20px] w-full">
+                    {/* Burası değişecek */}
                     <div className="flex flex-row gap-4 items-center justify-between w-full">
                         <p className="flex font-bold text-[20px]">
                             Address
@@ -87,6 +100,22 @@ function SavedWallets(){
                             Operations
                         </p>
                     </div>
+                    {wallets.map((wallet, index) => (
+                        <div key={index} className="flex flex-row gap-4 items-center justify-between w-full">
+                            <p className="flex text-[20px]">
+                                {wallet.address}
+                            </p>
+                            <p className="flex text-[20px]">
+                                {wallet.tag}
+                            </p>
+                            <p className="flex text-[20px]">
+                                {wallet.network}
+                            </p>
+                            <button className="flex items-center justify-center bg-tycheRed text-white text-[20px] px-4 py-1 rounded-full">
+                                Remove
+                            </button>
+                        </div>
+                    ))}
                 </div>
             </div>
         </>
@@ -95,12 +124,12 @@ function SavedWallets(){
 
 function PopupTabs(activeTab, setActiveTab, onClose) {
     return <div className="flex flex-grow justify-between items-center h-[85px]">
-        <button className={`${activeTab === 'settings' ? 'bg-tycheBeige text-tycheGray' : 'bg-tycheGreen text-white'} p-1 rounded-tl-[40px] w-full h-full flex items-center justify-center`} onClick={() => setActiveTab("settings")}>
+        <button className={`${activeTab === 'settings' ? 'bg-white text-black' : 'bg-tychePrimary text-white'} p-1 rounded-tl-[40px] w-full h-full flex items-center justify-center`} onClick={() => setActiveTab("settings")}>
             <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[24px]">
                 General Settings
             </div>
         </button>
-        <button className={`${activeTab === 'savedWallets' ? 'bg-tycheBeige text-tycheGray' : 'bg-tycheGreen text-white'} p-1 w-full h-full flex items-center justify-center`} onClick={() => setActiveTab("savedWallets")}>
+        <button className={`${activeTab === 'savedWallets' ? 'bg-white text-black' : 'bg-tychePrimary text-white'} p-1 w-full h-full flex items-center justify-center`} onClick={() => setActiveTab("savedWallets")}>
             <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[24px]">
                 Saved Wallets
             </div>

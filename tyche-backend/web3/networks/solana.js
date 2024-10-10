@@ -212,64 +212,28 @@ class SolanaNetwork extends BaseNetwork {
 			let amount = null;
 
 			const instructions = tx.transaction.message.instructions;
+			const accountKeys = tx.transaction.message.accountKeys;
+			const preBalances = tx.meta.preBalances;
+			const postBalances = tx.meta.postBalances;
 
 			console.log("Parsed Instructions:", instructions);
 
-			for (const [index, instruction] of instructions.entries()) {
-				console.log(`\nProcessing Instruction ${index + 1}:`);
-				console.log("Program ID:", instruction.programId);
-				console.log(
-					"Parsed Data:",
-					JSON.stringify(instruction.parsed, null, 2)
-				);
+			// First account is the payer
+			from = accountKeys[0];
 
-				const programId = instruction.programId;
+			// Calculate the total SOL spent by the sender
+			const lamportsSpent = preBalances[0] - postBalances[0];
+			amount = lamportsSpent / 1e9; // Convert lamports to SOL
+			asset = "SOL";
 
-				// Handle SOL Transfer (System Program)
-				if (
-					programId === "11111111111111111111111111111111" &&
-					instruction.data
-				) {
-					// Native SOL transfer detected; decode the instruction data
-					const dataBuffer = Buffer.from(instruction.data, "base64");
+			console.log(`Sender ${from} spent ${amount} SOL`);
 
-					// Read the lamports amount (8 bytes) starting from byte index 4
-					const lamports = dataBuffer.readBigUInt64LE(4);
-					amount = Number(lamports) / 1e9; // Convert lamports to SOL
-
-					// Extract from and to addresses
-					from = tx.transaction.message.accountKeys[instruction.accounts[0]];
-					to = tx.transaction.message.accountKeys[instruction.accounts[1]];
-					asset = "SOL";
-
-					console.log(
-						`Identified SOL Transfer: From ${from} to ${to}, Amount: ${amount} SOL`
-					);
-					break; // Stop after finding the first SOL transfer
-				}
-
-				// Handle SPL Token Transfer
-				if (
-					programId === "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" &&
-					instruction.parsed
-				) {
-					const parsed = instruction.parsed;
-
-					if (parsed.type === "transferChecked") {
-						from = parsed.info.source;
-						to = parsed.info.destination;
-						asset = parsed.info.mint; // Mint address of the SPL Token
-
-						// Calculate the amount using the raw amount and decimals
-						const rawAmount = BigInt(parsed.info.tokenAmount.amount);
-						const decimals = parsed.info.tokenAmount.decimals;
-						amount = Number(rawAmount) / Math.pow(10, decimals);
-
-						console.log(
-							`Identified SPL Token Transfer: From ${from} to ${to}, Asset: ${asset}, Amount: ${amount}`
-						);
-						break; // Stop after finding the first valid transfer
-					}
+			// Optionally, find the recipient from the instruction data
+			// For associated token account creation, the recipient is in the instruction
+			for (const instruction of instructions) {
+				if (instruction.parsed && instruction.parsed.type === "create") {
+					to = instruction.parsed.info.wallet;
+					break;
 				}
 			}
 

@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
+import goLinkIcon from "./../../assets/images/icons/goLinkIcon.svg";
 
 function DAppCard({ dapp }) {
   const dappLink = dapp.link || "#"; // Fallback to "#" if the link is undefined
 
   return (
-    <div className="flex items-center bg-tycheWhite rounded p-4 shadow-md">
+    <div className="flex items-center bg-white rounded-[20px] p-4 shadow-md">
       <div className="flex-shrink-0">
         <img
           src={dapp.image}
@@ -16,8 +17,11 @@ function DAppCard({ dapp }) {
         <h3 className="text-md font-semibold">{dapp.name}</h3>
         <p className="text-sm text-tycheGray">{dapp.description}</p>
       </div>
-      <a href={dappLink} className="text-tycheBlue ml-4">
-        Visit
+      <a href={dappLink}>
+        <div className="flex flex-row items-center gap-[8px]">
+          <p className="text-tycheBlue font-bold text-[12px]">Go</p>
+          <img src={goLinkIcon} alt="Go Link" className="w-[12px] h-[12px]" />
+        </div>
       </a>
     </div>
   );

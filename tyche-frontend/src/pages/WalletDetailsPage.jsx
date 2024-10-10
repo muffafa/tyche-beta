@@ -1,16 +1,36 @@
+import DAppList from "../components/Content/DAppList";
 import Portfolio from "../components/Content/Portfolio";
+import TxHistory from "../components/Content/TxHistory";
+import WalletInfo from "../components/Content/WalletInfo";
 
 function WalletDetailsPage() {
   return (
-  <>
-    <div className="flex flex-col h-full justify-center items-center">
-      <div className="flex flex-col items-center justify-center max-w-[915px] w-full h-full">
-        <div className="min-w-[300px] min-h-[384px]">
-          <Portfolio tokens={[]} nfts={[]} network={"network"} />
+    <>
+      <div className="flex flex-col h-full justify-center items-center mt-[80px]">
+        <div className="flex flex-row justify-center max-w-[915px] w-full h-full gap-[11px]">
+          <div className="flex flex-col gap-[16px] h-full">
+            <div className="min-w-[300px] min-h-[384px] max-h-[384px] max-w-[300px]">
+              <Portfolio tokens={[]} nfts={[]} network={"ethereum"} />
+            </div>
+            <div className="min-w-[300px] min-h-[384px] max-h-[384px] max-w-[300px]">
+              <DAppList network={"ethereum"} />
+            </div>
+          </div>
+          <div className="flex flex-col w-full gap-[16px]">
+            
+            <WalletInfo currentAddress={"address"} currentNetwork={"ethereum"} />
+            
+            <div className="min-w-[300px] min-h-[384px]">
+              <TxHistory
+                transactions={[]}
+                currentNetwork={"network"}
+                currentAddress={"address"}
+              />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </>
+    </>
   );
 }
 

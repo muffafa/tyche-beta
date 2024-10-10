@@ -12,7 +12,7 @@ function Portfolio({ tokens, nfts }) {
 
   return (
     <div className="flex flex-col gap-[8px]">
-      <h2 className="text-[24px] text-tychePrimary tracking-wide font-[300]">Portfolio</h2>
+      <p className="text-[24px] text-tychePrimary tracking-wide font-[350]">Portfolio</p>
       <div className="bg-tycheLightGray shadow rounded-[20px] col-span-4">
         <div className="flex justify-between mb-4">
           <button

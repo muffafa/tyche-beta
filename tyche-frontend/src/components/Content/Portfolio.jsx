@@ -37,25 +37,23 @@ function Portfolio({ tokens, nfts }) {
           </button>
         </div>
         {activeTab === "tokens" ? (
-          <>
+          <div className="px-[25px] gap-[12px]">
             <div className="top-0 bg-tycheLightGray">
-              <table className="w-full text-left">
-                <thead>
-                  <tr>
-                    <th>Asset</th>
-                    <th>Amount</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
+              <table className="w-full font-normal text-[12px]">
+                <tr className="flex flex-row w-full">
+                  <td className="flex w-full justify-start">Asset</td>
+                  <td className="flex w-full justify-start">Amount</td>
+                  <td className="flex w-full justify-end pr-[6px]">Value</td>
+                </tr>
               </table>
             </div>
             <div className={`overflow-y-scroll ${consistentHeightClass}`}>
               {tokens.length > 0 ? (
-                <table className="w-full text-left">
-                  <tbody>
+                <table className="w-full text-left flex">
+                  <tbody className="gap-[12px] flex flex-col w-full">
                     {tokens.map((token, index) => (
-                      <tr key={index} className="bg-tycheWhite rounded">
-                        <td className="p-2">
+                      <tr key={index} className="bg-tycheLightGray flex w-full">
+                        <td className="w-full">
                           <TokenCard token={token} />
                         </td>
                       </tr>
@@ -66,10 +64,10 @@ function Portfolio({ tokens, nfts }) {
                 <p className="text-center text-tycheGray">No tokens found.</p>
               )}
             </div>
-          </>
+          </div>
         ) : (
           <>
-            <div className="top-0 bg-tycheBeige">
+            <div className="top-0">
               <table className="w-full text-left">
                 <thead>
                   <tr>
@@ -85,7 +83,7 @@ function Portfolio({ tokens, nfts }) {
                 <table className="w-full text-left">
                   <tbody>
                     {nfts.map((nft, index) => (
-                      <tr key={index} className="bg-tycheWhite rounded">
+                      <tr key={index} className="bg-tycheLightGray rounded-full">
                         <td className="p-2">
                           <NftCard nft={nft} />
                         </td>

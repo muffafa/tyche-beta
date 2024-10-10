@@ -8,7 +8,7 @@ function DAppList({ network }) {
 
   if (dApps.length === 0) {
     return (
-      <div className="p-4 bg-tycheLightGray shadow rounded col-span-4">
+      <div className="p-4 bg-tycheLightGray shadow rounded">
         <h2 className="text-lg font-semibold mb-4">No dApps Available</h2>
         <p className="text-center text-tycheGray">
           There are no dApps available for this network.
@@ -18,13 +18,13 @@ function DAppList({ network }) {
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-[8px]">
       <p className="text-[24px] text-tychePrimary tracking-wide font-[350]">Decentralized Apps</p>
-      <div className="p-4 bg-tycheLightGray shadow rounded-[20px] col-span-4">
+      <div className="px-[23px] py-[43px] bg-tycheLightGray shadow rounded-[20px]">
         
         <div
           className={`space-y-4 ${
-            dApps.length > 2 ? "max-h-[240px] overflow-y-scroll" : "min-h-[240px]"
+            dApps.length > 2 ? "max-h-[346px] overflow-y-scroll" : "min-h-[346px]"
           }`}
         >
           {dApps.map((dapp, index) => (

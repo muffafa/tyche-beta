@@ -4,26 +4,54 @@ import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
 
 function WalletDetailsPage() {
+
+  const tokens = [
+    {
+      symbol: "ETH",
+      tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
+      holdingAmount: "0.001",
+      priceUsd: "2000",
+      valueUsd: "200",
+      tokenId: "0xkdsjljsdjlsjdjsdj",
+    },
+    {
+      symbol: "DAI",
+      tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
+      holdingAmount: "0.0001",
+      priceUsd: "1",
+      valueUsd: "0.1",
+      tokenId: "0xkdsjljsdjlsjdjsdj,",
+    },
+  ];
+  const nfts = [
+    {
+    symbol: "NFT",
+    tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
+    holdingAmount: "1",
+    priceUsd: "1000",
+    valueUsd: "555",
+    tokenId: "0xkdsjljsdjlsjdjsdj,",
+  },
+];
+  const network = "ethereum";
   return (
     <>
       <div className="flex flex-col h-full justify-center items-center mt-[80px]">
         <div className="flex flex-row justify-center max-w-[915px] w-full h-full gap-[11px]">
           <div className="flex flex-col gap-[16px] h-full">
             <div className="min-w-[300px] min-h-[384px] max-h-[384px] max-w-[300px]">
-              <Portfolio tokens={[]} nfts={[]} network={"ethereum"} />
+              <Portfolio tokens={tokens} nfts={nfts} network={network} />
             </div>
             <div className="min-w-[300px] min-h-[384px] max-h-[384px] max-w-[300px]">
-              <DAppList network={"ethereum"} />
+              <DAppList network={network} />
             </div>
           </div>
-          <div className="flex flex-col w-full gap-[16px]">
-            
-            <WalletInfo currentAddress={"address"} currentNetwork={"ethereum"} />
-            
+          <div className="flex flex-col w-full gap-[23px]">
+            <WalletInfo currentAddress={"address"} currentNetwork={network} />
             <div className="min-w-[300px] min-h-[384px]">
               <TxHistory
                 transactions={[]}
-                currentNetwork={"network"}
+                currentNetwork={network}
                 currentAddress={"address"}
               />
             </div>

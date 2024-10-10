@@ -5,24 +5,26 @@ function DAppCard({ dapp }) {
   const dappLink = dapp.link || "#"; // Fallback to "#" if the link is undefined
 
   return (
-    <div className="flex items-center bg-white rounded-[20px] p-4 shadow-md">
-      <div className="flex-shrink-0">
+    <div className="flex flex-row items-center bg-white rounded-[20px] p-4 gap-[10px]">
+      <div className="flex items-center justify-center min-w-[54px] min-h-[54px] max-w-[54px] max-h-[54px] rounded-full bg-tycheLightGray">
         <img
           src={dapp.image}
           alt={dapp.name}
-          className="h-8 w-8 object-contain"
+          className="h-8 w-8"
         />
       </div>
-      <div className="ml-4 flex-grow">
-        <h3 className="text-md font-semibold">{dapp.name}</h3>
-        <p className="text-sm text-tycheGray">{dapp.description}</p>
-      </div>
-      <a href={dappLink}>
-        <div className="flex flex-row items-center gap-[8px]">
-          <p className="text-tycheBlue font-bold text-[12px]">Go</p>
-          <img src={goLinkIcon} alt="Go Link" className="w-[12px] h-[12px]" />
+      <div className="flex flex-row justify-between items-center w-full">
+        <div className="">
+          <p className="text-[12px] font-bold text-black">{dapp.name}</p>
+          <p className="text-[8px]">{dapp.description}</p>
         </div>
-      </a>
+        <a href={dappLink}>
+          <div className="flex flex-row items-center gap-[8px]">
+            <p className="text-tycheBlue font-bold text-[12px]">Go</p>
+            <img src={goLinkIcon} alt="Go Link" className="w-[12px] h-[12px]" />
+          </div>
+        </a>
+      </div>
     </div>
   );
 }

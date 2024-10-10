@@ -16,16 +16,16 @@ function SettingsPopup({ onClose }) {
     //get settings from redux
     
     return (
-        <>
-            <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
-                <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
-                    {PopupTabs(activeTab, setActiveTab, onClose)}
-                    <div className="flex flex-col w-full justify-center p-8">
-                        {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets />}
-                    </div>
-                </div>
+      <>
+        <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
+          <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
+            {PopupTabs(activeTab, setActiveTab, onClose)}
+            <div className="flex flex-col w-full justify-top p-8">
+              {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets />}
             </div>
-        </>
+          </div>
+        </div>
+      </>
     );
 }
 
@@ -144,10 +144,9 @@ function SavedWallets(){
               <p className="flex font-bold text-[20px] w-[130px]">Address</p>
               <p className="flex font-bold text-[20px] w-[130px]">Tag</p>
               <p className="flex font-bold text-[20px] w-[130px]">Network</p>
-              <p className="flex font-bold text-[20px] w-[130px] justify-end">
-                Operations
-              </p>
+              <p className="flex font-bold text-[20px] w-[130px] justify-end">Operations</p>
             </div>
+            <div className="flex flex-col gap-[20px] overflow-y-auto max-h-[250px]">
             {wallets
               .filter(
                 (wallet) =>
@@ -165,7 +164,7 @@ function SavedWallets(){
                 ) : (
                   <div
                     key={index}
-                    className="flex flex-row gap-4 items-center justify-between w-full h-[70px] rounded-[25px] px-[29px] bg-white"
+                    className="flex flex-row gap-4 items-center justify-between w-full min-h-[70px] max-h-[70px] rounded-[25px] px-[29px] bg-white"
                   >
                     <p className="text-[20px] w-[130px] overflow-hidden whitespace-nowrap text-ellipsis text-tycheDarkBlue">
                       {wallet.address}
@@ -193,6 +192,7 @@ function SavedWallets(){
                   </div>
                 )
               )}
+              </div>
             {/* Save Wallet Button */}
             {saveWalletButtonClicked ? (
               <AddOrEditWallet
@@ -240,7 +240,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
         onSave(updatedWallet);
     };
     return (
-      <div className="flex flex-row gap-4 items-center justify-between w-full h-[70px] rounded-[25px] px-[29px] bg-tycheDarkGray">
+      <div className="flex flex-row gap-4 items-center justify-between w-full min-h-[70px] max-h-[70px] rounded-[25px] px-[29px] bg-tycheDarkGray">
         <input
             type="text"
             placeholder="Wallet"

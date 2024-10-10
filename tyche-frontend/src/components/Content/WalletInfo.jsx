@@ -1,6 +1,8 @@
 import PropTypes from "prop-types";
 import QRCode from "./../../assets/images/qrcode.png";
 import shareIcon from "./../../assets/images/icons/shareIcon.svg";
+import walletCopyIcon from "./../../assets/images/icons/walletCopyIcon.svg";
+import tagEditBlueIcon from "./../../assets/images/icons/tagEditBlueIcon.svg";
 
 function WalletInfo(){
     return (
@@ -22,10 +24,64 @@ WalletInfo.propTypes = {
 export default WalletInfo;
 
 function Details() {
-    return <div className="flex flex-col items-center">
-        <p className="text-tycheGray text-[14px]">Wallet Address</p>
-        <p className="text-tycheBlack text-[20px]">0.00 ETH</p>
-    </div>;
+    return (
+      <div className="flex flex-col items-start gap-[24px]">
+        <div className="flex flex-row gap-[15px]">
+          <p className="text-black text-[14px] font-bold">Wallet Address:</p>
+          <div className="flex flex-row items-center">
+              <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
+                0xjhkjhasdygq9823421391802381823
+              </p>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText("0xjhkjhasdygq9823421391802381823");
+                }}
+              >
+                <img
+                  src={walletCopyIcon}
+                  alt="Copy"
+                  className="w-[15px] h-[15px]"
+                />
+              </button>
+          </div>
+        </div>
+        <div className="flex flex-row gap-[15px]">
+          <p className="text-black text-[14px] font-bold">Private Name Tag:</p>
+            <button className="flex flex-row items-center gap-[10px]">
+            <div className="flex flex-row items-center gap-[10px]">
+                <p className="text-[14px] text-tycheBlue font-[350]">
+                    muffafa
+                </p>
+                <img
+                    src={tagEditBlueIcon}
+                    alt="Edit"
+                    className="flex w-[15px] h-[15px]"
+                />
+            </div>
+            </button>
+        </div>
+        <div className="flex flex-row gap-[15px]">
+            <p className="text-black text-[14px] font-bold">Wallet Balance:</p>
+            <p className="text-[14px] text-black font-[350]">
+            263.4 USD
+            </p>
+        </div>
+        <div className="flex flex-row gap-[40px]">
+        <div className="flex flex-row gap-[15px]">
+            <p className="text-black text-[14px] font-bold">First tx:</p>
+            <p className="text-[14px] text-tycheBlue font-[350] cursor-pointer" onClick={() => console.log("First tx clicked")}>
+                5 months ago
+            </p>
+        </div>
+        <div className="flex flex-row gap-[15px]">
+            <p className="text-black text-[14px] font-bold">Last tx:</p>
+            <p className="text-[14px] text-tycheBlue font-[350] cursor-pointer" onClick={() => console.log("Last tx clicked")}>
+                2 days ago
+            </p>
+        </div>
+        </div>
+      </div>
+    );
 }
 
 function ShareWallet() {

@@ -2,12 +2,12 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import formatCurrency from "../../utils/formatCurrency";
+import { getNetworkIcon } from "../../utils/NetworkManager";
 
 function TokenCard({ token }) {
   const [formattedValue, setFormattedValue] = useState(null);
   const selectedCurrency = useSelector((state) => state.settings.currency);
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork); // Fetching networkName from Redux store
-  const assetImage = ""; // Placeholder for the image source
 
   useEffect(() => {
     const fetchTokenValue = async () => {
@@ -32,30 +32,30 @@ function TokenCard({ token }) {
   ]);
 
   return (
-    <div className="token-card bg-tycheBeige p-4 mb-4 rounded shadow flex justify-between items-center">
+    <div className="token-card bg-white p-[4px] pr-[7px] rounded-full flex justify-between items-center">
       {/* Asset Image */}
-      <div className="token-asset flex items-center">
-        {assetImage ? (
-          <img src={assetImage} alt={token.symbol} className="w-8 h-8 mr-4" />
+      <div className="token-asset flex items-center w-full">
+        {/* Temporary image */}
+        {getNetworkIcon(selectedNetwork) !== "" 
+         ? (
+          <img src={getNetworkIcon(selectedNetwork)} alt={token.symbol} className="w-[27px] h-[27px]" /> 
         ) : (
-          <div className="w-8 h-8 mr-4 bg-gray-300 rounded"></div>
+          <div className="w-[27px] h-[27px] bg-gray-300 rounded-full"></div>
         )}
       </div>
 
       {/* Token Info */}
-      <div className="token-info flex-1">
-        <h5 className="text-tycheBlue font-bold">{token.symbol}</h5>
-        <p className="text-tycheGray">
+      <div className="token-info flex items-center justify-start w-full">
+        <p className="text-tycheGray text-[12px] justify-start">
           {token.holdingAmount} {token.symbol}
         </p>
       </div>
 
       {/* Token Amount & Value */}
-      <div className="token-amount">
-        <span className="text-tycheBlue font-bold">
-          {formattedValue || token.holdingAmount}
+      <div className="token-amount flex items-center justify-end w-full">
+        <span className="text-black text-[12px] justify-end">
+          {formattedValue || token.holdingAmount} {selectedCurrency}
         </span>
-        <span className="text-tycheGray"> {selectedCurrency}</span>
       </div>
     </div>
   );

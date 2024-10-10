@@ -4,11 +4,13 @@ import { convertTimestampToTimezone } from "../../utils/convertTimestampToTimezo
 import { useSelector } from "react-redux";
 import outgoingIcon from "./../../assets/images/icons/outgoingIcon.svg";
 import incomingIcon from "./../../assets/images/icons/incomingIcon.svg";
+import { useNavigate } from "react-router-dom";
 
 const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
 
 function TxCard({ tx, currentAddress }) {
   const settings = useSelector((state) => state.settings);
+  const navigate = useNavigate();
 
   const formattedTime = convertTimestampToTimezone(
     tx.transactionTime,
@@ -52,7 +54,7 @@ function TxCard({ tx, currentAddress }) {
   }
 
   return (
-    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer" onClick={() => console.log("TX Clicked")}>
+    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer" onClick={() => navigate(`/transaction/${tx.attributes.hash}`)}>
       <div className="flex flex-col gap-[2px] text-[12px]">
         <p className="font-bold">
           {formattedTime.split(" ")[0]} {formattedTime.split(" ")[1]}{" "}

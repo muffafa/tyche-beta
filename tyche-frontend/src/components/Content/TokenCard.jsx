@@ -27,6 +27,7 @@ function TokenCard({ token }) {
   }, [
     token.holdingAmount,
     token.tokenContractAddress,
+    token.valueUsd,
     selectedNetwork, // Using the selectedNetwork from Redux
     selectedCurrency,
   ]);
@@ -35,7 +36,7 @@ function TokenCard({ token }) {
     <div className="token-card bg-white p-[4px] pr-[7px] rounded-full flex justify-between items-center">
       {/* Asset Image */}
       <div className="token-asset flex items-center w-full">
-        {/* Temporary image */}
+        {/* Burası şimdilik network iconu alıyor ama ileride değişecek */}
         {getNetworkIcon(selectedNetwork) !== "" 
          ? (
           <img src={getNetworkIcon(selectedNetwork)} alt={token.symbol} className="w-[27px] h-[27px]" /> 

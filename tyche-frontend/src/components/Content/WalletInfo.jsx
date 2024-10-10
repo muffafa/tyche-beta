@@ -1,8 +1,10 @@
 import PropTypes from "prop-types";
-import QRCode from "./../../assets/images/qrcode.png";
+import QRCode from "./../../assets/images/qrcode.svg";
 import shareIcon from "./../../assets/images/icons/shareIcon.svg";
 import walletCopyIcon from "./../../assets/images/icons/walletCopyIcon.svg";
 import tagEditBlueIcon from "./../../assets/images/icons/tagEditBlueIcon.svg";
+import { useState } from "react";
+import ZoomQRCode from "./ZoomQRCode";
 
 function WalletInfo(){
     return (
@@ -62,9 +64,7 @@ function Details() {
         </div>
         <div className="flex flex-row gap-[15px]">
             <p className="text-black text-[14px] font-bold">Wallet Balance:</p>
-            <p className="text-[14px] text-black font-[350]">
-            263.4 USD
-            </p>
+            <p className="text-[14px] text-black font-[350]">263.4 USD</p>
         </div>
         <div className="flex flex-row gap-[40px]">
         <div className="flex flex-row gap-[15px]">
@@ -85,11 +85,15 @@ function Details() {
 }
 
 function ShareWallet() {
+    const [zoom, setZoom] = useState(false);
     return (
         <div className="flex flex-col items-center h-full gap-[3px]">
             <div className="flex flex-col items-center gap-[9px]">
                 <p className="text-black text-[8px] italic">{"*This page's link"}</p>
-                <img src={QRCode} alt="QR Code" className="w-[80px] h-[80px]"/>
+                <img src={QRCode} alt="QR Code" className="w-[80px] h-[80px] cursor-pointer" onClick={() => setZoom(true)}/>
+                {zoom && (
+                    <ZoomQRCode qr={QRCode} setZoom={setZoom} />
+                )}
             </div>
             <p className="text-black text-[6px] italic">Click and zoom to QR Code</p>
             <div className="h-[4px]"/>
@@ -97,7 +101,7 @@ function ShareWallet() {
                 className="flex flex-row gap-[5px] items-center justify-center bg-tychePrimary font-[300] text-white text-[14px] px-[10px] py-[6px] tracking-wide rounded-[60px] w-full h-fit">
                 <p>Share</p>
                 <img src={shareIcon} alt="Share" className="w-[14px] h-[14px]"/>
-          </button>
+            </button>
         </div>
     );
 }

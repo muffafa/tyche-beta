@@ -46,28 +46,28 @@ function Portfolio({ tokens, nfts }) {
             >
               Show as a graph
             </p>
-            <div className="top-0 bg-tycheLightGray">
-              <table className="w-full font-normal text-[12px]">
-                <tr className="flex flex-row w-full">
-                  <td className="flex w-full justify-start">Asset</td>
-                  <td className="flex w-full justify-start">Amount</td>
-                  <td className="flex w-full justify-end pr-[6px]">Value</td>
-                </tr>
-              </table>
+            <div className="top-0 bg-tycheLightGray mt-[20px]">
+              <div className="w-full font-normal text-[12px]">
+                <div className="flex flex-row w-full">
+                  <p className="flex w-full justify-start">Asset</p>
+                  <p className="flex w-full justify-start">Amount</p>
+                  <p className="flex w-full justify-end pr-[6px]">Value</p>
+                </div>
+              </div>
             </div>
             <div className={`overflow-y-scroll ${consistentHeightClass}`}>
               {tokens.length > 0 ? (
-                <table className="w-full text-left flex">
-                  <tbody className="gap-[12px] flex flex-col w-full">
+                <div className="w-full text-left flex">
+                  <div className="gap-[12px] flex flex-col w-full">
                     {tokens.map((token, index) => (
-                      <tr key={index} className="bg-tycheLightGray flex w-full">
-                        <td className="w-full">
+                      <div key={index} className="bg-tycheLightGray flex w-full">
+                        <div className="w-full">
                           <TokenCard token={token} />
-                        </td>
-                      </tr>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                </div>
               ) : (
                 <p className="text-center text-black">No tokens found.</p>
               )}

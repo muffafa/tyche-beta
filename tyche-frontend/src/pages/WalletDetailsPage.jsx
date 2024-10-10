@@ -25,13 +25,55 @@ function WalletDetailsPage() {
   ];
   const nfts = [
     {
-    symbol: "NFT",
-    tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
-    holdingAmount: "1",
-    priceUsd: "1000",
-    valueUsd: "555",
-    tokenId: "0xkdsjljsdjlsjdjsdj,",
-  },
+      header: "NFT",
+      id: "1640",
+      basePrice: "300",
+    },
+    {
+      header: "NFT",
+      id: "1641",
+      basePrice: "400",
+    },
+    {
+      header: "NFT",
+      id: "1642",
+      basePrice: "500",
+    },
+    {
+      header: "NFT",
+      id: "1643",
+      basePrice: "600",
+    },
+    {
+      header: "NFT",
+      id: "1644",
+      basePrice: "700",
+    },
+    {
+      header: "NFT",
+      id: "1645",
+      basePrice: "800",
+    },
+    {
+      header: "NFT",
+      id: "1646",
+      basePrice: "900",
+    },
+    {
+      header: "NFT",
+      id: "1647",
+      basePrice: "1000",
+    },
+    {
+      header: "NFT",
+      id: "1648",
+      basePrice: "1100",
+    },
+    {
+      header: "NFT",
+      id: "1649",
+      basePrice: "1200",
+    },
 ];
   const network = "ethereum";
   return (

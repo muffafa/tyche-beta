@@ -188,7 +188,7 @@ class SolanaNetwork extends BaseNetwork {
 				params: [
 					txid,
 					{
-						encoding: "json",
+						encoding: "jsonParsed",
 						commitment: "finalized",
 						maxSupportedTransactionVersion: 0,
 					},
@@ -202,71 +202,77 @@ class SolanaNetwork extends BaseNetwork {
 				return null;
 			}
 
-			// Extract block time and fees
 			const date = tx.blockTime ? new Date(tx.blockTime * 1000) : null;
 			const feeLamports = tx.meta?.fee || 0;
-			const feeSOL = feeLamports / 1e9; // Convert lamports to SOL
+			const feeSOL = feeLamports / 1e9;
 
-			// Initialize variables to store transfer information
 			let from = null;
 			let to = null;
 			let asset = null;
 			let amount = null;
 
-			// Instructions array from the transaction
 			const instructions = tx.transaction.message.instructions;
-			const accountKeys = tx.transaction.message.accountKeys;
 
-			console.log("Instructions:", instructions);
+			console.log("Parsed Instructions:", instructions);
 
-			// Loop through the instructions to find the transfer instruction
-			for (const instruction of instructions) {
-				const programId = accountKeys[instruction.programIdIndex]; // Program ID
+			for (const [index, instruction] of instructions.entries()) {
+				console.log(`\nProcessing Instruction ${index + 1}:`);
+				console.log("Program ID:", instruction.programId);
+				console.log(
+					"Parsed Data:",
+					JSON.stringify(instruction.parsed, null, 2)
+				);
 
-				// Handle native SOL transfers (System Program ID)
-				if (programId === "11111111111111111111111111111111") {
-					// Assuming accounts[0] is the sender and accounts[1] is the receiver
-					from = accountKeys[instruction.accounts[0]];
-					to = accountKeys[instruction.accounts[1]];
+				const programId = instruction.programId;
+
+				// Handle SOL Transfer (System Program)
+				if (
+					programId === "11111111111111111111111111111111" &&
+					instruction.data
+				) {
+					// Native SOL transfer detected; decode the instruction data
+					const dataBuffer = Buffer.from(instruction.data, "base64");
+
+					// Read the lamports amount (8 bytes) starting from byte index 4
+					const lamports = dataBuffer.readBigUInt64LE(4);
+					amount = Number(lamports) / 1e9; // Convert lamports to SOL
+
+					// Extract from and to addresses
+					from = tx.transaction.message.accountKeys[instruction.accounts[0]];
+					to = tx.transaction.message.accountKeys[instruction.accounts[1]];
 					asset = "SOL";
 
-					// Decode amount of SOL transferred from instruction's data (in lamports)
-					if (instruction.data) {
-						const lamports = parseInt(instruction.data, 16); // Hex to integer (lamports)
-						amount = lamports / 1e9; // Convert lamports to SOL
-					}
-
 					console.log(
-						`SOL Transfer - From: ${from}, To: ${to}, Amount: ${amount} SOL`
+						`Identified SOL Transfer: From ${from} to ${to}, Amount: ${amount} SOL`
 					);
-					break; // Assuming one transfer per transaction; otherwise, remove this.
+					break; // Stop after finding the first SOL transfer
 				}
 
-				// Handle SPL token transfers (Token Program ID)
-				if (programId === "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA") {
-					const fromAccount = accountKeys[instruction.accounts[0]]; // Sender
-					const toAccount = accountKeys[instruction.accounts[1]]; // Receiver
-					const tokenMint = accountKeys[instruction.accounts[2]]; // Token mint address (SPL Token)
+				// Handle SPL Token Transfer
+				if (
+					programId === "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" &&
+					instruction.parsed
+				) {
+					const parsed = instruction.parsed;
 
-					from = fromAccount;
-					to = toAccount;
-					asset = tokenMint;
+					if (parsed.type === "transferChecked") {
+						from = parsed.info.source;
+						to = parsed.info.destination;
+						asset = parsed.info.mint; // Mint address of the SPL Token
 
-					// Parse SPL token amount from parsed instruction data
-					if (instruction.parsed && instruction.parsed.info) {
-						const parsedInstruction = instruction.parsed.info;
-						amount = parsedInstruction.tokenAmount.uiAmount; // Already adjusted for decimals
+						// Calculate the amount using the raw amount and decimals
+						const rawAmount = BigInt(parsed.info.tokenAmount.amount);
+						const decimals = parsed.info.tokenAmount.decimals;
+						amount = Number(rawAmount) / Math.pow(10, decimals);
+
+						console.log(
+							`Identified SPL Token Transfer: From ${from} to ${to}, Asset: ${asset}, Amount: ${amount}`
+						);
+						break; // Stop after finding the first valid transfer
 					}
-
-					console.log(
-						`SPL Token Transfer - From: ${from}, To: ${to}, Asset (Mint): ${asset}, Amount: ${amount}`
-					);
-					break;
-					// Transaction basina 1 transfer varsa
 				}
 			}
 
-			// Return the structured data
 			return {
 				transactionId: txid,
 				date,

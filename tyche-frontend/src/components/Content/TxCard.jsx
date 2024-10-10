@@ -2,6 +2,8 @@ import PropTypes from "prop-types";
 import shortenAddress from "../../utils/shortenAddress";
 import { convertTimestampToTimezone } from "../../utils/convertTimestampToTimezone";
 import { useSelector } from "react-redux";
+import outgoingIcon from "./../../assets/images/icons/outgoingIcon.svg";
+import incomingIcon from "./../../assets/images/icons/incomingIcon.svg";
 
 const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
 
@@ -43,44 +45,56 @@ function TxCard({ tx, currentAddress }) {
   const address_to = String(tx.attributes.sent_to).trim().toLowerCase();
   const stringcurrentAddress = String(currentAddress).trim().toLowerCase();
 
-  let isGreen = false;
+  let incoming = false;
 
   if (address_to === stringcurrentAddress) {
-    isGreen = true;
+    incoming = true;
   }
 
   return (
-    <div className="grid grid-cols-3 items-center bg-white rounded p-4 shadow-md">
-      <div>
-        <p className="text-lg font-semibold">
-          {formattedTime.split(" ").slice(0, 3).join(" ")}
+    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer" onClick={() => console.log("TX Clicked")}>
+      <div className="flex flex-col gap-[2px] text-[12px]">
+        <p className="font-bold">
+          {formattedTime.split(" ")[0]} {formattedTime.split(" ")[1]}{" "}
+          {formattedTime.split(" ")[2]}
         </p>
-        <p className="text-sm text-tycheGray">{formattedTime.split(" ")[3]}</p>
-        <p className="text-tycheBlue">{shortenAddress(tx.attributes.hash)}</p>
+        <p className="text-[12px] text-black">{formattedTime.split(" ")[3]}</p>
+        <p className="text-tycheBlue text-[16px] font-semibold">
+          {shortenAddress(tx.attributes.hash)}
+        </p>
       </div>
-      <div className="text-center">
-        <p className="text-sm">
-          From:{" "}
-          <span className="text-tycheBlue">
+      <div className="text-center gap-[26px] h-full flex flex-col">
+        <div className="flex flex-row gap-[5px]">
+          <p className="text-[12px] font-bold">From:</p>
+          <span className="text-tycheBlue text-[12px]">
             {shortenAddress(tx.attributes.sent_from)}
           </span>
-        </p>
-        <p className="text-sm">
-          To:{" "}
-          <span className="text-tycheBlue">
+        </div>
+        <div className="flex flex-row gap-[5px]">
+          <p className="text-[12px] font-bold">To:</p>
+          <span className="text-tycheBlue text-[12px]">
             {shortenAddress(tx.attributes.sent_to)}
           </span>
-        </p>
+        </div>
       </div>
-      <div
-        className={`text-right p-2 rounded h-full flex flex-col justify-center ${
-          isGreen ? "bg-tycheGreen" : "bg-tycheRed"
-        } text-white`}
-      >
-        <p className="font-semibold">
-          Amount: {amount} - {symbol}
-        </p>
-        <p>Value: {value} USD</p>
+      <div className="text-center gap-[26px] h-full flex flex-col">
+        <div className="flex flex-row gap-[5px]">
+          <p className="text-[12px] font-bold">Value:</p>
+          <span className="text-black text-[12px]">{value} USD</span>
+        </div>
+        <div className="flex flex-row gap-[5px]">
+          <p className="text-[12px] font-bold">Amount:</p>
+          <span className="text-black text-[12px]">
+            {amount} {symbol}
+          </span>
+        </div>
+      </div>
+      <div>
+        <img
+          src={incoming ? incomingIcon : outgoingIcon}
+          alt="icon"
+          className="w-[24px] h-[24px]"
+        />
       </div>
     </div>
   );

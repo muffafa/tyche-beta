@@ -66,13 +66,13 @@ function GeneralSettings() {
                 onChange={(e) => dispatch(updateSettings({ currency: generalSettings.currency, timezone: e.target.value }))}
             >
                 <option selected={generalSettings.timezone === "Europe/Berlin (CET)"}>
-                    Europe/Berlin (CET)
+                    Europe/Berlin
                 </option>
                 <option selected={generalSettings.timezone === "Europe/London (GMT)"}>
-                   Europe/London (GMT)
+                   Europe/London
                 </option>
                 <option selected={generalSettings.timezone === "Europe/Moscow (MSK)"}>
-                    Europe/Moscow (MSK)
+                    Europe/Moscow
                 </option>
             </select>
         </div>

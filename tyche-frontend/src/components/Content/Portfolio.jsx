@@ -69,7 +69,7 @@ function Portfolio({ tokens, nfts }) {
                   </tbody>
                 </table>
               ) : (
-                <p className="text-center text-tycheGray">No tokens found.</p>
+                <p className="text-center text-black">No tokens found.</p>
               )}
             </div>
           </div>
@@ -83,7 +83,7 @@ function Portfolio({ tokens, nfts }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-tycheGray">No NFTs found.</p>
+                <p className="text-center text-black">No NFTs found.</p>
               )}
             </div>
           </div>

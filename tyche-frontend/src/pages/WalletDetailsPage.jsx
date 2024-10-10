@@ -4,6 +4,120 @@ import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
 
 function WalletDetailsPage() {
+  const currentAddress = "0x123777777";
+  const transactions = [
+    {
+      txId: "0x123",
+      transactionTime: "2021-09-01T10:00:00Z",
+      attributes: {
+        hash: "0x12ıjoıjoas3",
+        sent_from: "0x12fjbfnjf3",
+        sent_to: "0x45assoıjoj6",
+        mined_at: "2021-09-01T10:00:00Z",
+        transfers: [
+          {
+            fungible_info: {
+              symbol: "ETH",
+              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+            },
+            quantity: {
+              float: 0.0001,
+            },
+            value: 200,
+          },
+        ],
+      },
+    },
+    {
+      txId: "0x456",
+      transactionTime: "2021-09-01T10:00:00Z",
+      attributes: {
+        hash: "0x45ljxoıcjc6",
+        sent_from: "0x12asoıjsao3",
+        sent_to: "0x45kjncxjxjnjnjn6",
+        mined_at: "2021-09-01T10:00:00Z",
+        transfers: [
+          {
+            fungible_info: {
+              symbol: "ETH",
+              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+            },
+            quantity: {
+              float: 0.0001,
+            },
+            value: 200,
+          },
+        ],
+      },
+    },
+    {
+      txId: "0x789",
+      transactionTime: "2021-09-01T10:00:00Z",
+      attributes: {
+        hash: "0x78ljndjnc9",
+        sent_from: "0x12kdjndcjkn3",
+        sent_to: "0x45dndnjknkn6",
+        mined_at: "2021-09-01T10:00:00Z",
+        transfers: [
+          {
+            fungible_info: {
+              symbol: "ETH",
+              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+            },
+            quantity: {
+              float: 0.0001,
+            },
+            value: 200,
+          },
+        ],
+      },
+    },
+    {
+      txId: "0x101",
+      transactionTime: "2021-09-01T10:00:00Z",
+      attributes: {
+        hash: "0x10dckjnbjksn1",
+        sent_from: "0x1cvlnjxcnn23",
+        sent_to: "0x456xcjnjn",
+        mined_at: "2021-09-01T10:00:00Z",
+        transfers: [
+          {
+            fungible_info: {
+              symbol: "ETH",
+              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+            },
+            quantity: {
+              float: 0.0001,
+            },
+            value: 200,
+          },
+        ],
+      },
+    },
+    {
+      txId: "0x101",
+      transactionTime: "2021-09-01T10:00:00Z",
+      attributes: {
+        hash: "0x10jhkhkh1",
+        sent_from: "0x12sss3",
+        sent_to: currentAddress,
+        mined_at: "2021-09-01T10:00:00Z",
+        transfers: [
+          {
+            fungible_info: {
+              symbol: "ETH",
+              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+            },
+            quantity: {
+              float: 0.0001,
+            },
+            value: 200,
+          },
+        ],
+      },
+    }
+  ];
+  
 
   const tokens = [
     {
@@ -92,9 +206,9 @@ function WalletDetailsPage() {
             <WalletInfo currentAddress={"address"} currentNetwork={network} />
             <div className="min-w-[300px] min-h-[384px]">
               <TxHistory
-                transactions={[]}
+                transactions={transactions}
                 currentNetwork={network}
-                currentAddress={"address"}
+                currentAddress={currentAddress}
               />
             </div>
           </div>

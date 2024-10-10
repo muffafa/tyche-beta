@@ -88,7 +88,7 @@ function Header() {
 
           {/* Login Button */}
           { loggedIn ? <button>
-            <div className="flex items-center justify-center bg-tycheDarkGray text-black text-[20px] font-[300] w-[52px] h-[52px] p-[14px] rounded-full" onClick={() => { document.cookie = "loggedIn=false"; navigate("/login") }}>
+            <div className="flex items-center justify-center bg-tycheDarkGray text-black text-[20px] font-[300] w-[52px] h-[52px] p-[14px] rounded-full" onClick={() => { document.cookie = "loggedIn=false"; window.location.reload(); }}>
               <p>A</p> {/* User's first letter of the name  */}
             </div>
           </button>:

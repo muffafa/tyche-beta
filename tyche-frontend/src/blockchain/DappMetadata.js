@@ -11,6 +11,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: uniswapImg,
       link: "https://app.uniswap.org/",
+      sponsored: true,
     },
     {
       id: 2,
@@ -18,6 +19,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://www.sushi.com/swap",
+      sponsored: false,
     },
     {
       id: 3,
@@ -25,6 +27,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.balancer.fi/#/ethereum",
+      sponsored: false,
     },
     {
       id: 4,
@@ -32,6 +35,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.1inch.io/#/1/simple/swap/ETH",
+      sponsored: true,
     },
     {
       id: 5,
@@ -39,6 +43,7 @@ export const DappMetadata = {
       description: "Lending and borrowing platform",
       image: aaveImg,
       link: "https://app.aave.com/",
+      sponsored: false,
     },
   ],
   bsc: [
@@ -48,6 +53,7 @@ export const DappMetadata = {
       description: "Perpetual decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.vooi.io/",
+      sponsored: false,
     },
     {
       id: 7,
@@ -55,6 +61,7 @@ export const DappMetadata = {
       description: "Perpetual decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.kiloex.io/trade",
+      sponsored: true,
     },
     {
       id: 8,
@@ -62,6 +69,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: pancakeswapImg,
       link: "https://pancakeswap.finance/swap",
+      sponsored: false,
     },
     {
       id: 9,
@@ -69,6 +77,7 @@ export const DappMetadata = {
       description: "Perpetual/Spot decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://biswap.org/tr/swap",
+      sponsored: false,
     },
     {
       id: 10,
@@ -76,6 +85,7 @@ export const DappMetadata = {
       description: "Lending and borrowing platform",
       image: pangolinImg, // Placeholder
       link: "https://app.radiant.capital/#/markets",
+      sponsored: true,
     },
   ],
   avaxc: [
@@ -85,6 +95,7 @@ export const DappMetadata = {
       description: "Decentralized exchange on Avalanche",
       image: pangolinImg, // Placeholder
       link: "https://traderjoexyz.com/avalanche",
+      sponsored: false
     },
     {
       id: 12,
@@ -92,6 +103,7 @@ export const DappMetadata = {
       description: "Decentralized exchange on Avalanche",
       image: pangolinImg, // Placeholder
       link: "https://app.dexalot.com/swap",
+      sponsored: false,
     },
     {
       id: 13,
@@ -99,6 +111,7 @@ export const DappMetadata = {
       description: "Perpetual decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.contango.xyz/",
+      sponsored: true,
     },
     {
       id: 14,
@@ -106,6 +119,7 @@ export const DappMetadata = {
       description: "TRY pegged stable coin",
       image: pangolinImg, // Placeholder
       link: "https://www.bilira.co/",
+      sponsored: false,
     },
     {
       id: 15,
@@ -113,6 +127,7 @@ export const DappMetadata = {
       description: "Launchpad on Avalanche",
       image: pangolinImg, // Placeholder
       link: "https://avalaunch.app/launchpad",
+      sponsored: false,
     },
   ],
   btc: [
@@ -122,6 +137,7 @@ export const DappMetadata = {
       description: "NFT marketplace",
       image: pangolinImg, // Placeholder
       link: "https://magiceden.io/",
+      sponsored: false,
     },
     {
       id: 17,
@@ -129,6 +145,7 @@ export const DappMetadata = {
       description: "Ordinal decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://uxuy.com/tr/marketplace",
+      sponsored: true,
     },
     {
       id: 18,
@@ -136,6 +153,7 @@ export const DappMetadata = {
       description: "Decentralized exchange",
       image: pangolinImg, // Placeholder
       link: "https://app.thorswap.finance/swap",
+      sponsored: false,
     },
     {
       id: 19,
@@ -143,6 +161,7 @@ export const DappMetadata = {
       description: "Biggest BTC wallet",
       image: pangolinImg, // Placeholder
       link: "https://unisat.io/",
+      sponsored: false,
     },
     {
       id: 20,
@@ -150,6 +169,7 @@ export const DappMetadata = {
       description: "Ordinals lending platform",
       image: pangolinImg, // Placeholder
       link: "https://app.liquidium.fi/lend",
+      sponsored: true,
     },
   ],
 };

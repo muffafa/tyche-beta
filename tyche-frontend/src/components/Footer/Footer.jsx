@@ -1,15 +1,28 @@
+import tycheLogo from "../../assets/images/tyche.svg"; // logoyu svg olarak aldım png çözünürlüğü düşük
+
 function Footer() {
   return (
-    <footer className="footer-container bg-tycheGray text-tycheWhite p-4 flex justify-between items-center">
-      <div className="logo-container">
-        <img src="/tyche.png" alt="Tyche Logo" className="h-8" />
+    <footer className="footer-container bg-tycheGray py-6 flex justify-between items-center w-full max-w-[915px] mx-auto mt-10 rounded-[40px]">
+      {/* Logo Section */}
+      <div className="logo-container flex items-center">
+        <img src={tycheLogo} alt="Tyche Logo" className="h-8" />{" "}
+        {/* New logo */}
       </div>
-      <div className="copyright-container text-center">
-        © 2024 Tyche <br /> Tüm Hakları Saklıdır
+
+      {/* Copyright Section */}
+      <div className="copyright-container text-center text-[12px]">
+        © 2024 Tyche <br /> All Rights Reserved
       </div>
+
+      {/* Contact Link Section */}
       <div className="contact-link">
-        <a href="/contact" className="text-tycheBlue">
-          İletişim
+        <a
+          target="_blank"
+          rel="noreferrer noopener"
+          href="https://github.com/muffafa/tyche-beta"
+          className="text-tycheBlue text-[14px]"
+        >
+          Github Repo
         </a>
       </div>
     </footer>

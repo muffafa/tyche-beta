@@ -1,5 +1,6 @@
 import BaseNetwork from "./BaseNetwork.js";
 import createAxiosInstance from "../utils/axiosInstance.js";
+import { TokenListProvider } from "@solana/spl-token-registry";
 
 class SolanaNetwork extends BaseNetwork {
 	constructor(apiKey) {
@@ -7,8 +8,110 @@ class SolanaNetwork extends BaseNetwork {
 		this.axios = createAxiosInstance(
 			`https://solana-mainnet.g.alchemy.com/v2/${this.apiKey}`
 		);
+		this.tokenList = [];
+		this.tokenListInitialized = false;
+		this.tokenListPromise = this.initializeTokenList();
 	}
 
+	/**
+	 * Initializes the token list by fetching it from the token registry.
+	 */
+	async initializeTokenList() {
+		try {
+			const tokenListContainer = await new TokenListProvider().resolve();
+			this.tokenList = tokenListContainer
+				.filterByClusterSlug("mainnet-beta")
+				.getList();
+			console.log(
+				"Token list initialized with",
+				this.tokenList.length,
+				"tokens."
+			);
+			this.tokenListInitialized = true;
+		} catch (error) {
+			console.error("Error initializing token list:", error);
+		}
+	}
+
+	/**
+	 * Ensures that the token list is initialized before proceeding.
+	 */
+	async ensureTokenListInitialized() {
+		if (!this.tokenListInitialized) {
+			await this.tokenListPromise;
+		}
+	}
+
+	/**
+	 * Retrieves the token metadata for a given mint address from the token list.
+	 * @param {string} mintAddress - The mint address of the token.
+	 * @returns {Object|null} - Token metadata or null if not found.
+	 */
+	getTokenInfo(mintAddress) {
+		const tokenInfo = this.tokenList.find((t) => t.address === mintAddress);
+		if (tokenInfo) {
+			return {
+				symbol: tokenInfo.symbol,
+				name: tokenInfo.name,
+				decimals: tokenInfo.decimals,
+			};
+		} else {
+			// Token not found in the registry
+			return null;
+		}
+	}
+
+	/**
+	 * Fetches the token decimals from the mint account.
+	 * @param {string} mintAddress - The mint address of the token.
+	 * @returns {number} - The decimals of the token.
+	 */
+	async getTokenDecimals(mintAddress) {
+		try {
+			const response = await this.axios.post("", {
+				jsonrpc: "2.0",
+				id: 1,
+				method: "getAccountInfo",
+				params: [
+					mintAddress,
+					{
+						encoding: "base64",
+					},
+				],
+			});
+
+			const accountInfo = response.data.result.value;
+			if (accountInfo === null) {
+				console.error(`No account info found for mint address ${mintAddress}`);
+				return 0;
+			}
+
+			const data = accountInfo.data[0]; // base64 encoded data
+			const buffer = Buffer.from(data, "base64");
+
+			// Mint account data layout:
+			//   mint authority: 32 bytes
+			//   supply: 8 bytes
+			//   decimals: 1 byte
+			//   is_initialized: 1 byte
+			//   freeze authority option: 1 byte
+			//   freeze authority: 32 bytes (if freeze authority option is 1)
+
+			// The decimals byte is at offset 44
+			const decimals = buffer.readUInt8(44);
+
+			return decimals;
+		} catch (error) {
+			console.error(`Error fetching mint account for ${mintAddress}:`, error);
+			return 0;
+		}
+	}
+
+	/**
+	 * Fetches the wallet's SOL balance.
+	 * @param {string} walletAddress - The wallet address.
+	 * @returns {number} - The SOL balance.
+	 */
 	async getWalletBalance(walletAddress) {
 		try {
 			const response = await this.axios.post("", {
@@ -28,8 +131,16 @@ class SolanaNetwork extends BaseNetwork {
 		}
 	}
 
+	/**
+	 * Fetches the wallet's SPL token accounts, including decimals for unknown tokens.
+	 * @param {string} walletAddress - The wallet address.
+	 * @returns {Array<Object>} - An array of token objects.
+	 */
 	async getWalletTokenAccounts(walletAddress) {
 		try {
+			// Ensure the token list is initialized
+			await this.ensureTokenListInitialized();
+
 			const response = await this.axios.post("", {
 				jsonrpc: "2.0",
 				id: 1,
@@ -45,19 +156,40 @@ class SolanaNetwork extends BaseNetwork {
 			const tokens = [];
 
 			for (const accountInfo of tokenAccounts) {
-				const tokenAccount = accountInfo.account.data.parsed.info;
-				const mintAddress = tokenAccount.mint;
-				const tokenBalance = tokenAccount.tokenAmount.uiAmount;
+				const tokenAccountInfo = accountInfo.account.data.parsed.info;
+				const mintAddress = tokenAccountInfo.mint;
+				const tokenAmountInfo = tokenAccountInfo.tokenAmount;
+				const amountRaw = tokenAmountInfo.amount; // Raw amount as string
+
+				// Check if token is in the registry
+				const tokenInfo = this.getTokenInfo(mintAddress);
+
+				let decimals;
+				let symbol;
+				let name;
+
+				if (tokenInfo) {
+					decimals = tokenInfo.decimals;
+					symbol = tokenInfo.symbol;
+					name = tokenInfo.name;
+				} else {
+					// Token not found in registry; fetch decimals from mint account
+					decimals = await this.getTokenDecimals(mintAddress);
+					symbol = "UNKNOWN";
+					name = "Unknown Token";
+				}
+
+				// Compute the token balance using the raw amount and decimals
+				const tokenBalance = parseInt(amountRaw) / Math.pow(10, decimals);
 
 				tokens.push({
 					tokenAccount: accountInfo.pubkey,
 					mintAddress,
 					tokenBalance,
+					symbol,
+					name,
+					decimals,
 				});
-
-				// fetch additional metadata
-				// const metadata = await this.fetchTokenMetadata(mintAddress);
-				// tokens[tokens.length - 1].metadata = metadata;
 			}
 
 			return tokens;

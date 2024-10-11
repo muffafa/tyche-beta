@@ -1,16 +1,22 @@
 import BaseNetwork from "./BaseNetwork.js";
 import createAxiosInstance from "../utils/axiosInstance.js";
 import { TokenListProvider } from "@solana/spl-token-registry";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { Metaplex } from "@metaplex-foundation/js";
 
 class SolanaNetwork extends BaseNetwork {
 	constructor(apiKey) {
 		super(apiKey);
-		this.axios = createAxiosInstance(
-			`https://solana-mainnet.g.alchemy.com/v2/${this.apiKey}`
-		);
+		this.apiKey = apiKey;
+		this.rpcEndpoint = `https://solana-mainnet.g.alchemy.com/v2/${this.apiKey}`;
+		this.axios = createAxiosInstance(this.rpcEndpoint);
 		this.tokenList = [];
 		this.tokenListInitialized = false;
 		this.tokenListPromise = this.initializeTokenList();
+
+		// Initialize Solana connection and Metaplex instance
+		this.connection = new Connection(this.rpcEndpoint);
+		this.metaplex = Metaplex.make(this.connection);
 	}
 
 	/**
@@ -89,14 +95,6 @@ class SolanaNetwork extends BaseNetwork {
 			const data = accountInfo.data[0]; // base64 encoded data
 			const buffer = Buffer.from(data, "base64");
 
-			// Mint account data layout:
-			//   mint authority: 32 bytes
-			//   supply: 8 bytes
-			//   decimals: 1 byte
-			//   is_initialized: 1 byte
-			//   freeze authority option: 1 byte
-			//   freeze authority: 32 bytes (if freeze authority option is 1)
-
 			// The decimals byte is at offset 44
 			const decimals = buffer.readUInt8(44);
 
@@ -104,6 +102,33 @@ class SolanaNetwork extends BaseNetwork {
 		} catch (error) {
 			console.error(`Error fetching mint account for ${mintAddress}:`, error);
 			return 0;
+		}
+	}
+
+	/**
+	 * Fetches the token metadata (name and symbol) using Metaplex.
+	 * @param {string} mintAddress - The mint address of the token.
+	 * @returns {Object} - An object containing the name and symbol.
+	 */
+	async getTokenMetadata(mintAddress) {
+		try {
+			const mintPublicKey = new PublicKey(mintAddress);
+
+			// Fetch the token metadata using Metaplex
+			const nft = await this.metaplex
+				.nfts()
+				.findByMint({ mintAddress: mintPublicKey });
+
+			return {
+				name: nft.name.trim(),
+				symbol: nft.symbol.trim(),
+			};
+		} catch (error) {
+			console.error(
+				`Error fetching metadata for ${mintAddress}:`,
+				error.message
+			);
+			return { name: "Unknown Token", symbol: "UNKNOWN" };
 		}
 	}
 
@@ -132,7 +157,7 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the wallet's SPL token accounts, including decimals for unknown tokens.
+	 * Fetches the wallet's SPL token accounts, including metadata from Metaplex for unknown tokens.
 	 * @param {string} walletAddress - The wallet address.
 	 * @returns {Array<Object>} - An array of token objects.
 	 */
@@ -154,6 +179,9 @@ class SolanaNetwork extends BaseNetwork {
 
 			const tokenAccounts = response.data.result.value;
 			const tokens = [];
+
+			// Collect mint addresses that are unknown to fetch via Metaplex
+			const unknownMintAddresses = [];
 
 			for (const accountInfo of tokenAccounts) {
 				const tokenAccountInfo = accountInfo.account.data.parsed.info;
@@ -177,6 +205,9 @@ class SolanaNetwork extends BaseNetwork {
 					decimals = await this.getTokenDecimals(mintAddress);
 					symbol = "UNKNOWN";
 					name = "Unknown Token";
+
+					// Collect unknown mint addresses for Metaplex metadata fetching
+					unknownMintAddresses.push(mintAddress);
 				}
 
 				// Compute the token balance using the raw amount and decimals
@@ -189,6 +220,26 @@ class SolanaNetwork extends BaseNetwork {
 					symbol,
 					name,
 					decimals,
+				});
+			}
+
+			// Fetch metadata for unknown tokens using Metaplex
+			if (unknownMintAddresses.length > 0) {
+				// To optimize, fetch metadata in parallel
+				const metadataPromises = unknownMintAddresses.map((mint) =>
+					this.getTokenMetadata(mint)
+				);
+				const metaplexMetadata = await Promise.all(metadataPromises);
+
+				// Update tokens with fetched metadata
+				tokens.forEach((token) => {
+					if (token.symbol === "UNKNOWN") {
+						const index = unknownMintAddresses.indexOf(token.mintAddress);
+						if (index !== -1 && metaplexMetadata[index]) {
+							token.symbol = metaplexMetadata[index].symbol;
+							token.name = metaplexMetadata[index].name;
+						}
+					}
 				});
 			}
 

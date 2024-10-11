@@ -3,6 +3,7 @@ import QRCode from "./../../assets/images/qrcode.svg";
 import shareIcon from "./../../assets/images/icons/shareIcon.svg";
 import walletCopyIcon from "./../../assets/images/icons/walletCopyIcon.svg";
 import tagEditBlueIcon from "./../../assets/images/icons/tagEditBlueIcon.svg";
+import saveWalletLightBlueIcon from "./../../assets/images/icons/saveWalletLightBlueIcon.svg";
 import { useState } from "react";
 import ZoomQRCode from "./ZoomQRCode";
 
@@ -26,59 +27,75 @@ WalletInfo.propTypes = {
 export default WalletInfo;
 
 function Details() {
+    let isSavedWallet = false; //Change this to true to see the saved wallet UI
     return (
       <div className="flex flex-col items-start gap-[24px]">
         <div className="flex flex-row gap-[15px]">
           <p className="text-black text-[14px] font-bold">Wallet Address:</p>
           <div className="flex flex-row items-center">
-              <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
-                0xjhkjhasdygq9823421391802381823
-              </p>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText("0xjhkjhasdygq9823421391802381823");
-                }}
-              >
-                <img
-                  src={walletCopyIcon}
-                  alt="Copy"
-                  className="w-[15px] h-[15px]"
-                />
-              </button>
+            <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
+              0xjhkjhasdygq9823421391802381823
+            </p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  "0xjhkjhasdygq9823421391802381823"
+                );
+              }}
+            >
+              <img
+                src={walletCopyIcon}
+                alt="Copy"
+                className="w-[15px] h-[15px]"
+              />
+            </button>
           </div>
         </div>
         <div className="flex flex-row gap-[15px]">
           <p className="text-black text-[14px] font-bold">Private Name Tag:</p>
-            <button className="flex flex-row items-center gap-[10px]">
-            <div className="flex flex-row items-center gap-[10px]">
-                <p className="text-[14px] text-tycheBlue font-[350]">
-                    muffafa
-                </p>
+          <div className="flex flex-row items-center gap-[10px]">
+            {isSavedWallet ? (
+              <button className="flex flex-row items-center gap-[10px]" onClick={() => console.log("Edit Tag clicked")}>
+                <p className="text-[14px] text-tycheBlue font-[350]">muffafa</p>
                 <img
-                    src={tagEditBlueIcon}
-                    alt="Edit"
-                    className="flex w-[15px] h-[15px]"
+                  src={tagEditBlueIcon}
+                  alt="Edit"
+                  className="flex w-[15px] h-[15px]"
                 />
-            </div>
-            </button>
+              </button>
+            ) : (
+              <button className="flex flex-row items-center justify-center gap-[10px] border-dashed border-[2px] px-[10px] py-[1px] border-tycheBlue rounded-full" onClick={() => console.log("Save Wallet clicked")}>
+                <div className="flex flex-row items-center justify-center gap-[5px]">
+                    <img src={saveWalletLightBlueIcon} alt="Save" className="w-[10px] h-[10px]"/>
+                    <p className="text-[10px] text-tycheBlue font-[350]">Save Wallet</p>
+                </div>
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex flex-row gap-[15px]">
-            <p className="text-black text-[14px] font-bold">Wallet Balance:</p>
-            <p className="text-[14px] text-black font-[350]">263.4 USD</p>
+          <p className="text-black text-[14px] font-bold">Wallet Balance:</p>
+          <p className="text-[14px] text-black font-[350]">263.4 USD</p>
         </div>
         <div className="flex flex-row gap-[40px]">
-        <div className="flex flex-row gap-[15px]">
+          <div className="flex flex-row gap-[15px]">
             <p className="text-black text-[14px] font-bold">First tx:</p>
-            <p className="text-[14px] text-tycheBlue font-[350] cursor-pointer" onClick={() => console.log("First tx clicked")}>
-                5 months ago
+            <p
+              className="text-[14px] text-tycheBlue font-[350] cursor-pointer"
+              onClick={() => console.log("First tx clicked")}
+            >
+              5 months ago
             </p>
-        </div>
-        <div className="flex flex-row gap-[15px]">
+          </div>
+          <div className="flex flex-row gap-[15px]">
             <p className="text-black text-[14px] font-bold">Last tx:</p>
-            <p className="text-[14px] text-tycheBlue font-[350] cursor-pointer" onClick={() => console.log("Last tx clicked")}>
-                2 days ago
+            <p
+              className="text-[14px] text-tycheBlue font-[350] cursor-pointer"
+              onClick={() => console.log("Last tx clicked")}
+            >
+              2 days ago
             </p>
-        </div>
+          </div>
         </div>
       </div>
     );

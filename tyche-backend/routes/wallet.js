@@ -54,9 +54,14 @@ router.get("/balance", getWalletBalance);
 router.get("/tokens", getWalletTokenAccounts);
 
 /**
- * @route   GET /api/v1/wallet/transactions?walletAddress=<address>&network=<network>
- * @desc    Get the transaction history of a wallet in a specified network, including the first and last transactions
+ * @route   GET /api/v1/wallet/transactions?walletAddress=<address>&network=<network>&page=<page>&limit=<limit>
+ * @desc    Get the transaction history of a wallet in a specified network with pagination
  * @access  Public
+ * @queryParams
+ *  - walletAddress (string, required): The wallet address to fetch transactions for.
+ *  - network (string, required): The network of the wallet (e.g., Solana).
+ *  - page (number, optional): The page number for pagination (default: 1).
+ *  - limit (number, optional): The number of transactions per page (default: 5, max: 1000).
  */
 router.get("/transactions", getWalletTransactions);
 

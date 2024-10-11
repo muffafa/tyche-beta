@@ -88,29 +88,38 @@ class SolanaNetwork extends BaseNetwork {
 	////////////////////////////////
 
 	/**
-	 * Fetches all transactions for a given wallet address.
+	 * Fetches transactions for a given wallet address with pagination.
 	 * @param {string} walletAddress - The wallet address to fetch transactions for.
+	 * @param {Object} options - Pagination options.
+	 * @param {number} options.limit - Number of transactions to fetch.
+	 * @param {string} [options.before] - Signature to paginate before.
 	 * @returns {Array} - An array of transaction objects.
 	 */
-	async getAllTransactions(walletAddress) {
+	async getAllTransactions(walletAddress, options = {}) {
+		const { limit = 1000, before } = options;
+
 		try {
+			const params = {
+				limit,
+				commitment: "finalized",
+			};
+
+			if (before) {
+				params.before = before;
+			}
+
 			const response = await this.axios.post("", {
 				jsonrpc: "2.0",
 				id: 1,
 				method: "getSignaturesForAddress",
-				params: [
-					walletAddress,
-					{
-						limit: 1000,
-					},
-				],
+				params: [walletAddress, params],
 			});
 
 			const transactions = response.data.result;
 
 			// Convert Unix timestamps to JavaScript Date objects, add as 'date' field
 			transactions.forEach((tx) => {
-				tx.date = new Date(tx.blockTime * 1000); // Convert Unix timestamp to JavaScript Date
+				tx.date = tx.blockTime ? new Date(tx.blockTime * 1000) : null; // Handle cases where blockTime might be null
 			});
 
 			return transactions;

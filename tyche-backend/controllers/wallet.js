@@ -281,12 +281,12 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * @desc    Get wallet transactions
+ * @desc    Get wallet transactions with pagination
  * @route   GET /api/v1/wallets/transactions
  * @access  Public
  */
 export const getWalletTransactions = asyncHandler(async (req, res, next) => {
-	const { walletAddress, network } = req.query;
+	const { walletAddress, network, page, limit } = req.query;
 
 	if (!walletAddress || !network) {
 		return next(
@@ -295,6 +295,19 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 				400
 			)
 		);
+	}
+
+	// Parse pagination parameters with default values
+	const pageNumber = parseInt(page, 10) || 1;
+	const limitNumber = parseInt(limit, 10) || 5;
+
+	// Validate pagination parameters
+	if (pageNumber < 1) {
+		return next(new ErrorResponse("Page number must be at least 1.", 400));
+	}
+
+	if (limitNumber < 1 || limitNumber > 1000) {
+		return next(new ErrorResponse("Limit must be between 1 and 1000.", 400));
 	}
 
 	const networkLower = network.toLowerCase();
@@ -309,33 +322,59 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 	try {
 		const networkService = createNetwork(networkLower);
 
-		// Fetch first and last transactions
-		const transactions = await networkService.getAllTransactions(walletAddress);
-		const firstTransaction = await networkService.getFirstTransaction(
-			walletAddress
+		// Limiti next page olup olmadigini anlamak icin 1 arttirip fetch ediyorum!
+		// API'ye her zaman +1 istek gidiyor!!!
+		const fetchLimit = pageNumber * limitNumber + 1;
+
+		// Fetch transactions up to the current page
+		const allTransactions = await networkService.getAllTransactions(
+			walletAddress,
+			{ limit: fetchLimit }
 		);
-		const lastTransaction = await networkService.getLastTransaction(
-			walletAddress
+
+		// Slice transactions for the current page
+		const startIndex = (pageNumber - 1) * limitNumber;
+		const paginatedTransactions = allTransactions.slice(
+			startIndex,
+			startIndex + limitNumber
 		);
+
+		// Determine if there is a next page
+		const hasNextPage = allTransactions.length > pageNumber * limitNumber;
+
+		// Fetch first and last transactions only once
+		let firstTransaction = null;
+		let lastTransaction = null;
+
+		if (pageNumber === 1 && paginatedTransactions.length > 0) {
+			firstTransaction = {
+				transactionId:
+					paginatedTransactions[paginatedTransactions.length - 1].signature,
+				date: paginatedTransactions[paginatedTransactions.length - 1].date,
+			};
+		}
+
+		if (paginatedTransactions.length > 0) {
+			lastTransaction = {
+				transactionId:
+					paginatedTransactions[paginatedTransactions.length - 1].signature,
+				date: paginatedTransactions[paginatedTransactions.length - 1].date,
+			};
+		}
 
 		res.status(200).json({
 			success: true,
+			pagination: {
+				currentPage: pageNumber,
+				limit: limitNumber,
+				hasNextPage,
+			},
 			data: {
 				walletAddress,
 				network: networkLower,
-				firstTransaction: firstTransaction
-					? {
-							transactionId: firstTransaction.transactionId,
-							date: firstTransaction.date,
-					  }
-					: null,
-				lastTransaction: lastTransaction
-					? {
-							transactionId: lastTransaction.transactionId,
-							date: lastTransaction.date,
-					  }
-					: null,
-				transactions: transactions,
+				firstTransaction,
+				lastTransaction,
+				transactions: paginatedTransactions,
 			},
 		});
 	} catch (error) {

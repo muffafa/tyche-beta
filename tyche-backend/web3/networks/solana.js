@@ -36,6 +36,7 @@ class SolanaNetwork extends BaseNetwork {
 			this.tokenListInitialized = true;
 		} catch (error) {
 			console.error("Error initializing token list:", error);
+			// Optionally, handle the error or retry
 		}
 	}
 
@@ -60,6 +61,7 @@ class SolanaNetwork extends BaseNetwork {
 				symbol: tokenInfo.symbol,
 				name: tokenInfo.name,
 				decimals: tokenInfo.decimals,
+				image: tokenInfo.logoURI, // Add image from token registry
 			};
 		} else {
 			// Token not found in the registry
@@ -106,9 +108,9 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the token metadata (name and symbol) using Metaplex.
+	 * Fetches the token metadata (name, symbol, and image) using Metaplex.
 	 * @param {string} mintAddress - The mint address of the token.
-	 * @returns {Object} - An object containing the name and symbol.
+	 * @returns {Object} - An object containing the name, symbol, and image.
 	 */
 	async getTokenMetadata(mintAddress) {
 		try {
@@ -119,16 +121,24 @@ class SolanaNetwork extends BaseNetwork {
 				.nfts()
 				.findByMint({ mintAddress: mintPublicKey });
 
+			// Fetch the URI which contains the JSON metadata
+			const uri = nft.uri;
+
+			// Fetch the JSON metadata from the URI
+			const response = await fetch(uri);
+			const metadataJson = await response.json();
+
 			return {
-				name: nft.name.trim(),
-				symbol: nft.symbol.trim(),
+				name: metadataJson.name ? metadataJson.name.trim() : "Unknown Token",
+				symbol: metadataJson.symbol ? metadataJson.symbol.trim() : "UNKNOWN",
+				image: metadataJson.image ? metadataJson.image.trim() : null,
 			};
 		} catch (error) {
 			console.error(
 				`Error fetching metadata for ${mintAddress}:`,
 				error.message
 			);
-			return { name: "Unknown Token", symbol: "UNKNOWN" };
+			return { name: "Unknown Token", symbol: "UNKNOWN", image: null };
 		}
 	}
 
@@ -195,16 +205,19 @@ class SolanaNetwork extends BaseNetwork {
 				let decimals;
 				let symbol;
 				let name;
+				let image;
 
 				if (tokenInfo) {
 					decimals = tokenInfo.decimals;
 					symbol = tokenInfo.symbol;
 					name = tokenInfo.name;
+					image = tokenInfo.image;
 				} else {
 					// Token not found in registry; fetch decimals from mint account
 					decimals = await this.getTokenDecimals(mintAddress);
 					symbol = "UNKNOWN";
 					name = "Unknown Token";
+					image = null;
 
 					// Collect unknown mint addresses for Metaplex metadata fetching
 					unknownMintAddresses.push(mintAddress);
@@ -220,6 +233,7 @@ class SolanaNetwork extends BaseNetwork {
 					symbol,
 					name,
 					decimals,
+					image, // Include image if available
 				});
 			}
 
@@ -238,6 +252,7 @@ class SolanaNetwork extends BaseNetwork {
 						if (index !== -1 && metaplexMetadata[index]) {
 							token.symbol = metaplexMetadata[index].symbol;
 							token.name = metaplexMetadata[index].name;
+							token.image = metaplexMetadata[index].image || token.image;
 						}
 					}
 				});

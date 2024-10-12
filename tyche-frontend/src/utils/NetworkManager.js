@@ -7,12 +7,12 @@ import bscIcon from "../assets/images/coin/bnb.svg";
 import baseIcon from "../assets/images/coin/base.svg";
 
 const networkMappings = {
+  solana: "sol",
   ethereum: "eth",
   "bnb smart chain": "bsc",
   avalanche: "avaxc",
   base: "base",
   bitcoin: "btc",
-  solana: "sol",
   // Add other networks as needed
 };
 
@@ -24,12 +24,12 @@ const chainIdMappings = {
 };
 
 const networkIcons = {
+  sol: solIcon,
   eth: ethIcon,
   bsc: bscIcon,
   avaxc: avaxcIcon,
   base: baseIcon,
   btc: btcIcon,
-  sol: solIcon,
 };
 
 export function getNetworkShortName(networkName) {

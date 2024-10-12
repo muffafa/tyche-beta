@@ -2,6 +2,9 @@ import uniswapImg from "../assets/images/uniswap.png";
 import aaveImg from "../assets/images/aave.png";
 import pangolinImg from "../assets/images/ethereum.png"; // Placeholder image
 import pancakeswapImg from "../assets/images/ethereum.png"; // Placeholder image
+import dialectImg from "../assets/images/dialect.png";
+import jupiterImg from "../assets/images/jupiter.png";
+import tensorImg from "../assets/images/tensor.png";
 
 export const DappMetadata = {
   eth: [
@@ -95,7 +98,7 @@ export const DappMetadata = {
       description: "Decentralized exchange on Avalanche",
       image: pangolinImg, // Placeholder
       link: "https://traderjoexyz.com/avalanche",
-      sponsored: false
+      sponsored: false,
     },
     {
       id: 12,
@@ -170,6 +173,32 @@ export const DappMetadata = {
       image: pangolinImg, // Placeholder
       link: "https://app.liquidium.fi/lend",
       sponsored: true,
+    },
+  ],
+  sol: [
+    {
+      id: 1,
+      name: "Dialect",
+      description: "Messaging protocol enabling secure on-chain communication.",
+      image: dialectImg,
+      link: "https://dialect.to/",
+      sponsored: true,
+    },
+    {
+      id: 2,
+      name: "Jupiter",
+      description: "Liquidity aggregator offering optimal token swap prices.",
+      image: jupiterImg,
+      link: "https://jup.ag/",
+      sponsored: false,
+    },
+    {
+      id: 3,
+      name: "Tensor",
+      description: "NFT trading platform with advanced tools and analytics.",
+      image: tensorImg,
+      link: "https://www.tensor.trade/",
+      sponsored: false,
     },
   ],
 };

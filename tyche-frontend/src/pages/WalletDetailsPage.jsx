@@ -136,7 +136,8 @@ function WalletDetailsPage() {
       basePrice: "300",
     },
   ];
-  const network = "ethereum";
+  const network = "solana";
+
   return (
     <>
       <div className="flex flex-col h-full justify-center items-center mt-[80px]">

@@ -16,10 +16,10 @@ function TransactionDetailsPage() {
   // Example tokens array
   const tokens = [
     {
-      symbol: "ETH",
+      symbol: "SOL",
       tokenContractAddress: "0x1234",
-      holdingAmount: 1.0,
-      valueUsd: 1000,
+      holdingAmount: 1.5,
+      valueUsd: 218.28,
     },
     // Add more tokens if needed
   ];
@@ -70,7 +70,7 @@ function TransactionDetailsPage() {
                 <div className="flex flex-col gap-[33px]">
                   <div className="flex flex-col">
                     <p className="text-[18px] font-[550] text-black">
-                      27 Sep 2024
+                      1 May 2023
                     </p>
                     <p className="text-[18px] font-[350] text-black">
                       12:00:00
@@ -103,7 +103,7 @@ function TransactionDetailsPage() {
                 <div className="flex flex-row gap-[22px]">
                   <p className="text-[18px] font-[550] text-black">From:</p>
                   <p className="text-[18px] font-[350] text-tycheBlue">
-                    0x1234...5678
+                    0x12fjbfn...
                   </p>
                 </div>
                 <img
@@ -114,7 +114,7 @@ function TransactionDetailsPage() {
                 <div className="flex flex-row gap-[22px]">
                   <p className="text-[18px] font-[550] text-black">To:</p>
                   <p className="text-[18px] font-[350] text-tycheBlue">
-                    0x1234...5678
+                    0x1237777...
                   </p>
                 </div>
               </div>

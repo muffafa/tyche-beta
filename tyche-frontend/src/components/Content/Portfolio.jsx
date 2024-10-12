@@ -38,6 +38,7 @@ function Portfolio({ tokens, nfts }) {
             NFTs
           </button>
         </div>
+
         {activeTab === "tokens" ? (
           <div className="px-[25px] gap-[12px] h-[290px]">
             <p
@@ -55,12 +56,16 @@ function Portfolio({ tokens, nfts }) {
                 </div>
               </div>
             </div>
-            <div className={`overflow-y-scroll ${consistentHeightClass}`}>
+
+            <div className={`overflow-y-auto ${consistentHeightClass}`}>
               {tokens.length > 0 ? (
                 <div className="w-full text-left flex">
                   <div className="gap-[12px] flex flex-col w-full">
                     {tokens.map((token, index) => (
-                      <div key={index} className="bg-tycheLightGray flex w-full">
+                      <div
+                        key={index}
+                        className="bg-tycheLightGray flex w-full"
+                      >
                         <div className="w-full">
                           <TokenCard token={token} />
                         </div>
@@ -75,7 +80,7 @@ function Portfolio({ tokens, nfts }) {
           </div>
         ) : (
           <div className="px-[25px] gap-[12px] h-[290px]">
-            <div className={`overflow-y-scroll ${consistentHeightClass}`}>
+            <div className={`overflow-y-auto ${consistentHeightClass}`}>
               {nfts.length > 0 ? (
                 <div className="flex flex-wrap gap-x-[20px] gap-y-[10px] justify-center pb-[10px]">
                   {nfts.map((nft, index) => (

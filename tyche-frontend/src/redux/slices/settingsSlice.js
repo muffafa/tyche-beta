@@ -22,7 +22,7 @@ const saveState = (state) => {
 };
 
 const initialState = loadState() || {
-  currency: "TRY",
+  currency: "USD",
   timezone: "Europe/Istanbul",
 };
 

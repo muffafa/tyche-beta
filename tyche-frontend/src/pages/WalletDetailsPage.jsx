@@ -5,136 +5,128 @@ import WalletInfo from "../components/Content/WalletInfo";
 
 function WalletDetailsPage() {
   const currentAddress = "0x123777777";
+
   const transactions = [
     {
       txId: "0x123",
-      transactionTime: "2021-09-01T10:00:00Z",
+      transactionTime: "2023-05-01T10:00:00Z",
       attributes: {
         hash: "0x12ıjoıjoas3",
         sent_from: "0x12fjbfnjf3",
-        sent_to: "0x45assoıjoj6",
-        mined_at: "2021-09-01T10:00:00Z",
+        sent_to: currentAddress, // You are the receiver
+        mined_at: "2023-05-01T10:00:00Z",
         transfers: [
           {
             fungible_info: {
-              symbol: "ETH",
-              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+              symbol: "SOL",
+              icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.0001,
+              float: 1.5,
             },
-            value: 200,
+            value: (1.5 * 145.59).toFixed(2), // 218.39 USD
           },
         ],
       },
     },
     {
       txId: "0x456",
-      transactionTime: "2021-09-01T10:00:00Z",
+      transactionTime: "2023-07-01T14:30:00Z",
       attributes: {
         hash: "0x45ljxoıcjc6",
-        sent_from: "0x12asoıjsao3",
+        sent_from: currentAddress, // You are the sender
         sent_to: "0x45kjncxjxjnjnjn6",
-        mined_at: "2021-09-01T10:00:00Z",
+        mined_at: "2023-07-01T14:30:00Z",
         transfers: [
           {
             fungible_info: {
-              symbol: "ETH",
-              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+              symbol: "SOL",
+              icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.0001,
+              float: 2.3,
             },
-            value: 200,
+            value: (2.3 * 145.59).toFixed(2), // 334.86 USD
           },
         ],
       },
     },
     {
       txId: "0x789",
-      transactionTime: "2021-09-01T10:00:00Z",
+      transactionTime: "2023-08-10T16:00:00Z",
       attributes: {
         hash: "0x78ljndjnc9",
         sent_from: "0x12kdjndcjkn3",
-        sent_to: "0x45dndnjknkn6",
-        mined_at: "2021-09-01T10:00:00Z",
+        sent_to: currentAddress, // You are the receiver
+        mined_at: "2023-08-10T16:00:00Z",
         transfers: [
           {
             fungible_info: {
-              symbol: "ETH",
-              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+              symbol: "SOL",
+              icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.0001,
+              float: 0.75,
             },
-            value: 200,
+            value: (0.75 * 145.59).toFixed(2), // 109.19 USD
           },
         ],
       },
     },
     {
       txId: "0x101",
-      transactionTime: "2021-09-01T10:00:00Z",
+      transactionTime: "2023-08-25T11:00:00Z",
       attributes: {
         hash: "0x10dckjnbjksn1",
-        sent_from: "0x1cvlnjxcnn23",
+        sent_from: currentAddress, // You are the sender
         sent_to: "0x456xcjnjn",
-        mined_at: "2021-09-01T10:00:00Z",
+        mined_at: "2023-08-25T11:00:00Z",
         transfers: [
           {
             fungible_info: {
-              symbol: "ETH",
-              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+              symbol: "SOL",
+              icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.0001,
+              float: 1.25,
             },
-            value: 200,
+            value: (1.25 * 145.59).toFixed(2), // 181.99 USD
           },
         ],
       },
     },
     {
       txId: "0x101",
-      transactionTime: "2021-09-01T10:00:00Z",
+      transactionTime: "2023-09-01T12:00:00Z",
       attributes: {
         hash: "0x10jhkhkh1",
         sent_from: "0x12sss3",
-        sent_to: currentAddress,
-        mined_at: "2021-09-01T10:00:00Z",
+        sent_to: currentAddress, // You are the receiver
+        mined_at: "2023-09-01T12:00:00Z",
         transfers: [
           {
             fungible_info: {
-              symbol: "ETH",
-              icon: "https://assets.coingecko.com/coins/images/279/small/ethereum.png",
+              symbol: "SOL",
+              icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.0001,
+              float: 3.0,
             },
-            value: 200,
+            value: (3.0 * 145.59).toFixed(2), // 436.77 USD
           },
         ],
       },
-    }
+    },
   ];
-  
 
   const tokens = [
     {
-      symbol: "ETH",
+      symbol: "SOL",
       tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
-      holdingAmount: "0.001",
-      priceUsd: "2000",
-      valueUsd: "200",
+      holdingAmount: "1",
+      priceUsd: "145.59",
+      valueUsd: "145.59",
       tokenId: "0xkdsjljsdjlsjdjsdj",
-    },
-    {
-      symbol: "DAI",
-      tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
-      holdingAmount: "0.0001",
-      priceUsd: "1",
-      valueUsd: "0.1",
-      tokenId: "0xkdsjljsdjlsjdjsdj,",
     },
   ];
   const nfts = [
@@ -143,52 +135,7 @@ function WalletDetailsPage() {
       id: "1640",
       basePrice: "300",
     },
-    {
-      header: "NFT",
-      id: "1641",
-      basePrice: "400",
-    },
-    {
-      header: "NFT",
-      id: "1642",
-      basePrice: "500",
-    },
-    {
-      header: "NFT",
-      id: "1643",
-      basePrice: "600",
-    },
-    {
-      header: "NFT",
-      id: "1644",
-      basePrice: "700",
-    },
-    {
-      header: "NFT",
-      id: "1645",
-      basePrice: "800",
-    },
-    {
-      header: "NFT",
-      id: "1646",
-      basePrice: "900",
-    },
-    {
-      header: "NFT",
-      id: "1647",
-      basePrice: "1000",
-    },
-    {
-      header: "NFT",
-      id: "1648",
-      basePrice: "1100",
-    },
-    {
-      header: "NFT",
-      id: "1649",
-      basePrice: "1200",
-    },
-];
+  ];
   const network = "ethereum";
   return (
     <>
@@ -217,21 +164,6 @@ function WalletDetailsPage() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 //import { useEffect, useState } from "react";

@@ -465,13 +465,12 @@ class SolanaNetwork extends BaseNetwork {
 		}
 	}
 
-
 	/**
-	  * Generates a Helius API URL for fetching transactions of a specific address.
-	  * @param {string} address - The address to fetch transactions for.
-	  * @param {string} type - The type of transactions to fetch (optional).
-	  * @returns {Array} - An array of transaction objects.
-	*/
+	 * Fetches and parses transactions for a given wallet address from Helius.
+	 * @param {string} address - The wallet address.
+	 * @param {string} [type] - The type of transactions to filter (optional).
+	 * @returns {Array<Object>} - An array of parsed transaction objects.
+	 */
 	async getTransactionsFromHelius(address, type) {
 		let url = `/${address}/transactions?api-key=${this.heliusApiKey}`;
 		if (type) {
@@ -479,13 +478,99 @@ class SolanaNetwork extends BaseNetwork {
 		}
 		try {
 			const response = await this.axiosHelius.get(url);
-			return response.data;
+			const data = response.data;
+
+			// Parse the transactions
+			const parsedData = data.map((tx) => ({
+				description: tx.description,
+				type: tx.type,
+				source: tx.source,
+				fee: tx.fee,
+				feePayer: tx.feePayer,
+				signature: tx.signature,
+				timestamp: new Date(tx.timestamp * 1000),
+				nativeTransfers: (tx.nativeTransfers || []).map((transfer) => ({
+					from: transfer.fromUserAccount,
+					to: transfer.toUserAccount,
+					amount: transfer.amount || 0,
+				})),
+				tokenTransfers: (tx.tokenTransfers || []).map((transfer) => ({
+					from: transfer.fromUserAccount,
+					to: transfer.toUserAccount,
+					fromTokenAccount: transfer.fromTokenAccount,
+					toTokenAccount: transfer.toTokenAccount,
+					tokenAmount: transfer.tokenAmount || 0,
+					mint: transfer.mint,
+				})),
+				transactionError: tx.transactionError || null,
+				events: {
+					nft: tx.events?.nft
+						? {
+								description: tx.events.nft.description,
+								type: tx.events.nft.type,
+								source: tx.events.nft.source,
+								amount: tx.events.nft.amount,
+								fee: tx.events.nft.fee,
+								buyer: tx.events.nft.buyer,
+								seller: tx.events.nft.seller,
+								nfts: (tx.events.nft.nfts || []).map((nft) => ({
+									mint: nft.mint,
+									tokenStandard: nft.tokenStandard,
+								})),
+						  }
+						: null,
+					swap: tx.events?.swap
+						? {
+								nativeInput: tx.events.swap.nativeInput || {},
+								nativeOutput: tx.events.swap.nativeOutput || {},
+								tokenInputs: (tx.events.swap.tokenInputs || []).map(
+									(input) => ({
+										userAccount: input.userAccount,
+										tokenAccount: input.tokenAccount,
+										mint: input.mint,
+										tokenAmount: input.rawTokenAmount.tokenAmount,
+									})
+								),
+								tokenOutputs: (tx.events.swap.tokenOutputs || []).map(
+									(output) => ({
+										userAccount: output.userAccount,
+										tokenAccount: output.tokenAccount,
+										mint: output.mint,
+										tokenAmount: output.rawTokenAmount.tokenAmount,
+									})
+								),
+								tokenFees: (tx.events.swap.tokenFees || []).map((fee) => ({
+									userAccount: fee.userAccount,
+									tokenAccount: fee.tokenAccount,
+									mint: fee.mint,
+									tokenAmount: fee.rawTokenAmount.tokenAmount,
+								})),
+								nativeFees: (tx.events.swap.nativeFees || []).map((fee) => ({
+									account: fee.account,
+									amount: fee.amount,
+								})),
+								innerSwaps: (tx.events.swap.innerSwaps || []).map(
+									(innerSwap) => ({
+										tokenInputs: innerSwap.tokenInputs,
+										tokenOutputs: innerSwap.tokenOutputs,
+										tokenFees: innerSwap.tokenFees,
+										nativeFees: innerSwap.nativeFees,
+										programInfo: innerSwap.programInfo,
+									})
+								),
+						  }
+						: null,
+					compressed: tx.events?.compressed || null,
+					setAuthority: tx.events?.setAuthority || null,
+				},
+			}));
+
+			return parsedData;
 		} catch (error) {
 			console.error("Error fetching transactions:", error);
 			throw error;
 		}
 	}
-
 }
 
 export default SolanaNetwork;

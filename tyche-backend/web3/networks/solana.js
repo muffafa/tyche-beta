@@ -5,11 +5,14 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
 
 class SolanaNetwork extends BaseNetwork {
-	constructor(apiKey) {
-		super(apiKey);
+	constructor(apiKey, heliusApiKey) {
+		super(apiKey, heliusApiKey);
 		this.apiKey = apiKey;
+		this.heliusApiKey = heliusApiKey;
 		this.rpcEndpoint = `https://solana-mainnet.g.alchemy.com/v2/${this.apiKey}`;
+		this.heliusEndpoint = `https://api.helius.xyz/v0/addresses`;
 		this.axios = createAxiosInstance(this.rpcEndpoint);
+		this.axiosHelius = createAxiosInstance(this.heliusEndpoint);
 		this.tokenList = [];
 		this.tokenListInitialized = false;
 		this.tokenListPromise = this.initializeTokenList();
@@ -461,6 +464,28 @@ class SolanaNetwork extends BaseNetwork {
 			throw error;
 		}
 	}
+
+
+	/**
+	  * Generates a Helius API URL for fetching transactions of a specific address.
+	  * @param {string} address - The address to fetch transactions for.
+	  * @param {string} type - The type of transactions to fetch (optional).
+	  * @returns {Array} - An array of transaction objects.
+	*/
+	async getTransactionsFromHelius(address, type) {
+		let url = `/${address}/transactions?api-key=${this.heliusApiKey}`;
+		if (type) {
+			url += `&type=${type}`;
+		}
+		try {
+			const response = await this.axiosHelius.get(url);
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching transactions:", error);
+			throw error;
+		}
+	}
+
 }
 
 export default SolanaNetwork;

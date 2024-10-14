@@ -11,13 +11,19 @@ const createNetwork = (networkType) => {
 	}
 
 	const apiKey = process.env.ALCHEMY_API_KEY;
+	const heliusApiKey = process.env.HELIUS_API_KEY;
 	if (!apiKey) {
 		throw new Error(
 			"ALCHEMY_API_KEY is not defined in the environment variables."
 		);
 	}
+	if (!heliusApiKey) {
+		throw new Error(
+			"HELIUS_API_KEY is not defined in the environment variables."
+		);
+	}
 
-	return new NetworkClass(apiKey);
+	return new NetworkClass(apiKey, heliusApiKey);
 };
 
 export default createNetwork;

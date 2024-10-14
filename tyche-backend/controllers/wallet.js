@@ -286,7 +286,7 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
  * @access  Public
  */
 export const getWalletTransactions = asyncHandler(async (req, res, next) => {
-	const { walletAddress, network, page, limit } = req.query;
+	const { walletAddress, network, type } = req.query;
 
 	if (!walletAddress || !network) {
 		return next(
@@ -295,19 +295,6 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 				400
 			)
 		);
-	}
-
-	// Parse pagination parameters with default values
-	const pageNumber = parseInt(page, 10) || 1;
-	const limitNumber = parseInt(limit, 10) || 5;
-
-	// Validate pagination parameters
-	if (pageNumber < 1) {
-		return next(new ErrorResponse("Page number must be at least 1.", 400));
-	}
-
-	if (limitNumber < 1 || limitNumber > 1000) {
-		return next(new ErrorResponse("Limit must be between 1 and 1000.", 400));
 	}
 
 	const networkLower = network.toLowerCase();
@@ -319,62 +306,107 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	const validTypes = [
+		"NFT_BID", "NFT_SALE", "NFT_MINT", "TRANSFER", "DEPOSIT",
+		"WITHDRAW", "SWAP", "STAKE", "UNSTAKE", "CLAIM_REWARDS",
+		"LOAN", "REPAY_LOAN", "BORROW_SOL_FOR_NFT", "CLAIM_NFT",
+		"REBORROW_SOL_FOR_NFT", "FORECLOSE_LOAN", "CANCEL_LOAN_REQUEST",
+		"CREATE_ORDER", "CANCEL_ORDER", "FILL_ORDER"
+	];
+
+	if (type && !validTypes.includes(type)) {
+		return next(
+			new ErrorResponse(`Invalid transaction type "${type}".`, 400)
+		);
+	}
+
 	try {
 		const networkService = createNetwork(networkLower);
 
-		// Limiti next page olup olmadigini anlamak icin 1 arttirip fetch ediyorum!
-		// API'ye her zaman +1 istek gidiyor!!!
-		const fetchLimit = pageNumber * limitNumber + 1;
-
 		// Fetch transactions up to the current page
-		const allTransactions = await networkService.getAllTransactions(
+		const data = await networkService.getTransactionsFromHelius(
 			walletAddress,
-			{ limit: fetchLimit }
+			type  // Optional
 		);
 
-		// Slice transactions for the current page
-		const startIndex = (pageNumber - 1) * limitNumber;
-		const paginatedTransactions = allTransactions.slice(
-			startIndex,
-			startIndex + limitNumber
-		);
-
-		// Determine if there is a next page
-		const hasNextPage = allTransactions.length > pageNumber * limitNumber;
-
-		// Fetch first and last transactions only once
-		let firstTransaction = null;
-		let lastTransaction = null;
-
-		if (pageNumber === 1 && paginatedTransactions.length > 0) {
-			firstTransaction = {
-				transactionId:
-					paginatedTransactions[paginatedTransactions.length - 1].signature,
-				date: paginatedTransactions[paginatedTransactions.length - 1].date,
-			};
-		}
-
-		if (paginatedTransactions.length > 0) {
-			lastTransaction = {
-				transactionId:
-					paginatedTransactions[paginatedTransactions.length - 1].signature,
-				date: paginatedTransactions[paginatedTransactions.length - 1].date,
-			};
-		}
+		const parsedData = data.map(tx => ({
+			description: tx.description,
+			type: tx.type,
+			source: tx.source,
+			fee: tx.fee,
+			feePayer: tx.feePayer,
+			signature: tx.signature,
+			timestamp: new Date(tx.timestamp * 1000),
+			nativeTransfers: (tx.nativeTransfers || []).map(transfer => ({
+				from: transfer.fromUserAccount,
+				to: transfer.toUserAccount,
+				amount: transfer.amount || 0 // 
+			})),
+			tokenTransfers: (tx.tokenTransfers || []).map(transfer => ({
+				from: transfer.fromUserAccount,
+				to: transfer.toUserAccount,
+				fromTokenAccount: transfer.fromTokenAccount,
+				toTokenAccount: transfer.toTokenAccount,
+				tokenAmount: transfer.tokenAmount || 0,
+				mint: transfer.mint
+			})),
+			transactionError: tx.transactionError || null,
+			events: {
+				nft: tx.events?.nft ? {
+					description: tx.events.nft.description,
+					type: tx.events.nft.type,
+					source: tx.events.nft.source,
+					amount: tx.events.nft.amount,
+					fee: tx.events.nft.fee,
+					buyer: tx.events.nft.buyer,
+					seller: tx.events.nft.seller,
+					nfts: (tx.events.nft.nfts || []).map(nft => ({
+						mint: nft.mint,
+						tokenStandard: nft.tokenStandard
+					}))
+				} : null,
+				swap: tx.events?.swap ? {
+					nativeInput: tx.events.swap.nativeInput || {},
+					nativeOutput: tx.events.swap.nativeOutput || {},
+					tokenInputs: (tx.events.swap.tokenInputs || []).map(input => ({
+						userAccount: input.userAccount,
+						tokenAccount: input.tokenAccount,
+						mint: input.mint,
+						tokenAmount: input.rawTokenAmount.tokenAmount
+					})),
+					tokenOutputs: (tx.events.swap.tokenOutputs || []).map(output => ({
+						userAccount: output.userAccount,
+						tokenAccount: output.tokenAccount,
+						mint: output.mint,
+						tokenAmount: output.rawTokenAmount.tokenAmount
+					})),
+					tokenFees: (tx.events.swap.tokenFees || []).map(fee => ({
+						userAccount: fee.userAccount,
+						tokenAccount: fee.tokenAccount,
+						mint: fee.mint,
+						tokenAmount: fee.rawTokenAmount.tokenAmount
+					})),
+					nativeFees: (tx.events.swap.nativeFees || []).map(fee => ({
+						account: fee.account,
+						amount: fee.amount
+					})),
+					innerSwaps: (tx.events.swap.innerSwaps || []).map(innerSwap => ({
+						tokenInputs: innerSwap.tokenInputs,
+						tokenOutputs: innerSwap.tokenOutputs,
+						tokenFees: innerSwap.tokenFees,
+						nativeFees: innerSwap.nativeFees,
+						programInfo: innerSwap.programInfo
+					}))
+				} : null,
+				compressed: tx.events?.compressed || null,
+				setAuthority: tx.events?.setAuthority || null
+			}
+		}));
 
 		res.status(200).json({
 			success: true,
-			pagination: {
-				currentPage: pageNumber,
-				limit: limitNumber,
-				hasNextPage,
-			},
 			data: {
-				walletAddress,
-				network: networkLower,
-				firstTransaction,
-				lastTransaction,
-				transactions: paginatedTransactions,
+				parsedData
 			},
 		});
 	} catch (error) {

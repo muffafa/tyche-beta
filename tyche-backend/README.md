@@ -19,6 +19,7 @@ JWT_EXPIRE=30d
 
 # Web3 Configuration
 ALCHEMY_API_KEY=
+HELIUS_API_KEY=
 
 # Email Configuration
 EMAIL_HOST=smtp.your-email-provider.com

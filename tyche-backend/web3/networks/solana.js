@@ -3,6 +3,8 @@ import createAxiosInstance from "../utils/axiosInstance.js";
 import { TokenListProvider } from "@solana/spl-token-registry";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
+import networkConfig from "./networkConfig.js";
+import { getCurrentPrices } from "../utils/price.js";
 
 class SolanaNetwork extends BaseNetwork {
 	constructor(apiKey, heliusApiKey) {
@@ -31,11 +33,6 @@ class SolanaNetwork extends BaseNetwork {
 			this.tokenList = tokenListContainer
 				.filterByClusterSlug("mainnet-beta")
 				.getList();
-			console.log(
-				"Token list initialized with",
-				this.tokenList.length,
-				"tokens."
-			);
 			this.tokenListInitialized = true;
 		} catch (error) {
 			console.error("Error initializing token list:", error);
@@ -466,10 +463,11 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches and parses transactions for a given wallet address from Helius.
+	 * Fetches and parses transactions for a given wallet address from Helius,
+	 * including fiat equivalents for native transfer amounts.
 	 * @param {string} address - The wallet address.
 	 * @param {string} [type] - The type of transactions to filter (optional).
-	 * @returns {Array<Object>} - An array of parsed transaction objects.
+	 * @returns {Array<Object>} - An array of parsed transaction objects with fiat equivalents.
 	 */
 	async getTransactionsFromHelius(address, type) {
 		let url = `/${address}/transactions?api-key=${this.heliusApiKey}`;
@@ -480,6 +478,20 @@ class SolanaNetwork extends BaseNetwork {
 			const response = await this.axiosHelius.get(url);
 			const data = response.data;
 
+			// Fetch current prices for SOL in USD, EUR, and TRY
+			let prices;
+			try {
+				prices = await getCurrentPrices(networkConfig.solana.coinGeckoId, [
+					"usd",
+					"eur",
+					"try",
+				]);
+			} catch (priceError) {
+				console.error("Error fetching current SOL prices:", priceError);
+				// Fallback to zero equivalents if price fetching fails
+				prices = { usd: 0, eur: 0, try: 0 };
+			}
+
 			// Parse the transactions
 			const parsedData = data.map((tx) => ({
 				description: tx.description,
@@ -489,11 +501,22 @@ class SolanaNetwork extends BaseNetwork {
 				feePayer: tx.feePayer,
 				signature: tx.signature,
 				timestamp: new Date(tx.timestamp * 1000),
-				nativeTransfers: (tx.nativeTransfers || []).map((transfer) => ({
-					from: transfer.fromUserAccount,
-					to: transfer.toUserAccount,
-					amount: transfer.amount || 0,
-				})),
+				nativeTransfers: (tx.nativeTransfers || []).map((transfer) => {
+					const solAmount = (transfer.amount || 0) / 1_000_000_000; // Convert lamports to SOL
+					return {
+						from: transfer.fromUserAccount,
+						to: transfer.toUserAccount,
+						amount: {
+							amount: solAmount,
+							symbol: "SOL",
+							equivalents: {
+								USD: parseFloat((solAmount * prices.usd).toFixed(2)),
+								EUR: parseFloat((solAmount * prices.eur).toFixed(2)),
+								TRY: parseFloat((solAmount * prices.try).toFixed(2)),
+							},
+						},
+					};
+				}),
 				tokenTransfers: (tx.tokenTransfers || []).map((transfer) => ({
 					from: transfer.fromUserAccount,
 					to: transfer.toUserAccount,

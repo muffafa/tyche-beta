@@ -1,5 +1,4 @@
 // import { useState, useEffect } from "react";
-// import PropTypes from "prop-types";
 import searchIcon from "../../assets/images/icons/searchIcon.svg";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -90,10 +89,5 @@ function SearchBar() {
 //     </div>
 //   );
 // }
-
-// SearchBar.propTypes = {
-//   onSearch: PropTypes.func.isRequired,
-//   lastSearchedAddress: PropTypes.string,
-// };
 
 export default SearchBar;

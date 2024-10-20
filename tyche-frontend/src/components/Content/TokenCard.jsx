@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import formatCurrency from "../../utils/formatCurrency";
@@ -37,9 +36,12 @@ function TokenCard({ token }) {
       {/* Asset Image */}
       <div className="token-asset flex items-center w-full">
         {/* Burası şimdilik network iconu alıyor ama ileride değişecek */}
-        {getNetworkIcon(selectedNetwork) !== "" 
-         ? (
-          <img src={getNetworkIcon(selectedNetwork)} alt={token.symbol} className="w-[27px] h-[27px]" /> 
+        {getNetworkIcon(selectedNetwork) !== "" ? (
+          <img
+            src={getNetworkIcon(selectedNetwork)}
+            alt={token.symbol}
+            className="w-[27px] h-[27px]"
+          />
         ) : (
           <div className="w-[27px] h-[27px] bg-gray-300 rounded-full"></div>
         )}
@@ -61,14 +63,5 @@ function TokenCard({ token }) {
     </div>
   );
 }
-
-TokenCard.propTypes = {
-  token: PropTypes.shape({
-    symbol: PropTypes.string.isRequired,
-    tokenContractAddress: PropTypes.string.isRequired,
-    holdingAmount: PropTypes.string.isRequired,
-    valueUsd: PropTypes.string, // This will be used later for value calculations
-  }).isRequired,
-};
 
 export default TokenCard;

@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import shortenAddress from "../../utils/shortenAddress";
 
 function TxDetailsPopup({ tx, onClose }) {
@@ -33,17 +32,5 @@ function TxDetailsPopup({ tx, onClose }) {
     </div>
   );
 }
-
-TxDetailsPopup.propTypes = {
-  tx: PropTypes.shape({
-    date: PropTypes.string.isRequired,
-    hash: PropTypes.string.isRequired,
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-    amount: PropTypes.string.isRequired,
-    symbol: PropTypes.string.isRequired,
-  }).isRequired,
-  onClose: PropTypes.func.isRequired,
-};
 
 export default TxDetailsPopup;

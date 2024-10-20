@@ -1,15 +1,20 @@
-import PropTypes from "prop-types";
 import TxCard from "./TxCard";
 import filterIcon from "./../../assets/images/icons/filterIcon.svg";
 
 function TxHistory({ transactions, currentNetwork, currentAddress }) {
   return (
     <div className="flex flex-col gap-[8px]">
-      <p className="text-[24px] tracking-wide font-[350] text-tychePrimary">Transaction History</p>
+      <p className="text-[24px] tracking-wide font-[350] text-tychePrimary">
+        Transaction History
+      </p>
       <div className="p-4 bg-tycheLightGray shadow rounded-[20px]">
         <div className="flex flex-row justify-end items-center mb-[25px]">
           <button className="flex flex-row gap-[7px] px-[10px] py-[5px] items-center justify-center text-tycheDarkBlue text-[12px] font-[600] tracking-wide rounded-full border-[2px] border-dashed w-fit border-tycheDarkBlue">
-            <img src={filterIcon} alt="Filter" className="max-w-[10px] max-h-[10px] min-w-[10px] min-h-[10px]" />
+            <img
+              src={filterIcon}
+              alt="Filter"
+              className="max-w-[10px] max-h-[10px] min-w-[10px] min-h-[10px]"
+            />
             <p>Filter</p>
           </button>
         </div>
@@ -42,20 +47,5 @@ function TxHistory({ transactions, currentNetwork, currentAddress }) {
     </div>
   );
 }
-
-TxHistory.propTypes = {
-  transactions: PropTypes.arrayOf(
-    PropTypes.shape({
-      txId: PropTypes.string.isRequired, // txId must be provided and is required
-      transactionTime: PropTypes.string,
-      from: PropTypes.string,
-      to: PropTypes.string,
-      amount: PropTypes.string,
-      symbol: PropTypes.string,
-    })
-  ).isRequired,
-  currentNetwork: PropTypes.string.isRequired,
-  currentAddress: PropTypes.string.isRequired,
-};
 
 export default TxHistory;

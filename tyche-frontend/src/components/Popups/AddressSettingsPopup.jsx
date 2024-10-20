@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import PropTypes from "prop-types";
 import { updateAddress } from "../../redux/slices/walletSlice";
 
 function AddressSettingsPopup({ address, onClose }) {
@@ -53,13 +52,5 @@ function AddressSettingsPopup({ address, onClose }) {
     </div>
   );
 }
-
-AddressSettingsPopup.propTypes = {
-  address: PropTypes.shape({
-    alias: PropTypes.string,
-    network: PropTypes.string,
-  }),
-  onClose: PropTypes.func.isRequired,
-};
 
 export default AddressSettingsPopup;

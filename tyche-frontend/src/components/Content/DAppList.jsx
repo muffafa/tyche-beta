@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import DAppCard from "./DAppCard";
 import { DappMetadata } from "../../blockchain/DappMetadata";
 import { getDappsByNetwork } from "../../utils/NetworkManager";
@@ -32,9 +31,5 @@ function DAppList({ network }) {
     </div>
   );
 }
-
-DAppList.propTypes = {
-  network: PropTypes.string.isRequired,
-};
 
 export default DAppList;

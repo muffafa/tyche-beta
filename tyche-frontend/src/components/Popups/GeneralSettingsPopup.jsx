@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import PropTypes from "prop-types";
 import AddressTablePopup from "./AddressTablePopup"; // Import the address table
 import { updateSettings } from "../../redux/slices/settingsSlice";
 
@@ -112,9 +111,5 @@ function GeneralSettingsPopup({ onClose }) {
     </div>
   );
 }
-
-GeneralSettingsPopup.propTypes = {
-  onClose: PropTypes.func.isRequired,
-};
 
 export default GeneralSettingsPopup;

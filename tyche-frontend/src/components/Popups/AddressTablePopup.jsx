@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import { deleteAddress } from "../../redux/slices/walletSlice";
-import PropTypes from "prop-types";
 
 function AddressTablePopup({ onEdit, onClose }) {
   const addresses = useSelector((state) => state.wallet.addresses);
@@ -53,10 +52,5 @@ function AddressTablePopup({ onEdit, onClose }) {
     </div>
   );
 }
-
-AddressTablePopup.propTypes = {
-  onEdit: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
 
 export default AddressTablePopup;

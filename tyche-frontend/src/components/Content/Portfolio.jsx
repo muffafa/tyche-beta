@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
 import TokenCard from "./TokenCard";
 import NftCard from "./NftCard";
 
@@ -97,25 +96,5 @@ function Portfolio({ tokens, nfts }) {
     </div>
   );
 }
-
-Portfolio.propTypes = {
-  tokens: PropTypes.arrayOf(
-    PropTypes.shape({
-      symbol: PropTypes.string.isRequired,
-      tokenContractAddress: PropTypes.string.isRequired,
-      holdingAmount: PropTypes.string.isRequired,
-      priceUsd: PropTypes.string,
-      valueUsd: PropTypes.string,
-      tokenId: PropTypes.string,
-    })
-  ).isRequired,
-  nfts: PropTypes.arrayOf(
-    PropTypes.shape({
-      header: PropTypes.string.isRequired,
-      id: PropTypes.string.isRequired,
-      basePrice: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};
 
 export default Portfolio;

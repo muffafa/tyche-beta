@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import goLinkIcon from "./../../assets/images/icons/goLinkIcon.svg";
 import sponsoredDapp from "./../../assets/images/sponsoredDapp.svg";
 
@@ -30,16 +29,5 @@ function DAppCard({ dapp }) {
     </div>
   );
 }
-
-DAppCard.propTypes = {
-  dapp: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired, // Ensure link is passed
-    sponsored: PropTypes.bool.isRequired,
-  }).isRequired,
-};
 
 export default DAppCard;

@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import { getSupportedNetworks } from "../../utils/NetworkManager";
 
 function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
@@ -18,10 +17,5 @@ function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
     </select>
   );
 }
-
-NetworkSelect.propTypes = {
-  selectedNetwork: PropTypes.string.isRequired,
-  onSelectNetwork: PropTypes.func.isRequired,
-};
 
 export default NetworkSelect;

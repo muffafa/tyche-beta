@@ -1,7 +1,12 @@
 import Wallet from "../models/Wallet.js";
 import asyncHandler from "../middleware/async.js";
 import ErrorResponse from "../utils/errorResponse.js";
-import { getCache, setCache, generateCacheKey } from "../utils/cache.js";
+import {
+	getCache,
+	setCache,
+	deleteCache,
+	generateCacheKey,
+} from "../utils/cache.js";
 import Web3 from "web3";
 
 // Initialize Web3 (optional, if you need to interact with blockchain)
@@ -82,6 +87,16 @@ export const addWallet = asyncHandler(async (req, res, next) => {
 	req.user.wallets.push(wallet._id);
 	await req.user.save();
 
+	// Invalidate the user's wallets cache
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
+
 	res.status(201).json({
 		success: true,
 		data: {
@@ -98,13 +113,38 @@ export const addWallet = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/wallets
 // @access  Private
 export const getWallets = asyncHandler(async (req, res, next) => {
-	const wallets = await Wallet.find({ user: req.user.id }).select("-__v");
+	const userId = req.user.id;
 
-	res.status(200).json({
-		success: true,
-		count: wallets.length,
-		data: wallets,
-	});
+	// Generate a unique cache key for the user's wallets
+	const cacheKey = generateCacheKey("userWallets", { userId });
+
+	// Attempt to retrieve wallets from cache
+	const cachedWallets = await getCache(cacheKey);
+	if (cachedWallets) {
+		return res.status(200).json({
+			success: true,
+			count: cachedWallets.length,
+			data: cachedWallets,
+			cached: true,
+		});
+	}
+
+	try {
+		// Fetch wallets from the database
+		const wallets = await Wallet.find({ user: userId }).select("-__v");
+
+		// Set the wallets data in the cache
+		await setCache(cacheKey, wallets, "userWallets");
+
+		res.status(200).json({
+			success: true,
+			count: wallets.length,
+			data: wallets,
+			cached: false,
+		});
+	} catch (error) {
+		next(error);
+	}
 });
 
 // @desc    Update a wallet's nickname
@@ -132,6 +172,16 @@ export const updateWallet = asyncHandler(async (req, res, next) => {
 
 	wallet.nickname = nickname;
 	await wallet.save();
+
+	// Invalidate the user's wallets cache
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
 
 	res.status(200).json({
 		success: true,
@@ -163,6 +213,16 @@ export const deleteWallet = asyncHandler(async (req, res, next) => {
 		(walletId) => walletId.toString() !== req.params.id
 	);
 	await req.user.save();
+
+	// Invalidate the user's wallets cache since a wallet has been deleted
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
 
 	res.status(200).json({
 		success: true,
@@ -285,9 +345,28 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	// Attempt to retrieve from cache
+	const cacheKey = generateCacheKey("walletTokens", {
+		walletAddress,
+		network,
+	});
+
+	const cachedTokens = await getCache(cacheKey);
+
+	if (cachedTokens) {
+		return res.status(200).json({
+			success: true,
+			data: cachedTokens,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(network);
 		const tokens = await networkService.getWalletTokenAccounts(walletAddress);
+
+		// Set cache with specific category TTL
+		await setCache(cacheKey, tokens, "walletTokens");
 
 		res.status(200).json({
 			success: true,

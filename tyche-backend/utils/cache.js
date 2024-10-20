@@ -55,3 +55,17 @@ export const setCache = async (key, value, category = "default") => {
 		console.error(`Error setting cache for key ${key}:`, error);
 	}
 };
+
+/**
+ * Deletes data from the cache based on the provided key.
+ * @param {string} key - The cache key to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteCache = async (key) => {
+	try {
+		await redisClient.del(key);
+		console.log(`Cache deleted for key ${key}`);
+	} catch (error) {
+		console.error(`Error deleting cache for key ${key}:`, error);
+	}
+};

@@ -1,4 +1,5 @@
 import redisClient from "../config/redis.js";
+import cacheConfig from "../config/cacheConfig.js";
 
 /**
  * Generates a unique cache key based on the request parameters.
@@ -25,7 +26,7 @@ export const getCache = async (key) => {
 	try {
 		const data = await redisClient.get(key);
 		if (data) {
-			console.log("Cache hit for key:", key);
+			console.log(`Cache hit for key ${key}`);
 			return JSON.parse(data);
 		}
 		return null;
@@ -36,14 +37,17 @@ export const getCache = async (key) => {
 };
 
 /**
- * Sets data in the cache with an optional TTL.
+ * Sets data in the cache with an appropriate TTL.
  * @param {string} key - The cache key.
  * @param {any} value - The data to cache.
- * @param {number} ttl - Time to live in seconds.
+ * @param {string} category - The cache category to determine TTL.
  * @returns {Promise<void>}
  */
-export const setCache = async (key, value, ttl = 3600) => {
+export const setCache = async (key, value, category = "default") => {
 	try {
+		// Retrieve TTL from config; fallback to default if category not found
+		const ttl = cacheConfig[category] || cacheConfig.default;
+
 		await redisClient.set(key, JSON.stringify(value), {
 			EX: ttl,
 		});

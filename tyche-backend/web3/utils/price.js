@@ -47,7 +47,7 @@ export const getCurrentPrices = async (
 		}
 
 		// Set cache with TTL
-		await setCache(cacheKey, prices, 60);
+		await setCache(cacheKey, prices, "fiatPrice");
 
 		return prices;
 	} catch (error) {

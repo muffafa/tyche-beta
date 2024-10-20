@@ -303,7 +303,7 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * @desc    Get wallet transactions with pagination
+ * @desc    Get wallet transactions
  * @route   GET /api/v1/wallets/transactions
  * @access  Public
  */
@@ -355,6 +355,23 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Invalid transaction type "${type}".`, 400));
 	}
 
+	// Attempt to retrieve from cache
+	const cacheKey = generateCacheKey("walletTransactions", {
+		walletAddress,
+		network: networkLower,
+		type,
+	});
+
+	const cachedTransactions = await getCache(cacheKey);
+
+	if (cachedTransactions) {
+		return res.status(200).json({
+			success: true,
+			data: cachedTransactions,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(networkLower);
 
@@ -364,11 +381,14 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 			type // Optional
 		);
 
+		// Set cache with specific category TTL
+		await setCache(cacheKey, parsedTransactions, "walletTransactions");
+
+		// Return the parsed transactions
 		res.status(200).json({
 			success: true,
-			data: {
-				transactions: parsedTransactions,
-			},
+			data: parsedTransactions,
+			cached: false, // Data freshly fetched from the API
 		});
 	} catch (error) {
 		next(error);

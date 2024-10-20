@@ -5,6 +5,7 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
 import networkConfig from "./networkConfig.js";
 import { getCurrentPrices } from "../utils/price.js";
+import { generateCacheKey, getCache, setCache } from "../../utils/cache.js";
 
 class SolanaNetwork extends BaseNetwork {
 	constructor(apiKey, heliusApiKey) {
@@ -36,7 +37,6 @@ class SolanaNetwork extends BaseNetwork {
 			this.tokenListInitialized = true;
 		} catch (error) {
 			console.error("Error initializing token list:", error);
-			// Optionally, handle the error or retry
 		}
 	}
 
@@ -50,19 +50,34 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Retrieves the token metadata for a given mint address from the token list.
+	 * Retrieves the token metadata for a given mint address from the token list, with caching.
 	 * @param {string} mintAddress - The mint address of the token.
 	 * @returns {Object|null} - Token metadata or null if not found.
 	 */
-	getTokenInfo(mintAddress) {
-		const tokenInfo = this.tokenList.find((t) => t.address === mintAddress);
+	async getTokenInfo(mintAddress) {
+		// Generate a cache key for the mint address
+		const cacheKey = generateCacheKey("tokenInfo", { mintAddress });
+
+		// Try to get the token info from cache
+		let tokenInfo = await getCache(cacheKey);
 		if (tokenInfo) {
-			return {
+			return tokenInfo;
+		}
+
+		// Token info not in cache, proceed to fetch
+		tokenInfo = this.tokenList.find((t) => t.address === mintAddress);
+		if (tokenInfo) {
+			const cachedTokenInfo = {
 				symbol: tokenInfo.symbol,
 				name: tokenInfo.name,
 				decimals: tokenInfo.decimals,
-				image: tokenInfo.logoURI, // Add image from token registry
+				image: tokenInfo.logoURI,
 			};
+
+			// Cache the token info
+			await setCache(cacheKey, cachedTokenInfo, "tokenMetadata");
+
+			return cachedTokenInfo;
 		} else {
 			// Token not found in the registry
 			return null;
@@ -70,11 +85,20 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the token decimals from the mint account.
+	 * Fetches the token decimals from the mint account, with caching.
 	 * @param {string} mintAddress - The mint address of the token.
 	 * @returns {number} - The decimals of the token.
 	 */
 	async getTokenDecimals(mintAddress) {
+		// Generate a cache key for the decimals
+		const cacheKey = generateCacheKey("tokenDecimals", { mintAddress });
+
+		// Try to get the decimals from cache
+		let decimals = await getCache(cacheKey);
+		if (decimals !== null && decimals !== undefined) {
+			return decimals;
+		}
+
 		try {
 			const response = await this.axios.post("", {
 				jsonrpc: "2.0",
@@ -91,14 +115,15 @@ class SolanaNetwork extends BaseNetwork {
 			const accountInfo = response.data.result.value;
 			if (accountInfo === null) {
 				console.error(`No account info found for mint address ${mintAddress}`);
-				return 0;
+				decimals = 0;
+			} else {
+				const data = accountInfo.data[0];
+				const buffer = Buffer.from(data, "base64");
+				decimals = buffer.readUInt8(44);
 			}
 
-			const data = accountInfo.data[0]; // base64 encoded data
-			const buffer = Buffer.from(data, "base64");
-
-			// The decimals byte is at offset 44
-			const decimals = buffer.readUInt8(44);
+			// Cache the decimals
+			await setCache(cacheKey, decimals, "tokenMetadata");
 
 			return decimals;
 		} catch (error) {
@@ -108,11 +133,21 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the token metadata (name, symbol, and image) using Metaplex.
+	 * Fetches the token metadata (name, symbol, and image) using Metaplex, with caching.
 	 * @param {string} mintAddress - The mint address of the token.
 	 * @returns {Object} - An object containing the name, symbol, and image.
 	 */
 	async getTokenMetadata(mintAddress) {
+		// Generate a cache key for the mint address
+		const cacheKey = generateCacheKey("tokenMetadata", { mintAddress });
+
+		// Try to get the token metadata from cache
+		let metadata = await getCache(cacheKey);
+		if (metadata) {
+			return metadata;
+		}
+
+		// Metadata not in cache, proceed to fetch
 		try {
 			const mintPublicKey = new PublicKey(mintAddress);
 
@@ -128,11 +163,16 @@ class SolanaNetwork extends BaseNetwork {
 			const response = await fetch(uri);
 			const metadataJson = await response.json();
 
-			return {
+			metadata = {
 				name: metadataJson.name ? metadataJson.name.trim() : "Unknown Token",
 				symbol: metadataJson.symbol ? metadataJson.symbol.trim() : "UNKNOWN",
 				image: metadataJson.image ? metadataJson.image.trim() : null,
 			};
+
+			// Cache the metadata
+			await setCache(cacheKey, metadata, "tokenMetadata");
+
+			return metadata;
 		} catch (error) {
 			console.error(
 				`Error fetching metadata for ${mintAddress}:`,
@@ -167,7 +207,7 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the wallet's SPL token accounts, including metadata from Metaplex for unknown tokens.
+	 * Fetches the wallet's SPL token accounts, utilizing cached metadata for each mint address.
 	 * @param {string} walletAddress - The wallet address.
 	 * @returns {Array<Object>} - An array of token objects.
 	 */
@@ -182,7 +222,7 @@ class SolanaNetwork extends BaseNetwork {
 				method: "getTokenAccountsByOwner",
 				params: [
 					walletAddress,
-					{ programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" }, // Solana token program
+					{ programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
 					{ encoding: "jsonParsed" },
 				],
 			});
@@ -190,38 +230,45 @@ class SolanaNetwork extends BaseNetwork {
 			const tokenAccounts = response.data.result.value;
 			const tokens = [];
 
-			// Collect mint addresses that are unknown to fetch via Metaplex
-			const unknownMintAddresses = [];
-
 			for (const accountInfo of tokenAccounts) {
 				const tokenAccountInfo = accountInfo.account.data.parsed.info;
 				const mintAddress = tokenAccountInfo.mint;
 				const tokenAmountInfo = tokenAccountInfo.tokenAmount;
-				const amountRaw = tokenAmountInfo.amount; // Raw amount as string
+				const amountRaw = tokenAmountInfo.amount;
 
-				// Check if token is in the registry
-				const tokenInfo = this.getTokenInfo(mintAddress);
+				// Generate cache keys
+				const metadataCacheKey = generateCacheKey("tokenMetadata", {
+					mintAddress,
+				});
+				const decimalsCacheKey = generateCacheKey("tokenDecimals", {
+					mintAddress,
+				});
 
-				let decimals;
-				let symbol;
-				let name;
-				let image;
+				// Try to get token metadata and decimals from cache
+				let tokenMetadata = await getCache(metadataCacheKey);
+				let decimals = await getCache(decimalsCacheKey);
 
-				if (tokenInfo) {
-					decimals = tokenInfo.decimals;
-					symbol = tokenInfo.symbol;
-					name = tokenInfo.name;
-					image = tokenInfo.image;
-				} else {
-					// Token not found in registry; fetch decimals from mint account
-					decimals = await this.getTokenDecimals(mintAddress);
-					symbol = "UNKNOWN";
-					name = "Unknown Token";
-					image = null;
+				// If metadata is not cached, fetch and cache it
+				if (!tokenMetadata) {
+					// Check if token is in the registry
+					tokenMetadata = await this.getTokenInfo(mintAddress);
 
-					// Collect unknown mint addresses for Metaplex metadata fetching
-					unknownMintAddresses.push(mintAddress);
+					if (!tokenMetadata) {
+						// Token not in registry, get metadata via Metaplex
+						tokenMetadata = await this.getTokenMetadata(mintAddress);
+					}
+
+					// Cache the token metadata
+					await setCache(metadataCacheKey, tokenMetadata, "tokenMetadata");
 				}
+
+				// If decimals are not cached, fetch and cache them
+				if (decimals === null || decimals === undefined) {
+					decimals = await this.getTokenDecimals(mintAddress);
+					await setCache(decimalsCacheKey, decimals, "tokenMetadata");
+				}
+
+				const { symbol, name, image } = tokenMetadata;
 
 				// Compute the token balance using the raw amount and decimals
 				const tokenBalance = parseInt(amountRaw) / Math.pow(10, decimals);
@@ -233,28 +280,7 @@ class SolanaNetwork extends BaseNetwork {
 					symbol,
 					name,
 					decimals,
-					image, // Include image if available
-				});
-			}
-
-			// Fetch metadata for unknown tokens using Metaplex
-			if (unknownMintAddresses.length > 0) {
-				// To optimize, fetch metadata in parallel
-				const metadataPromises = unknownMintAddresses.map((mint) =>
-					this.getTokenMetadata(mint)
-				);
-				const metaplexMetadata = await Promise.all(metadataPromises);
-
-				// Update tokens with fetched metadata
-				tokens.forEach((token) => {
-					if (token.symbol === "UNKNOWN") {
-						const index = unknownMintAddresses.indexOf(token.mintAddress);
-						if (index !== -1 && metaplexMetadata[index]) {
-							token.symbol = metaplexMetadata[index].symbol;
-							token.name = metaplexMetadata[index].name;
-							token.image = metaplexMetadata[index].image || token.image;
-						}
-					}
+					image,
 				});
 			}
 

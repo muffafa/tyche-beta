@@ -2,6 +2,12 @@ import User from "../models/User.js";
 import asyncHandler from "../middleware/async.js";
 import ErrorResponse from "../utils/errorResponse.js";
 import Wallet from "../models/Wallet.js";
+import {
+	getCache,
+	setCache,
+	generateCacheKey,
+	deleteCache,
+} from "../utils/cache.js";
 
 // Get token from model, create response and send
 const sendTokenResponse = (user, statusCode, res) => {
@@ -61,14 +67,39 @@ export const login = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/auth/me
 // @access  Private
 export const getMe = asyncHandler(async (req, res, next) => {
-	const user = await User.findById(req.user.id).select("-__v -wallets");
-	const wallets = await Wallet.find({ user: req.user.id }).select("-__v");
+	// Generate a unique cache key for the user's profile
+	const cacheKey = generateCacheKey("userProfile", { userId: req.user.id });
 
-	res.status(200).json({
-		success: true,
-		data: user,
-		wallets,
-	});
+	// Attempt to retrieve the user profile from the cache
+	const cachedUserProfile = await getCache(cacheKey);
+	if (cachedUserProfile) {
+		return res.status(200).json({
+			success: true,
+			data: cachedUserProfile.user,
+			wallets: cachedUserProfile.wallets,
+			cached: true,
+		});
+	}
+
+	try {
+		// Fetch the user and their wallets from the database
+		const user = await User.findById(req.user.id).select("-__v -wallets");
+		const wallets = await Wallet.find({ user: req.user.id }).select("-__v");
+
+		const userProfileData = { user, wallets };
+
+		// Cache the user profile data
+		await setCache(cacheKey, userProfileData, "userProfile");
+
+		res.status(200).json({
+			success: true,
+			data: user,
+			wallets,
+			cached: false,
+		});
+	} catch (error) {
+		next(error);
+	}
 });
 
 // @desc    Forgot password

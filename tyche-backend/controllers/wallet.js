@@ -1,6 +1,12 @@
 import Wallet from "../models/Wallet.js";
 import asyncHandler from "../middleware/async.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import {
+	getCache,
+	setCache,
+	deleteCache,
+	generateCacheKey,
+} from "../utils/cache.js";
 import Web3 from "web3";
 
 // Initialize Web3 (optional, if you need to interact with blockchain)
@@ -81,6 +87,16 @@ export const addWallet = asyncHandler(async (req, res, next) => {
 	req.user.wallets.push(wallet._id);
 	await req.user.save();
 
+	// Invalidate the user's wallets cache
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
+
 	res.status(201).json({
 		success: true,
 		data: {
@@ -97,13 +113,38 @@ export const addWallet = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/wallets
 // @access  Private
 export const getWallets = asyncHandler(async (req, res, next) => {
-	const wallets = await Wallet.find({ user: req.user.id }).select("-__v");
+	const userId = req.user.id;
 
-	res.status(200).json({
-		success: true,
-		count: wallets.length,
-		data: wallets,
-	});
+	// Generate a unique cache key for the user's wallets
+	const cacheKey = generateCacheKey("userWallets", { userId });
+
+	// Attempt to retrieve wallets from cache
+	const cachedWallets = await getCache(cacheKey);
+	if (cachedWallets) {
+		return res.status(200).json({
+			success: true,
+			count: cachedWallets.length,
+			data: cachedWallets,
+			cached: true,
+		});
+	}
+
+	try {
+		// Fetch wallets from the database
+		const wallets = await Wallet.find({ user: userId }).select("-__v");
+
+		// Set the wallets data in the cache
+		await setCache(cacheKey, wallets, "userWallets");
+
+		res.status(200).json({
+			success: true,
+			count: wallets.length,
+			data: wallets,
+			cached: false,
+		});
+	} catch (error) {
+		next(error);
+	}
 });
 
 // @desc    Update a wallet's nickname
@@ -131,6 +172,16 @@ export const updateWallet = asyncHandler(async (req, res, next) => {
 
 	wallet.nickname = nickname;
 	await wallet.save();
+
+	// Invalidate the user's wallets cache
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
 
 	res.status(200).json({
 		success: true,
@@ -162,6 +213,16 @@ export const deleteWallet = asyncHandler(async (req, res, next) => {
 		(walletId) => walletId.toString() !== req.params.id
 	);
 	await req.user.save();
+
+	// Invalidate the user's wallets cache since a wallet has been deleted
+	const walletCacheKey = generateCacheKey("userWallets", {
+		userId: req.user.id,
+	});
+	const profileCacheKey = generateCacheKey("userProfile", {
+		userId: req.user.id,
+	});
+	await deleteCache(walletCacheKey);
+	await deleteCache(profileCacheKey);
 
 	res.status(200).json({
 		success: true,
@@ -202,6 +263,21 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	const cacheKey = generateCacheKey("walletBalance", {
+		walletAddress,
+		network: networkLower,
+	});
+
+	// Attempt to retrieve from cache
+	const cachedBalance = await getCache(cacheKey);
+	if (cachedBalance) {
+		return res.status(200).json({
+			success: true,
+			data: cachedBalance,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(networkLower);
 		const balance = await networkService.getWalletBalance(walletAddress);
@@ -218,30 +294,36 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 		const balanceEUR = balance * currentPrices.eur;
 		const balanceTRY = balance * currentPrices.try;
 
-		res.status(200).json({
-			success: true,
-			data: {
-				walletAddress,
-				network: networkLower,
-				balance: {
-					amount: balance,
-					symbol: config.symbol,
+		const balanceData = {
+			walletAddress,
+			network: networkLower,
+			balance: {
+				amount: balance,
+				symbol: config.symbol,
+			},
+			equivalents: {
+				USD: {
+					amount: balanceUSD,
+					currency: "USD",
 				},
-				equivalents: {
-					USD: {
-						amount: balanceUSD,
-						currency: "USD",
-					},
-					EUR: {
-						amount: balanceEUR,
-						currency: "EUR",
-					},
-					TRY: {
-						amount: balanceTRY,
-						currency: "TRY",
-					},
+				EUR: {
+					amount: balanceEUR,
+					currency: "EUR",
+				},
+				TRY: {
+					amount: balanceTRY,
+					currency: "TRY",
 				},
 			},
+		};
+
+		// Set cache with specific category TTL
+		await setCache(cacheKey, balanceData, "walletBalance");
+
+		res.status(200).json({
+			success: true,
+			data: balanceData,
+			cached: false, // Data freshly fetched from the API
 		});
 	} catch (error) {
 		next(error);
@@ -263,9 +345,28 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	// Attempt to retrieve from cache
+	const cacheKey = generateCacheKey("walletTokens", {
+		walletAddress,
+		network,
+	});
+
+	const cachedTokens = await getCache(cacheKey);
+
+	if (cachedTokens) {
+		return res.status(200).json({
+			success: true,
+			data: cachedTokens,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(network);
 		const tokens = await networkService.getWalletTokenAccounts(walletAddress);
+
+		// Set cache with specific category TTL
+		await setCache(cacheKey, tokens, "walletTokens");
 
 		res.status(200).json({
 			success: true,
@@ -281,7 +382,7 @@ export const getWalletTokenAccounts = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * @desc    Get wallet transactions with pagination
+ * @desc    Get wallet transactions
  * @route   GET /api/v1/wallets/transactions
  * @access  Public
  */
@@ -333,6 +434,23 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 		return next(new ErrorResponse(`Invalid transaction type "${type}".`, 400));
 	}
 
+	// Attempt to retrieve from cache
+	const cacheKey = generateCacheKey("walletTransactions", {
+		walletAddress,
+		network: networkLower,
+		type,
+	});
+
+	const cachedTransactions = await getCache(cacheKey);
+
+	if (cachedTransactions) {
+		return res.status(200).json({
+			success: true,
+			data: cachedTransactions,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(networkLower);
 
@@ -342,11 +460,14 @@ export const getWalletTransactions = asyncHandler(async (req, res, next) => {
 			type // Optional
 		);
 
+		// Set cache with specific category TTL
+		await setCache(cacheKey, parsedTransactions, "walletTransactions");
+
+		// Return the parsed transactions
 		res.status(200).json({
 			success: true,
-			data: {
-				transactions: parsedTransactions,
-			},
+			data: parsedTransactions,
+			cached: false, // Data freshly fetched from the API
 		});
 	} catch (error) {
 		next(error);

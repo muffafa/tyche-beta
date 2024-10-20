@@ -1,9 +1,9 @@
-// web3/utils/price.js
 import Axios from "axios";
-import dotenv from "dotenv";
+import { getCache, setCache, generateCacheKey } from "../../utils/cache.js";
 
 /**
  * Fetches the current prices of a given cryptocurrency in specified fiat currencies using CoinGecko API.
+ * Utilizes caching to reduce API calls and manage rate limits.
  * @param {string} coinId - The CoinGecko ID of the cryptocurrency (e.g., 'solana').
  * @param {Array<string>} vsCurrencies - An array of fiat currency codes (e.g., ['usd', 'eur', 'try']).
  * @returns {Object} - An object containing the current prices in the specified fiat currencies.
@@ -12,6 +12,14 @@ export const getCurrentPrices = async (
 	coinId,
 	vsCurrencies = ["usd", "eur", "try"]
 ) => {
+	const cacheKey = generateCacheKey("fiatPrice", { coinId });
+
+	// Attempt to retrieve from cache
+	const cachedPrices = await getCache(cacheKey);
+	if (cachedPrices) {
+		return cachedPrices;
+	}
+
 	try {
 		const response = await Axios.get(
 			"https://api.coingecko.com/api/v3/simple/price",
@@ -37,6 +45,9 @@ export const getCurrentPrices = async (
 				`Prices for currencies [${missingCurrencies.join(", ")}] not found.`
 			);
 		}
+
+		// Set cache with TTL
+		await setCache(cacheKey, prices, "fiatPrice");
 
 		return prices;
 	} catch (error) {

@@ -9,6 +9,7 @@ Create a `.env` file in the root directory and add the following environment var
 NODE_ENV=development
 PORT=5002
 MONGO_URI=
+REDIS_URL=redis://localhost:6379
 
 # Auth Configuration
 WALLET_ENCRYPTION_SECRET=

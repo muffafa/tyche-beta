@@ -45,7 +45,7 @@ export const getCache = async (key) => {
  */
 export const setCache = async (key, value, category = "default") => {
 	try {
-		// Retrieve TTL from config; fallback to default if category not found
+		// Retrieve TTL from config; use default if category not found
 		const ttl = cacheConfig[category] || cacheConfig.default;
 
 		await redisClient.set(key, JSON.stringify(value), {

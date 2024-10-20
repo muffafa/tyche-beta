@@ -1,5 +1,5 @@
 import Axios from "axios";
-import { getCache, setCache, generateCacheKey } from "../../utils/cache.js"; // Adjust the import path if necessary
+import { getCache, setCache, generateCacheKey } from "../../utils/cache.js";
 
 /**
  * Fetches the current prices of a given cryptocurrency in specified fiat currencies using CoinGecko API.

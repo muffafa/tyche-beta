@@ -1,6 +1,7 @@
 import Wallet from "../models/Wallet.js";
 import asyncHandler from "../middleware/async.js";
 import ErrorResponse from "../utils/errorResponse.js";
+import { getCache, setCache, generateCacheKey } from "../utils/cache.js";
 import Web3 from "web3";
 
 // Initialize Web3 (optional, if you need to interact with blockchain)
@@ -202,6 +203,21 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 		);
 	}
 
+	const cacheKey = generateCacheKey("walletBalance", {
+		walletAddress,
+		network: networkLower,
+	});
+
+	// Attempt to retrieve from cache
+	const cachedBalance = await getCache(cacheKey);
+	if (cachedBalance) {
+		return res.status(200).json({
+			success: true,
+			data: cachedBalance,
+			cached: true, // Indicate that data was served from cache
+		});
+	}
+
 	try {
 		const networkService = createNetwork(networkLower);
 		const balance = await networkService.getWalletBalance(walletAddress);
@@ -218,30 +234,36 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 		const balanceEUR = balance * currentPrices.eur;
 		const balanceTRY = balance * currentPrices.try;
 
-		res.status(200).json({
-			success: true,
-			data: {
-				walletAddress,
-				network: networkLower,
-				balance: {
-					amount: balance,
-					symbol: config.symbol,
+		const balanceData = {
+			walletAddress,
+			network: networkLower,
+			balance: {
+				amount: balance,
+				symbol: config.symbol,
+			},
+			equivalents: {
+				USD: {
+					amount: balanceUSD,
+					currency: "USD",
 				},
-				equivalents: {
-					USD: {
-						amount: balanceUSD,
-						currency: "USD",
-					},
-					EUR: {
-						amount: balanceEUR,
-						currency: "EUR",
-					},
-					TRY: {
-						amount: balanceTRY,
-						currency: "TRY",
-					},
+				EUR: {
+					amount: balanceEUR,
+					currency: "EUR",
+				},
+				TRY: {
+					amount: balanceTRY,
+					currency: "TRY",
 				},
 			},
+		};
+
+		// Set cache with specific category TTL
+		await setCache(cacheKey, balanceData, "walletBalance");
+
+		res.status(200).json({
+			success: true,
+			data: balanceData,
+			cached: false, // Data freshly fetched from the API
 		});
 	} catch (error) {
 		next(error);

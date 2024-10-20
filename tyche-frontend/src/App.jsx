@@ -66,9 +66,12 @@ function App() {
           <Route path="/resetPassword" element={<PasswordResetPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/register/username" element={<UsernamePage />} />
-          <Route path="/:network/:address" element={<WalletDetailsPage />} />
           <Route
-            path="/transaction/:hash"
+            path="/:network/address/:address"
+            element={<WalletDetailsPage />}
+          />
+          <Route
+            path="/:network/tx/:hash"
             element={<TransactionDetailsPage />}
           />
           <Route path="*" element={<NotFound />} />

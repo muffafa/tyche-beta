@@ -16,8 +16,8 @@ function SearchBar() {
   //take searchterm from window.location.pathname
   let searchTerm = window.location.pathname.split("/")[2];
   const handleSearch = () => {
-    navigate("/" + selectedNetwork + "/" + searchTerm);
-  }
+    navigate("/" + selectedNetwork + "/address/" + searchTerm);
+  };
 
   return (
     <div className="flex items-center w-full relative">
@@ -28,14 +28,17 @@ function SearchBar() {
           alt={selectedNetwork}
           className="border-[4px] border-white rounded-full"
         />
-        <NetworkSelect selectedNetwork={selectedNetwork} onSelectNetwork={(network) => dispatch(setNetwork(network))} />
+        <NetworkSelect
+          selectedNetwork={selectedNetwork}
+          onSelectNetwork={(network) => dispatch(setNetwork(network))}
+        />
       </div>
       {/* Search Field */}
       <div className="flex items-center w-full">
         <input
           type="text"
           defaultValue={searchTerm}
-          onChange={(e) => searchTerm = e.target.value}
+          onChange={(e) => (searchTerm = e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSearch();

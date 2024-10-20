@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import shortenAddress from "../../utils/shortenAddress";
 import { convertTimestampToTimezone } from "../../utils/convertTimestampToTimezone";
 import { useSelector } from "react-redux";
@@ -53,8 +52,17 @@ function TxCard({ tx, currentAddress }) {
     incoming = true;
   }
 
+  const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
+
+  const handleClick = () => {
+    navigate(`/${selectedNetwork}/tx/${tx.attributes.hash}`);
+  };
+
   return (
-    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer" onClick={() => navigate(`/transaction/${tx.attributes.hash}`)}>
+    <div
+      className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="flex flex-col gap-[2px] text-[12px]">
         <p className="font-bold">
           {formattedTime.split(" ")[0]} {formattedTime.split(" ")[1]}{" "}
@@ -102,31 +110,5 @@ function TxCard({ tx, currentAddress }) {
   );
 }
 
-TxCard.propTypes = {
-  tx: PropTypes.shape({
-    txId: PropTypes.string.isRequired, // Ensure txId is passed correctly
-    transactionTime: PropTypes.string, // Updated to allow null or undefined values
-    attributes: PropTypes.shape({
-      hash: PropTypes.string.isRequired,
-      sent_from: PropTypes.string.isRequired,
-      sent_to: PropTypes.string.isRequired,
-      mined_at: PropTypes.string,
-      transfers: PropTypes.arrayOf(
-        PropTypes.shape({
-          fungible_info: PropTypes.shape({
-            symbol: PropTypes.string,
-            icon: PropTypes.string, // Ensure icon is of type string
-          }),
-          quantity: PropTypes.shape({
-            float: PropTypes.number,
-          }),
-          value: PropTypes.number,
-        })
-      ),
-    }).isRequired,
-  }).isRequired,
-  currentAddress: PropTypes.string.isRequired,
-  currentNetwork: PropTypes.string.isRequired,
-};
 
 export default TxCard;

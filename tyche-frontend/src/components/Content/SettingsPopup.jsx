@@ -4,31 +4,33 @@ import tagDeleteIcon from "./../../assets/images/icons/tagDeleteIcon.svg";
 import tagConfirmIcon from "./../../assets/images/icons/tagConfirmIcon.svg";
 import tagCancelIcon from "./../../assets/images/icons/tagCancelIcon.svg";
 import saveWalletIcon from "./../../assets/images/icons/saveWalletIcon.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getSupportedNetworks } from "../../utils/NetworkManager";
 import { useSelector } from "react-redux";
 import { updateSettings } from "../../redux/slices/settingsSlice";
 import { useDispatch } from "react-redux";
+import { addAddress, deleteAddress, updateAddress } from "../../redux/slices/walletSlice";
 
-function SettingsPopup({ onClose }) {
-  const [activeTab, setActiveTab] = useState("settings");
+function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
+  const [activeTab, setActiveTab] = useState(preferredTab || "settings");
   //get settings from redux
-
+  console.log("NEW WALLET");
+  console.log(newWallet);
+  console.log("WALLET TO EDIT");
+  console.log(walletToEdit);
   return (
     <>
       <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
         <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
           {PopupTabs(activeTab, setActiveTab, onClose)}
           <div className="flex flex-col w-full justify-top p-8">
-            {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets />}
+            {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets newWallet={newWallet} walletToEdit={walletToEdit} />}
           </div>
         </div>
       </div>
     </>
   );
 }
-
-export default SettingsPopup;
 
 function GeneralSettings() {
   const generalSettings = useSelector((state) => state.settings);
@@ -85,25 +87,13 @@ function GeneralSettings() {
   );
 }
 
-function SavedWallets() {
+function SavedWallets({ newWallet, walletToEdit }) {
   const networks = getSupportedNetworks();
   const [selectedNetwork, setSelectedNetwork] = useState("All Networks");
   const [saveWalletButtonClicked, setSaveWalletButtonClicked] = useState(false);
   const [editWalletId, setEditWalletId] = useState(null);
-  const [wallets, setWallets] = useState([
-    {
-      id: 1,
-      address: "0x7487226B39433cFAD2A0622D19CcE2670aB6d788",
-      tag: "Ali",
-      network: "bnb smart chain",
-    },
-    {
-      id: 2,
-      address: "0x0987sdndvffefe68645745w32wuyffsnsl654321",
-      tag: "My Wallet",
-      network: "ethereum",
-    },
-  ]);
+  const addresses = useSelector((state) => state.wallet.addresses);
+  const dispatch = useDispatch();
 
   const handleNetworkChange = (event) => {
     setSelectedNetwork(event.target.value);
@@ -115,22 +105,33 @@ function SavedWallets() {
 
   const handleSaveWallet = (updatedWallet) => {
     // if wallet exists, update it, else add it
-    if (wallets.find((wallet) => wallet.id === updatedWallet.id)) {
-      setWallets(
-        wallets.map((wallet) =>
-          wallet.id === updatedWallet.id ? updatedWallet : wallet
-        )
-      );
+
+    if (addresses.find((wallet) => wallet.id === updatedWallet.id)) {
+      dispatch(updateAddress(updatedWallet));
     } else {
-      setWallets([...wallets, updatedWallet]);
+      updatedWallet.id = addresses.length + 1;
+      dispatch(addAddress(updatedWallet));
     }
     setEditWalletId(null);
     setSaveWalletButtonClicked(false);
+    newWallet = null;
+    walletToEdit = null;
   };
 
   const handleDeleteWallet = (walletId) => {
-    setWallets(wallets.filter((wallet) => wallet.id !== walletId));
+    dispatch(deleteAddress(walletId));
   };
+
+  useEffect(() => {
+    if (newWallet) {
+      setSaveWalletButtonClicked(true);
+    }
+    if (walletToEdit) {
+      setEditWalletId(walletToEdit.id);
+    }
+  }
+  , [newWallet, walletToEdit]);
+
   return (
     <>
       <div className="flex flex-col gap-[35px] w-full">
@@ -158,7 +159,7 @@ function SavedWallets() {
             </p>
           </div>
           <div className="flex flex-col gap-[20px] overflow-y-auto max-h-[250px]">
-            {wallets
+            {addresses
               .filter(
                 (wallet) =>
                   selectedNetwork === "All Networks" ||
@@ -207,6 +208,7 @@ function SavedWallets() {
           {/* Save Wallet Button */}
           {saveWalletButtonClicked ? (
             <AddOrEditWallet
+              wallet={newWallet}
               setSaveWalletButtonClicked={setSaveWalletButtonClicked}
               setEditWalletId={setEditWalletId}
               onSave={handleSaveWallet}
@@ -279,7 +281,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           <option
             key={network}
             value={network}
-            selected={network === newNetwork}
+            defaultValue={network === newNetwork}
           >
             {network}
           </option>
@@ -337,3 +339,5 @@ function PopupTabs(activeTab, setActiveTab, onClose) {
     </div>
   );
 }
+
+export default SettingsPopup;

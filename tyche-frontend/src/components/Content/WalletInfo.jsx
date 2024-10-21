@@ -3,8 +3,10 @@ import shareIcon from "./../../assets/images/icons/shareIcon.svg";
 import walletCopyIcon from "./../../assets/images/icons/walletCopyIcon.svg";
 import tagEditBlueIcon from "./../../assets/images/icons/tagEditBlueIcon.svg";
 import saveWalletLightBlueIcon from "./../../assets/images/icons/saveWalletLightBlueIcon.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ZoomQRCode from "./ZoomQRCode";
+import { useSelector } from "react-redux";
+import SettingsPopup from "./SettingsPopup";
 
 function WalletInfo() {
   return (
@@ -14,27 +16,51 @@ function WalletInfo() {
       </p>
       <div className="flex flex-row justify-start items-center bg-tycheLightGray px-[30px] py-[25px] rounded-[20px] gap-[40px] h-full">
         <ShareWallet />
-        <Details />
+        <Details walletAddress="0xjhkjhasdygq9823421391802381823" />
       </div>
     </div>
   );
 }
 
-export default WalletInfo;
 
-function Details() {
-  let isSavedWallet = false; //Change this to true to see the saved wallet UI
+function Details({ walletAddress }) {
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  const addresses = useSelector((state) => state.wallet.addresses);
+  const network = useSelector((state) => state.global.selectedNetwork);
+  const [SavedWallet, setSavedWallet] = useState({
+    id: -1,
+    address: walletAddress,
+    network: network,
+    tag: "",
+  });
+
+  useEffect(() => {
+    const savedWallet = addresses.find((address) => address.address === walletAddress);
+    if (savedWallet) {
+      setSavedWallet(savedWallet);
+    }
+    else {
+      setSavedWallet({
+        id: -1,
+        address: walletAddress,
+        network: network,
+        tag: "",
+      });
+    }
+  }
+  , [addresses, walletAddress, network]);
+  
   return (
     <div className="flex flex-col items-start gap-[24px]">
       <div className="flex flex-row gap-[15px]">
         <p className="text-black text-[14px] font-bold">Wallet Address:</p>
         <div className="flex flex-row items-center">
           <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
-            0xjhkjhasdygq9823421391802381823
+            {walletAddress}
           </p>
           <button
             onClick={() => {
-              navigator.clipboard.writeText("0xjhkjhasdygq9823421391802381823");
+              navigator.clipboard.writeText(walletAddress);
             }}
           >
             <img
@@ -48,12 +74,12 @@ function Details() {
       <div className="flex flex-row gap-[15px]">
         <p className="text-black text-[14px] font-bold">Private Name Tag:</p>
         <div className="flex flex-row items-center gap-[10px]">
-          {isSavedWallet ? (
+          {SavedWallet.id !== -1 ? (
             <button
               className="flex flex-row items-center gap-[10px]"
-              onClick={() => console.log("Edit Tag clicked")}
+              onClick={() => setShowSettingsPopup(true)}
             >
-              <p className="text-[14px] text-tycheBlue font-[350]">muffafa</p>
+              <p className="text-[14px] text-tycheBlue font-[350]">{SavedWallet.tag}</p>
               <img
                 src={tagEditBlueIcon}
                 alt="Edit"
@@ -63,7 +89,7 @@ function Details() {
           ) : (
             <button
               className="flex flex-row items-center justify-center gap-[10px] border-dashed border-[2px] px-[10px] py-[1px] border-tycheBlue rounded-full"
-              onClick={() => console.log("Save Wallet clicked")}
+              onClick={() => setShowSettingsPopup(true)}
             >
               <div className="flex flex-row items-center justify-center gap-[5px]">
                 <img
@@ -103,6 +129,9 @@ function Details() {
           </p>
         </div>
       </div>
+      {showSettingsPopup && (
+        <SettingsPopup onClose={() => setShowSettingsPopup(false)} preferredTab={"savedWallets"} newWallet={SavedWallet.id === -1 ? SavedWallet : null} walletToEdit={SavedWallet.id !== -1 ? SavedWallet : null} />
+      )}
     </div>
   );
 }
@@ -130,3 +159,5 @@ function ShareWallet() {
     </div>
   );
 }
+
+export default WalletInfo;

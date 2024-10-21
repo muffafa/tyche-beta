@@ -148,7 +148,7 @@ function Header() {
         </header>
       )}
       {showSettingsPopup && (
-        <SettingsPopup onClose={() => setShowSettingsPopup(false)} />
+        <SettingsPopup onClose={() => setShowSettingsPopup(false)} preferredTab={"settings"} newWallet={null} walletToEdit={null} />
       )}
     </>
   );

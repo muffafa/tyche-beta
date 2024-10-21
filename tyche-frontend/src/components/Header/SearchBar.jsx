@@ -13,7 +13,7 @@ function SearchBar() {
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
   //take searchterm from window.location.pathname
-  let searchTerm = window.location.pathname.split("/")[2];
+  let searchTerm = window.location.pathname.split("/")[3];
   const handleSearch = () => {
     navigate("/" + selectedNetwork + "/address/" + searchTerm);
   };

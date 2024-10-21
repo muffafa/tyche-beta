@@ -12,10 +12,15 @@ function SearchBar() {
 
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
-  //take searchterm from window.location.pathname
-  let searchTerm = window.location.pathname.split("/")[3];
+  let searchTerm = '';
+  if (window.location.pathname.split("/")[2] === "address") {
+    searchTerm = window.location.pathname.split("/")[3] || '';
+  }
+
   const handleSearch = () => {
-    navigate("/" + selectedNetwork + "/address/" + searchTerm);
+    if (searchTerm) {
+      navigate(`/${selectedNetwork}/address/${searchTerm}`);
+    }
   };
 
   return (

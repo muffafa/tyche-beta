@@ -31,7 +31,7 @@ function TransactionDetailsPage() {
           <div className="flex flex-row items-center justify-start gap-[20px] w-full">
             <button
               className="flex items-center bg-tychePrimary p-[13px] cursor-pointer rounded-full"
-              onClick={() => navigate("/")}
+              onClick={() => navigate(-1)}
             >
               <img src={goBackIcon} alt="Go Back" />
             </button>

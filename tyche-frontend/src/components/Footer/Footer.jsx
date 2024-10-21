@@ -19,7 +19,7 @@ function Footer() {
         <a
           target="_blank"
           rel="noreferrer noopener"
-          href="https://github.com/muffafa/tyche-beta"
+          href="https://github.com/usetyche/tyche-beta"
           className="text-tycheBlue text-[14px]"
         >
           Github Repo

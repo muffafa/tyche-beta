@@ -52,13 +52,13 @@ function WalletDetailsPage() {
       },
     },
     {
-      txId: "0x789",
-      transactionTime: "2023-08-10T16:00:00Z",
+      txId: "0x456",
+      transactionTime: "2023-07-01T14:30:00Z",
       attributes: {
-        hash: "0x78ljndjnc9",
-        sent_from: "0x12kdjndcjkn3",
-        sent_to: currentAddress, // You are the receiver
-        mined_at: "2023-08-10T16:00:00Z",
+        hash: "0x45ljxoıcjc6",
+        sent_from: currentAddress, // You are the sender
+        sent_to: "0x45kjncxjxjnjnjn6",
+        mined_at: "2023-07-01T14:30:00Z",
         transfers: [
           {
             fungible_info: {
@@ -66,9 +66,9 @@ function WalletDetailsPage() {
               icon: "https://assets.coingecko.com/coins/images/4128/small/solana.png",
             },
             quantity: {
-              float: 0.75,
+              float: 2.3,
             },
-            value: (0.75 * 145.59).toFixed(2), // 109.19 USD
+            value: (2.3 * 145.59).toFixed(2), // 334.86 USD
           },
         ],
       },
@@ -166,10 +166,10 @@ function WalletDetailsPage() {
         <div className="hidden md:flex w-full gap-[11px]">
           {/* Left column */}
           <div className="flex flex-col gap-[16px] w-[300px]">
-            <div className="w-[300px] h-[384px]">
+            <div className="w-[300px]">
               <Portfolio tokens={tokens} nfts={nfts} network={network} />
             </div>
-            <div className="w-[300px] h-[384px]">
+            <div className="w-[300px]">
               <DAppList network={network} />
             </div>
           </div>
@@ -180,7 +180,7 @@ function WalletDetailsPage() {
               currentAddress={currentAddress}
               currentNetwork={network}
             />
-            <div className="w-full min-h-[384px]">
+            <div className="w-full">
               <TxHistory
                 transactions={transactions}
                 currentNetwork={network}

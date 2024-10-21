@@ -43,7 +43,7 @@ function SearchBar() {
               handleSearch();
             }
           }}
-          placeholder="Wallet address or tx hash"
+          placeholder="Wallet address"
           className="bg-tycheLightGray w-full placeholder-[#444444] text-black placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[220px] focus:outline-none focus:ring-tychePrimary focus:border-tychePrimary focus:border-[1px]"
         />
         <button

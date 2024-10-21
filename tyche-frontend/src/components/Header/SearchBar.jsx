@@ -12,9 +12,9 @@ function SearchBar() {
 
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
-  let searchTerm = '';
+  let searchTerm = "";
   if (window.location.pathname.split("/")[2] === "address") {
-    searchTerm = window.location.pathname.split("/")[3] || '';
+    searchTerm = window.location.pathname.split("/")[3] || "";
   }
 
   const handleSearch = () => {
@@ -48,7 +48,7 @@ function SearchBar() {
               handleSearch();
             }
           }}
-          placeholder="Wallet address"
+          placeholder="Type the wallet address"
           className="bg-tycheLightGray w-full placeholder-[#444444] text-black placeholder-[20px] px-4 py-1 h-[54px] rounded-l-full relative z-0 pl-[220px] focus:outline-none focus:ring-tychePrimary focus:border-tychePrimary focus:border-[1px]"
         />
         <button

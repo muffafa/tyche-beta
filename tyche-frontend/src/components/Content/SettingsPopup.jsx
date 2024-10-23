@@ -4,7 +4,7 @@ import tagDeleteIcon from "./../../assets/images/icons/tagDeleteIcon.svg";
 import tagConfirmIcon from "./../../assets/images/icons/tagConfirmIcon.svg";
 import tagCancelIcon from "./../../assets/images/icons/tagCancelIcon.svg";
 import saveWalletIcon from "./../../assets/images/icons/saveWalletIcon.svg";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getSupportedNetworks } from "../../utils/NetworkManager";
 import { useSelector } from "react-redux";
 import { updateSettings } from "../../redux/slices/settingsSlice";
@@ -24,7 +24,7 @@ function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
         <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
           {PopupTabs(activeTab, setActiveTab, onClose)}
           <div className="flex flex-col w-full justify-top p-8">
-            {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets newWallet={newWallet} walletToEdit={walletToEdit} />}
+            {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets newWallet={newWallet} walletToEdit={walletToEdit} onClose={onClose}/>}
           </div>
         </div>
       </div>
@@ -87,7 +87,7 @@ function GeneralSettings() {
   );
 }
 
-function SavedWallets({ newWallet, walletToEdit }) {
+function SavedWallets({ newWallet, walletToEdit, onClose }) {
   const networks = getSupportedNetworks();
   const [selectedNetwork, setSelectedNetwork] = useState("All Networks");
   const [saveWalletButtonClicked, setSaveWalletButtonClicked] = useState(false);
@@ -104,8 +104,6 @@ function SavedWallets({ newWallet, walletToEdit }) {
   };
 
   const handleSaveWallet = (updatedWallet) => {
-    // if wallet exists, update it, else add it
-
     if (addresses.find((wallet) => wallet.id === updatedWallet.id)) {
       dispatch(updateAddress(updatedWallet));
     } else {
@@ -114,8 +112,10 @@ function SavedWallets({ newWallet, walletToEdit }) {
     }
     setEditWalletId(null);
     setSaveWalletButtonClicked(false);
-    newWallet = null;
-    walletToEdit = null;
+    //düzenleme kısmı wallet informationdan açıldıysa kaydedildikten sonra popupu kapatır
+    if (walletToEdit || newWallet) {
+      onClose();
+    }
   };
 
   const handleDeleteWallet = (walletId) => {
@@ -245,7 +245,25 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
     wallet ? wallet.network : getSupportedNetworks()[0]
   );
 
-  const handleSubmit = () => {
+  // Ref for tag input field
+  const tagInputRef = useRef(null);
+  const walletInputRef = useRef(null);
+
+  // Focus on tag input when component is mounted
+  useEffect(() => {
+    if (wallet && tagInputRef.current) {
+      tagInputRef.current.focus();
+    }
+    else if (walletInputRef.current) {
+      walletInputRef.current.focus();
+    }
+  }, [wallet]);
+
+  const handleSubmit = async () => {
+    if (!address || !tag) {
+      alert("Please fill in all fields");
+      return;
+    }
     const updatedWallet = {
       id: wallet ? wallet.id : Date.now(),
       address,
@@ -258,17 +276,37 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
     <div className="flex flex-row gap-4 items-center justify-between w-full min-h-[70px] max-h-[70px] rounded-[25px] px-[29px] bg-tycheDarkGray">
       <input
         type="text"
+        ref={walletInputRef}
         placeholder="Wallet"
         className="text-[20px] w-[130px] rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary px-1"
         defaultValue={address}
         onChange={(e) => setAddress(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
+          if (e.key === "Escape") {
+            onCancel();
+          }
+        }
+        }
       />
       <input
         type="text"
+        ref={tagInputRef}
         placeholder="Tag"
         className="text-[20px] w-[130px] rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary px-1"
         defaultValue={tag}
         onChange={(e) => setTag(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            handleSubmit();
+          }
+          if (e.key === "Escape") {
+            onCancel();
+          }
+        }
+        }
       />
       <select
         id="network"

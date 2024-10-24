@@ -4,12 +4,12 @@ import goBackIcon from "./../assets/images/icons/goBackIcon.svg";
 import copyIcon from "./../assets/images/icons/walletCopyIcon.svg";
 import shareIcon from "./../assets/images/icons/shareIcon.svg";
 import rightArrowIcon from "./../assets/images/icons/rightArrowIcon.svg";
-import QRCode from "./../assets/images/qrcode.svg";
 import shortenAddress from "../utils/shortenAddress";
 import TokenCard from "../components/Content/TokenCard";
 import ZoomQRCode from "../components/Content/ZoomQRCode";
 import { convertWalletToTag } from "../utils/convertWalletToTag";
 import { useSelector } from "react-redux";
+import QRCode from "react-qr-code";
 
 function TransactionDetailsPage() {
   const navigate = useNavigate();
@@ -99,13 +99,15 @@ function TransactionDetailsPage() {
                 <p className="text-black text-[8px] italic">
                   {"*This transaction's link"}
                 </p>
-                <img
-                  src={QRCode}
-                  alt="QR Code"
+                <QRCode
+                  size={80}
+                  value={window.location.href}
                   className="w-[80px] h-[80px] cursor-pointer"
                   onClick={() => setZoom(true)}
                 />
-                {zoom && <ZoomQRCode qr={QRCode} setZoom={setZoom} />}
+                {zoom && (
+                  <ZoomQRCode value={window.location.href} setZoom={setZoom} />
+                )}
               </div>
               <p className="text-black text-[6px] italic">
                 Click and zoom to QR Code

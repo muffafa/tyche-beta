@@ -1,4 +1,3 @@
-import QRCode from "./../../assets/images/qrcode.svg";
 import shareIcon from "./../../assets/images/icons/shareIcon.svg";
 import walletCopyIcon from "./../../assets/images/icons/walletCopyIcon.svg";
 import tagEditBlueIcon from "./../../assets/images/icons/tagEditBlueIcon.svg";
@@ -7,6 +6,7 @@ import { useEffect, useState } from "react";
 import ZoomQRCode from "./ZoomQRCode";
 import { useSelector } from "react-redux";
 import SettingsPopup from "./SettingsPopup";
+import QRCode from "react-qr-code";
 
 function WalletInfo() {
   return (
@@ -142,13 +142,13 @@ function ShareWallet() {
     <div className="flex flex-col items-center h-full gap-[3px]">
       <div className="flex flex-col items-center gap-[9px]">
         <p className="text-black text-[8px] italic">{"*This page's link"}</p>
-        <img
-          src={QRCode}
-          alt="QR Code"
+        <QRCode
+          size={80}
+          value={window.location.href}
           className="w-[80px] h-[80px] cursor-pointer"
           onClick={() => setZoom(true)}
         />
-        {zoom && <ZoomQRCode qr={QRCode} setZoom={setZoom} />}
+        {zoom && <ZoomQRCode value={window.location.href} setZoom={setZoom} />}
       </div>
       <p className="text-black text-[6px] italic">Click and zoom to QR Code</p>
       <div className="h-[4px]" />

@@ -1,5 +1,10 @@
-import redisClient from "../config/redis.js";
+import { redisClient, getRedisAvailability } from "../config/redis.js";
 import cacheConfig from "../config/cacheConfig.js";
+import {
+	getInMemoryCache,
+	setInMemoryCache,
+	deleteInMemoryCache,
+} from "../config/fallbackCache.js";
 
 /**
  * Generates a unique cache key based on the request parameters.
@@ -8,7 +13,6 @@ import cacheConfig from "../config/cacheConfig.js";
  * @returns {string} - The generated cache key.
  */
 export const generateCacheKey = (prefix, params) => {
-	// Filter out unnecessary details and keep only relevant params
 	const filteredParams = Object.entries(params)
 		.filter(([key, value]) => value !== undefined && value !== null)
 		.map(([key, value]) => `${key}:${value}`)
@@ -19,53 +23,68 @@ export const generateCacheKey = (prefix, params) => {
 
 /**
  * Retrieves data from the cache based on the provided key.
+ * Uses Redis if available; otherwise, falls back to in-memory cache.
  * @param {string} key - The cache key.
  * @returns {Promise<any>} - The cached data or null if not found.
  */
 export const getCache = async (key) => {
-	try {
-		const data = await redisClient.get(key);
-		if (data) {
-			console.log(`Cache hit for key ${key}`);
-			return JSON.parse(data);
+	if (getRedisAvailability()) {
+		try {
+			const data = await redisClient.get(key);
+			if (data) {
+				console.log(`Redis Cache hit for key ${key}`);
+				return JSON.parse(data);
+			}
+			return null;
+		} catch (error) {
+			console.error(`Error getting Redis cache for key ${key}:`, error);
+			return null;
 		}
-		return null;
-	} catch (error) {
-		console.error(`Error getting cache for key ${key}:`, error);
-		return null;
+	} else {
+		// Use in-memory cache
+		return await getInMemoryCache(key);
 	}
 };
 
 /**
  * Sets data in the cache with an appropriate TTL.
+ * Uses Redis if available; otherwise, falls back to in-memory cache.
  * @param {string} key - The cache key.
  * @param {any} value - The data to cache.
  * @param {string} category - The cache category to determine TTL.
  * @returns {Promise<void>}
  */
 export const setCache = async (key, value, category = "default") => {
-	try {
-		// Retrieve TTL from config; use default if category not found
-		const ttl = cacheConfig[category] || cacheConfig.default;
-
-		await redisClient.set(key, JSON.stringify(value), {
-			EX: ttl,
-		});
-	} catch (error) {
-		console.error(`Error setting cache for key ${key}:`, error);
+	if (getRedisAvailability()) {
+		try {
+			const ttl = cacheConfig[category] || cacheConfig.default;
+			await redisClient.set(key, JSON.stringify(value), { EX: ttl });
+			console.log(`Redis Cache set for key ${key} with TTL ${ttl}s`);
+		} catch (error) {
+			console.error(`Error setting Redis cache for key ${key}:`, error);
+		}
+	} else {
+		// Use in-memory cache
+		await setInMemoryCache(key, value, category);
 	}
 };
 
 /**
  * Deletes data from the cache based on the provided key.
+ * Uses Redis if available; otherwise, falls back to in-memory cache.
  * @param {string} key - The cache key to delete.
  * @returns {Promise<void>}
  */
 export const deleteCache = async (key) => {
-	try {
-		await redisClient.del(key);
-		console.log(`Cache deleted for key ${key}`);
-	} catch (error) {
-		console.error(`Error deleting cache for key ${key}:`, error);
+	if (getRedisAvailability()) {
+		try {
+			await redisClient.del(key);
+			console.log(`Redis Cache deleted for key ${key}`);
+		} catch (error) {
+			console.error(`Error deleting Redis cache for key ${key}:`, error);
+		}
+	} else {
+		// Use in-memory cache
+		await deleteInMemoryCache(key);
 	}
 };

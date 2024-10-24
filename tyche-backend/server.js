@@ -1,5 +1,4 @@
 import "dotenv/config"; // Automatically loads environment variables
-// Load environment variables
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -8,11 +7,12 @@ import connectDB from "./config/db.js";
 import auth from "./routes/auth.js";
 import wallet from "./routes/wallet.js";
 import transactions from "./routes/transactions.js";
+import { getRedisAvailability } from "./config/redis.js"; // Import Redis availability flag
 
 // Connect to database
 connectDB();
 
-// initialize express
+// Initialize Express
 const app = express();
 
 // Middleware
@@ -25,6 +25,15 @@ if (process.env.NODE_ENV === "development") {
 // Routes
 app.get("/", (req, res) => {
 	res.send("Welcome to Tyche Backend API");
+});
+
+app.get("/health", async (req, res) => {
+	const redisStatus = getRedisAvailability() ? "available" : "unavailable";
+	res.status(200).json({
+		status: "ok",
+		redis: redisStatus,
+		timestamp: new Date(),
+	});
 });
 
 // Mount routers
@@ -40,11 +49,16 @@ const server = app.listen(PORT, () => {
 	console.log(
 		`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
 	);
+	if (getRedisAvailability()) {
+		console.log("Redis caching is enabled.".green);
+	} else {
+		console.log("Redis caching is unavailable. Using in-memory cache.".yellow);
+	}
 });
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
-	console.log(`💥Error: ${err.message}`.red.bold);
+	console.log(`💥 Error: ${err.message}`.red.bold);
 	// Close server and exit process
 	server.close(() => process.exit(1));
 });

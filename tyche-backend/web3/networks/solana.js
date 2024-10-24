@@ -183,28 +183,78 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the wallet's SOL balance.
-	 * @param {string} walletAddress - The wallet address.
-	 * @returns {number} - The SOL balance.
-	 */
-	async getWalletBalance(walletAddress) {
-		try {
-			const response = await this.axios.post("", {
-				jsonrpc: "2.0",
-				id: 1,
-				method: "getBalance",
-				params: [walletAddress],
-			});
+     * Fetches the wallet's SOL balance with fiat equivalents and handles caching.
+     * @param {string} walletAddress - The wallet address.
+     * @returns {Object} - Wallet balance data with fiat equivalents.
+     */
+    async getWalletBalance(walletAddress) {
+        // Generate cache key for this specific wallet and network
+        const cacheKey = generateCacheKey("walletBalance", {
+            walletAddress,
+            network: "solana"
+        });
 
-			const balanceLamports = response.data.result.value;
-			const balanceSOL = balanceLamports / 1e9; // Convert lamports to SOL
+        // Try to get balance from cache
+        const cachedBalance = await getCache(cacheKey);
+        if (cachedBalance) {
+            return {
+                ...cachedBalance,
+                cached: true
+            };
+        }
 
-			return balanceSOL;
-		} catch (error) {
-			console.error("Error fetching Solana balance:", error);
-			throw error;
-		}
-	}
+        try {
+            // Fetch raw SOL balance
+            const response = await this.axios.post("", {
+                jsonrpc: "2.0",
+                id: 1,
+                method: "getBalance",
+                params: [walletAddress],
+            });
+
+            const balanceLamports = response.data.result.value;
+            const balanceSOL = balanceLamports / 1e9; // Convert lamports to SOL
+
+            // Fetch current prices for fiat equivalents
+            const currentPrices = await getCurrentPrices(
+                networkConfig.solana.coinGeckoId,
+                ["usd", "eur", "try"]
+            );
+
+            // Calculate fiat equivalents
+            const balanceData = {
+                walletAddress,
+                network: "solana",
+                balance: {
+                    amount: balanceSOL,
+                    symbol: networkConfig.solana.symbol,
+                },
+                equivalents: {
+                    USD: {
+                        amount: balanceSOL * currentPrices.usd,
+                        currency: "USD",
+                    },
+                    EUR: {
+                        amount: balanceSOL * currentPrices.eur,
+                        currency: "EUR",
+                    },
+                    TRY: {
+                        amount: balanceSOL * currentPrices.try,
+                        currency: "TRY",
+                    },
+                },
+                cached: false
+            };
+
+            // Cache the balance data
+            await setCache(cacheKey, balanceData, "walletBalance");
+
+            return balanceData;
+        } catch (error) {
+            console.error("Error fetching Solana wallet balance:", error);
+            throw error;
+        }
+    }
 
 	/**
 	 * Fetches the wallet's SPL token accounts, utilizing cached metadata for each mint address.
@@ -408,85 +458,91 @@ class SolanaNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches detailed transaction information by transaction ID.
-	 * @param {string} txid - The transaction ID.
-	 * @returns {Object} - Detailed transaction information.
-	 */
-	async getTransactionDetails(txid) {
-		try {
-			const response = await this.axios.post("", {
-				jsonrpc: "2.0",
-				id: 1,
-				method: "getTransaction",
-				params: [
-					txid,
-					{
-						encoding: "jsonParsed",
-						commitment: "finalized",
-						maxSupportedTransactionVersion: 0,
-					},
-				],
-			});
+     * Fetches and processes detailed transaction information including fiat values
+     * @param {string} txid - The transaction ID
+     * @returns {Object} - Processed transaction details with fiat values
+     */
+    async getTransactionDetails(txid) {
+        try {
+            // Get raw transaction details
+            const response = await this.axios.post("", {
+                jsonrpc: "2.0",
+                id: 1,
+                method: "getTransaction",
+                params: [
+                    txid,
+                    {
+                        encoding: "jsonParsed",
+                        commitment: "finalized",
+                        maxSupportedTransactionVersion: 0,
+                    },
+                ],
+            });
 
-			const tx = response.data.result;
+            const tx = response.data.result;
+            if (!tx) {
+                return null;
+            }
 
-			if (!tx) {
-				console.log(`No transaction details found for ${txid}`);
-				return null;
-			}
+            // Process basic transaction details
+            const date = tx.blockTime ? new Date(tx.blockTime * 1000) : null;
+            const feeLamports = tx.meta?.fee || 0;
+            const feeSOL = feeLamports / 1e9;
 
-			const date = tx.blockTime ? new Date(tx.blockTime * 1000) : null;
-			const feeLamports = tx.meta?.fee || 0;
-			const feeSOL = feeLamports / 1e9;
+            // Extract transaction data
+            const instructions = tx.transaction.message.instructions;
+            const accountKeys = tx.transaction.message.accountKeys;
+            const preBalances = tx.meta.preBalances;
+            const postBalances = tx.meta.postBalances;
 
-			let from = null;
-			let to = null;
-			let asset = null;
-			let amount = null;
+            // Process transaction participants and amounts
+            const from = accountKeys[0];
+            const lamportsSpent = preBalances[0] - postBalances[0];
+            const amount = lamportsSpent / 1e9;
+            const asset = "SOL";
 
-			const instructions = tx.transaction.message.instructions;
-			const accountKeys = tx.transaction.message.accountKeys;
-			const preBalances = tx.meta.preBalances;
-			const postBalances = tx.meta.postBalances;
+            // Find recipient from instruction data
+            let to = null;
+            for (const instruction of instructions) {
+                if (instruction.parsed && instruction.parsed.type === "create") {
+                    to = instruction.parsed.info.wallet;
+                    break;
+                }
+            }
 
-			console.log("Parsed Instructions:", instructions);
+            // Get current prices for fiat value calculation
+            const prices = await getCurrentPrices(networkConfig.solana.coinGeckoId, [
+                "usd",
+                "eur",
+                "try"
+            ]);
 
-			// First account is the payer
-			from = accountKeys[0];
+            // Calculate fiat values
+            const fiatValues = {
+                USD: amount * prices.usd,
+                EUR: amount * prices.eur,
+                TRY: amount * prices.try
+            };
 
-			// Calculate the total SOL spent by the sender
-			const lamportsSpent = preBalances[0] - postBalances[0];
-			amount = lamportsSpent / 1e9; // Convert lamports to SOL
-			asset = "SOL";
-
-			console.log(`Sender ${from} spent ${amount} SOL`);
-
-			// Optionally, find the recipient from the instruction data
-			// For associated token account creation, the recipient is in the instruction
-			for (const instruction of instructions) {
-				if (instruction.parsed && instruction.parsed.type === "create") {
-					to = instruction.parsed.info.wallet;
-					break;
-				}
-			}
-
-			return {
-				transactionId: txid,
-				date,
-				gasFee: {
-					lamports: feeLamports,
-					sol: feeSOL,
-				},
-				from,
-				to,
-				asset,
-				amount,
-			};
-		} catch (error) {
-			console.error("Error fetching Solana transaction details:", error);
-			throw error;
-		}
-	}
+            // Return processed transaction details
+            return {
+                transactionId: txid,
+                date,
+                gasFee: {
+                    lamports: feeLamports,
+                    sol: feeSOL
+                },
+                from,
+                to,
+                asset,
+                amount,
+                fiatValues
+            };
+        } catch (error) {
+            console.error("Error fetching Solana transaction details:", error);
+            throw error;
+        }
+    }
 
 	/**
 	 * Fetches and parses transactions for a given wallet address from Helius,

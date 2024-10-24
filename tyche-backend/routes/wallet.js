@@ -7,6 +7,7 @@ import {
 } from "../controllers/wallet.js";
 import { protect } from "../middleware/auth.js";
 import solanaWalletRoutes from "./solana/wallet.js";
+import ethereumWalletRoutes from "./ethereum/wallet.js";
 // import ethereumWalletRoutes from "./ethereum/wallet.js";
 const router = Router();
 
@@ -42,6 +43,6 @@ router.route("/:id").delete(protect, deleteWallet);
  * Mount network-specific wallet routers
  */
 router.use("/solana", solanaWalletRoutes);
-// router.use("/ethereum", ethereumWalletRoutes);
+router.use("/ethereum", ethereumWalletRoutes);
 
 export default router;

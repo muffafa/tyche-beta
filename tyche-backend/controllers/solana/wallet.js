@@ -7,7 +7,6 @@ import {
 	generateCacheKey,
 } from "../../utils/cache.js";
 import createNetwork from "../../web3/index.js";
-import { getCurrentPrices } from "../../web3/utils/price.js";
 import networkConfig from "../../web3/networks/networkConfig.js";
 
 const network = 'solana'
@@ -32,7 +31,7 @@ export const getWalletBalance = asyncHandler(async (req, res, next) => {
 
     try {
         // Create network instance and get wallet balance
-        const networkService = createNetwork("solana");
+        const networkService = createNetwork(network);
         const balanceData = await networkService.getWalletBalance(walletAddress);
 
         // Send response

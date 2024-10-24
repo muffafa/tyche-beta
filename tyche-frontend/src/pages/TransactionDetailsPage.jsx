@@ -8,13 +8,20 @@ import QRCode from "./../assets/images/qrcode.svg";
 import shortenAddress from "../utils/shortenAddress";
 import TokenCard from "../components/Content/TokenCard";
 import ZoomQRCode from "../components/Content/ZoomQRCode";
+import { convertWalletToTag } from "../utils/convertWalletToTag";
+import { useSelector } from "react-redux";
 
 function TransactionDetailsPage() {
   const navigate = useNavigate();
   const [zoom, setZoom] = useState(false);
+  const addresses = useSelector((state) => state.wallet.addresses);
 
   // Extract the transaction hash from the URL
   const hash = window.location.pathname.split("/")[2];
+
+  //burası ileride tx den gelen bilgilerden alınacak
+  const sent_from = "0xjhkjhasdygq9823421391802381823";
+  const sent_to = "0xnsljnjwe283t7y7w78651fdfscfwet2";
 
   // Example tokens array
   const tokens = [
@@ -122,7 +129,7 @@ function TransactionDetailsPage() {
             <div className="flex flex-col">
               <p className="text-black text-[14px] font-bold">From:</p>
               <p className="text-[14px] text-tycheBlue font-[350]">
-                0x12fjbfn...
+                {convertWalletToTag(sent_from, addresses)}
               </p>
             </div>
             <img
@@ -133,7 +140,7 @@ function TransactionDetailsPage() {
             <div className="flex flex-col items-end">
               <p className="text-black text-[14px] font-bold">To:</p>
               <p className="text-[14px] text-tycheBlue font-[350]">
-                0x1237777...
+                {convertWalletToTag(sent_to, addresses)}
               </p>
             </div>
           </div>

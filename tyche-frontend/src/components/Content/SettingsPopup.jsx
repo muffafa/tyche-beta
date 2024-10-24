@@ -150,7 +150,8 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
         </select>
         <div className="flex flex-col gap-[20px] w-full">
           {/* Burası değişecek */}
-          <div className="flex flex-row gap-4 items-center justify-between w-full px-[29px]">
+          { addresses.length === 0 ? <p className="flex font-bold text-[20px] w-full justify-center">There is no saved address!</p>:
+            <div className="flex flex-row gap-4 items-center justify-between w-full px-[29px]">
             <p className="flex font-bold text-[20px] w-[130px]">Address</p>
             <p className="flex font-bold text-[20px] w-[130px]">Tag</p>
             <p className="flex font-bold text-[20px] w-[130px]">Network</p>
@@ -158,6 +159,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
               Operations
             </p>
           </div>
+          }
           <div className="flex flex-col gap-[20px] overflow-y-auto max-h-[250px]">
             {addresses
               .filter(

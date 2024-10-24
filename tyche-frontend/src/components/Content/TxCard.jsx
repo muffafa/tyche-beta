@@ -4,11 +4,13 @@ import { useSelector } from "react-redux";
 import outgoingIcon from "./../../assets/images/icons/outgoingIcon.svg";
 import incomingIcon from "./../../assets/images/icons/incomingIcon.svg";
 import { useNavigate } from "react-router-dom";
+import { convertWalletToTag } from "../../utils/convertWalletToTag";
 
 const ETH_TO_USD = 3402.5; // Replace with the current ETH/USD rate
 
 function TxCard({ tx, currentAddress }) {
   const settings = useSelector((state) => state.settings);
+  const addresses = useSelector((state) => state.wallet.addresses);
   const navigate = useNavigate();
 
   const formattedTime = convertTimestampToTimezone(
@@ -58,6 +60,7 @@ function TxCard({ tx, currentAddress }) {
     navigate(`/${selectedNetwork}/tx/${tx.attributes.hash}`);
   };
 
+
   return (
     <div
       className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer"
@@ -77,13 +80,13 @@ function TxCard({ tx, currentAddress }) {
         <div className="flex flex-row gap-[5px]">
           <p className="text-[12px] font-bold">From:</p>
           <span className="text-tycheBlue text-[12px]">
-            {shortenAddress(tx.attributes.sent_from)}
+            {convertWalletToTag(tx.attributes.sent_from,addresses)}
           </span>
         </div>
         <div className="flex flex-row gap-[5px]">
           <p className="text-[12px] font-bold">To:</p>
           <span className="text-tycheBlue text-[12px]">
-            {shortenAddress(tx.attributes.sent_to)}
+            {convertWalletToTag(tx.attributes.sent_to,addresses)}
           </span>
         </div>
       </div>

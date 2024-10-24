@@ -4,7 +4,7 @@ import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
 
 function WalletDetailsPage() {
-  const currentAddress = "0x123777777";
+  const currentAddress = "0xjhkjhasdygq9823421391802381823";
 
   const transactions = [
     {

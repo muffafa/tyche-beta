@@ -8,7 +8,6 @@ import crypto from "crypto";
 const UserSchema = new mongoose.Schema({
 	fullname: {
 		type: String,
-		required: [true, "Please add your full name"],
 		trim: true,
 		maxlength: [50, "Full name can not exceed 50 characters"],
 	},
@@ -23,9 +22,14 @@ const UserSchema = new mongoose.Schema({
 	},
 	password: {
 		type: String,
-		required: [true, "Please add a password"],
 		minlength: 6,
 		select: false,
+		// Make password optional for Google users
+	},
+	googleId: {
+		type: String,
+		unique: true,
+		sparse: true, // Allows multiple docs with null googleId
 	},
 	wallets: [
 		{

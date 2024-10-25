@@ -4,7 +4,7 @@ import cacheConfig from "./cacheConfig.js";
 // Initialize in-memory cache with standard TTL and checkperiod
 const inMemoryCache = new NodeCache({
     stdTTL: cacheConfig.default,
-    checkperiod: 120
+    checkperiod: 60
 });
 
 /**

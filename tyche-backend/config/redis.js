@@ -1,5 +1,3 @@
-// tyche-backend/config/redis.js
-
 import { createClient } from "redis";
 import dotenv from "dotenv";
 

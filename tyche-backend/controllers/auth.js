@@ -25,6 +25,10 @@ const sendTokenResponse = (user, statusCode, res) => {
 export const register = asyncHandler(async (req, res, next) => {
 	const { fullname, email, password } = req.body;
 
+	if (!email || !password) {
+		return next(new ErrorResponse("Please provide an email and password", 400));
+	}
+
 	// Create user
 	const user = await User.create({
 		fullname,
@@ -189,6 +193,62 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
 
 	user.password = req.body.newPassword;
 	await user.save();
+
+	sendTokenResponse(user, 200, res);
+});
+
+
+//
+// Google OAuth Authentication
+import { OAuth2Client } from "google-auth-library";
+
+// Initialize Google OAuth Client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// @desc    Google Sign-In / Register
+// @route   POST /api/v1/auth/google
+// @access  Public
+export const googleAuth = asyncHandler(async (req, res, next) => {
+	const { idToken } = req.body;
+
+	if (!idToken) {
+		return next(new ErrorResponse("No ID token provided", 400));
+	}
+
+	let ticket;
+	try {
+		ticket = await client.verifyIdToken({
+			idToken,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		});
+	} catch (error) {
+		return next(new ErrorResponse("Invalid ID token", 400));
+	}
+
+	const payload = ticket.getPayload();
+	const { sub: googleId, email, name: fullname, picture } = payload;
+
+	if (!email) {
+		return next(new ErrorResponse("Google account has no email", 400));
+	}
+
+	// Check if user exists
+	let user = await User.findOne({ email });
+
+	if (user) {
+		// If user exists but doesn't have a googleId, associate it
+		if (!user.googleId) {
+			user.googleId = googleId;
+			await user.save();
+		}
+	} else {
+		// Create new user
+		user = await User.create({
+			fullname,
+			email,
+			googleId,
+		});
+	}
 
 	sendTokenResponse(user, 200, res);
 });

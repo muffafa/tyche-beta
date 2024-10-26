@@ -38,3 +38,14 @@ For the initial run, execute `pnpm install`, then:
 ```bash
 pnpm run dev
 ```
+
+#### Alternative: Running with Docker
+
+- Install [docker](https://www.docker.com/products/docker-desktop/) and run it.
+- In `backend` directory:
+
+```bash
+   docker compose up --build
+```
+
+- Backend will be running on `http://localhost:5005/`

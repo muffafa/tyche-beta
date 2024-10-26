@@ -205,6 +205,7 @@ import { OAuth2Client } from "google-auth-library";
 // Initialize Google OAuth Client
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+
 // @desc    Google Sign-In / Register
 // @route   POST /api/v1/auth/google
 // @access  Public
@@ -251,4 +252,36 @@ export const googleAuth = asyncHandler(async (req, res, next) => {
 	}
 
 	sendTokenResponse(user, 200, res);
+});
+
+
+// @desc    Update user's preferred currency
+// @route   PUT /api/v1/auth/preferredcurrency
+// @access  Private
+export const updateCurrency = asyncHandler(async (req, res, next) => {
+	const { preferredCurrency } = req.body;
+
+	// Validate the preferredCurrency
+	const validCurrencies = ["USD", "EUR", "TRY", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SEK"];
+	if (!preferredCurrency || !validCurrencies.includes(preferredCurrency)) {
+		return next(new ErrorResponse(`Please provide a valid preferredCurrency. Valid options are: ${validCurrencies.join(", ")}`, 400));
+	}
+
+	try {
+		// Find the user and update preferredCurrency
+		const user = await User.findByIdAndUpdate(
+			req.user.id,
+			{ preferredCurrency },
+			{ new: true, runValidators: true }
+		);
+
+		res.status(200).json({
+			success: true,
+			data: {
+				preferredCurrency: user.preferredCurrency,
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
 });

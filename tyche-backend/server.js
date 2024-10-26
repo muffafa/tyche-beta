@@ -8,6 +8,7 @@ import auth from "./routes/auth.js";
 import wallet from "./routes/wallet.js";
 import transactions from "./routes/transactions.js";
 import { getRedisAvailability } from "./config/redis.js"; // Import Redis availability flag
+import { getMongoDbStatus } from "./config/db.js"; // Import MongoDB availability flag
 
 // Connect to database
 connectDB();
@@ -29,9 +30,11 @@ app.get("/", (req, res) => {
 
 app.get("/health", async (req, res) => {
 	const redisStatus = getRedisAvailability() ? "available" : "unavailable";
+	const mongoStatus = getMongoDbStatus() ? "available" : "unavailable";
 	res.status(200).json({
 		status: "ok",
 		redis: redisStatus,
+		mongodb: mongoStatus,
 		timestamp: new Date(),
 	});
 });
@@ -49,11 +52,6 @@ const server = app.listen(PORT, () => {
 	console.log(
 		`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold
 	);
-	if (getRedisAvailability()) {
-		console.log("Redis caching is enabled.".green);
-	} else {
-		console.log("Redis caching is unavailable. Using in-memory cache.".yellow);
-	}
 });
 
 // Handle unhandled promise rejections

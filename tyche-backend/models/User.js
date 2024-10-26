@@ -37,6 +37,11 @@ const UserSchema = new mongoose.Schema({
 			ref: "Wallet",
 		},
 	],
+	preferredCurrency: {
+		type: String,
+		enum: ["USD", "EUR", "TRY", "GBP", "JPY", "AUD", "CAD", "CHF", "CNY", "SEK"],
+		default: "USD",
+	},
 	resetPasswordToken: String,
 	resetPasswordExpire: Date,
 	createdAt: {

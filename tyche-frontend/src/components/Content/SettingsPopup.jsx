@@ -388,6 +388,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
   const [newNetwork, setNewNetwork] = useState(
     wallet ? wallet.network : getSupportedNetworks()[0]
   );
+  const addresses = useSelector((state) => state.wallet.addresses);
 
   const tagInputRef = useRef(null);
   const walletInputRef = useRef(null);
@@ -400,11 +401,48 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
     }
   }, [wallet]);
 
-  const handleSubmit = async () => {
+  const validateWallet = () => {
+    // Check for empty fields
     if (!address || !tag) {
       alert("Please fill in all fields");
-      return;
+      return false;
     }
+
+    // Check tag length
+    if (tag.length > 16) {
+      alert("Tag cannot be longer than 16 characters");
+      return false;
+    }
+
+    // Filter out the current wallet if we're editing
+    const otherAddresses = addresses.filter(w => !wallet || w.id !== wallet.id);
+
+    // Rule 1: Same address with different tags in same network
+    const sameAddressInNetwork = otherAddresses.find(
+      w => w.address.toLowerCase() === address.toLowerCase() && 
+          w.network === newNetwork
+    );
+    if (sameAddressInNetwork) {
+      alert("This address is already saved in this network");
+      return false;
+    }
+
+    // Rule 2: Different addresses with same tag in same network
+    const sameTagInNetwork = otherAddresses.find(
+      w => w.tag.toLowerCase() === tag.toLowerCase() && 
+          w.network === newNetwork
+    );
+    if (sameTagInNetwork) {
+      alert("This tag is already used in this network");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateWallet()) return;
+
     const updatedWallet = {
       id: wallet ? wallet.id : Date.now(),
       address,
@@ -437,7 +475,8 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
         <input
           type="text"
           ref={tagInputRef}
-          placeholder="Tag"
+          placeholder="Tag (max 16 characters)"
+          maxLength={16}
           className="text-[14px] md:text-[16px] w-full rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary p-2"
           value={tag}
           onChange={(e) => setTag(e.target.value)}

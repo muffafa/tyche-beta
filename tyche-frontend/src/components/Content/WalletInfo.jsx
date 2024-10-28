@@ -7,12 +7,10 @@ import ZoomQRCode from "./ZoomQRCode";
 import { useSelector } from "react-redux";
 import SettingsPopup from "./SettingsPopup";
 import QRCode from "react-qr-code";
-import { useParams } from "react-router-dom";
 import shortenAddress from "../../utils/shortenAddress";
 
-function WalletInfo() {
-  const { address } = useParams();
-
+// eslint-disable-next-line no-unused-vars
+function WalletInfo({ currentAddress, currentNetwork }) {
   return (
     <div className="flex flex-col gap-[8px] h-[234px] w-full">
       <p className="text-[24px] text-tychePrimary tracking-wide font-[350]">
@@ -20,7 +18,7 @@ function WalletInfo() {
       </p>
       <div className="flex flex-row justify-start items-center bg-tycheLightGray px-[30px] py-[25px] rounded-[20px] gap-[40px] h-full">
         <ShareWallet />
-        <Details walletAddress={address} />
+        <Details walletAddress={currentAddress} />
       </div>
     </div>
   );
@@ -172,6 +170,48 @@ function Details({ walletAddress }) {
 
 function ShareWallet() {
   const [zoom, setZoom] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Tyche Wallet Details',
+          text: 'Check out this wallet on Tyche',
+          url: shareUrl
+        });
+      } catch (err) {
+        console.log('Share failed:', err);
+        await copyToClipboard(shareUrl);
+      }
+    } else {
+      await copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      // Create a temporary input element
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      
+      // Select and copy the text
+      tempInput.select();
+      document.execCommand('copy');
+      
+      // Remove the temporary element
+      document.body.removeChild(tempInput);
+      
+      setShareSuccess(true);
+      setTimeout(() => setShareSuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center h-full gap-[3px]">
       <div className="flex flex-col items-center gap-[9px]">
@@ -186,10 +226,20 @@ function ShareWallet() {
       </div>
       <p className="text-black text-[6px] italic">Click and zoom to QR Code</p>
       <div className="h-[4px]" />
-      <button className="flex flex-row gap-[5px] items-center justify-center bg-tychePrimary font-[300] text-white text-[14px] px-[10px] py-[6px] tracking-wide rounded-[60px] w-full h-fit">
-        <p>Share</p>
-        <img src={shareIcon} alt="Share" className="w-[14px] h-[14px]" />
-      </button>
+      <div className="relative">
+        <button 
+          onClick={handleShare}
+          className="flex flex-row gap-[5px] items-center justify-center bg-tychePrimary font-[300] text-white text-[14px] px-[10px] py-[6px] tracking-wide rounded-[60px] w-full h-fit"
+        >
+          <p>Share</p>
+          <img src={shareIcon} alt="Share" className="w-[14px] h-[14px]" />
+        </button>
+        {shareSuccess && (
+          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+            Link copied!
+          </span>
+        )}
+      </div>
     </div>
   );
 }

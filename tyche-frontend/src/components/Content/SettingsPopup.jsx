@@ -257,7 +257,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
               </p>
             </div>
           )}
-          
+
           {/* Scrollable list */}
           <div className="flex-grow overflow-y-auto min-h-0 mb-4">
             <div className="flex flex-col gap-[20px]">
@@ -281,21 +281,27 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                       className="flex flex-col md:flex-row gap-3 items-start md:items-center w-full rounded-[25px] p-4 md:px-6 bg-white"
                     >
                       <div className="flex flex-col w-full md:w-[200px]">
-                        <span className="text-[14px] font-bold md:hidden">Address:</span>
+                        <span className="text-[14px] font-bold md:hidden">
+                          Address:
+                        </span>
                         <span className="text-[14px] md:text-[16px] text-tycheDarkBlue break-words md:truncate">
                           {wallet.address}
                         </span>
                       </div>
 
                       <div className="flex flex-col w-full md:w-[200px]">
-                        <span className="text-[14px] font-bold md:hidden">Tag:</span>
+                        <span className="text-[14px] font-bold md:hidden">
+                          Tag:
+                        </span>
                         <span className="text-[14px] md:text-[16px] break-words md:truncate">
                           {wallet.tag}
                         </span>
                       </div>
 
                       <div className="flex flex-col w-full md:w-[200px]">
-                        <span className="text-[14px] font-bold md:hidden">Network:</span>
+                        <span className="text-[14px] font-bold md:hidden">
+                          Network:
+                        </span>
                         <span className="text-[14px] md:text-[16px]">
                           {wallet.network}
                         </span>

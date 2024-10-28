@@ -61,6 +61,14 @@ function TxCard({ tx, currentAddress }) {
     navigate(`/${selectedNetwork}/tx/${tx.attributes.hash}`);
   };
 
+  const handleAddressClick = (address) => (e) => {
+    e.stopPropagation();
+    // Force a full page refresh when navigating
+    window.location.href = `/${selectedNetwork}/address/${address}`;
+    // Alternatively, if you want to keep it as a SPA:
+    // navigate(`/${selectedNetwork}/address/${address}`, { replace: true });
+  };
+
   return (
     <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px]">
       <div className="flex flex-col gap-[2px] text-[12px]">
@@ -79,14 +87,20 @@ function TxCard({ tx, currentAddress }) {
       <div className="text-center gap-[26px] h-full flex flex-col">
         <div className="flex flex-row gap-[5px]">
           <p className="text-[12px] font-bold">From:</p>
-          <span className="text-tycheBlue text-[12px]">
-            {convertWalletToTag(tx.attributes.sent_from,addresses)}
+          <span 
+            className="text-tycheBlue text-[12px] cursor-pointer hover:underline"
+            onClick={handleAddressClick(tx.attributes.sent_from)}
+          >
+            {convertWalletToTag(tx.attributes.sent_from, addresses)}
           </span>
         </div>
         <div className="flex flex-row gap-[5px]">
           <p className="text-[12px] font-bold">To:</p>
-          <span className="text-tycheBlue text-[12px]">
-            {convertWalletToTag(tx.attributes.sent_to,addresses)}
+          <span 
+            className="text-tycheBlue text-[12px] cursor-pointer hover:underline"
+            onClick={handleAddressClick(tx.attributes.sent_to)}
+          >
+            {convertWalletToTag(tx.attributes.sent_to, addresses)}
           </span>
         </div>
       </div>

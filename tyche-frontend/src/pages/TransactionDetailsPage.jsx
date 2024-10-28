@@ -17,6 +17,7 @@ function TransactionDetailsPage() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
   const addresses = useSelector((state) => state.wallet.addresses);
+  const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
   const hash = window.location.pathname.split("/")[3];
 
@@ -82,6 +83,10 @@ function TransactionDetailsPage() {
     } catch (err) {
       console.error('Failed to copy:', err);
     }
+  };
+
+  const handleAddressClick = (address) => () => {
+    window.location.href = `/${selectedNetwork}/address/${address}`;
   };
 
   return (
@@ -199,7 +204,10 @@ function TransactionDetailsPage() {
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-col">
               <p className="text-black text-[14px] font-bold">From:</p>
-              <p className="text-[14px] text-tycheBlue font-[350]">
+              <p 
+                className="text-[14px] text-tycheBlue font-[350] cursor-pointer hover:underline"
+                onClick={handleAddressClick(sent_from)}
+              >
                 {convertWalletToTag(sent_from, addresses)}
               </p>
             </div>
@@ -210,7 +218,10 @@ function TransactionDetailsPage() {
             />
             <div className="flex flex-col items-end">
               <p className="text-black text-[14px] font-bold">To:</p>
-              <p className="text-[14px] text-tycheBlue font-[350]">
+              <p 
+                className="text-[14px] text-tycheBlue font-[350] cursor-pointer hover:underline"
+                onClick={handleAddressClick(sent_to)}
+              >
                 {convertWalletToTag(sent_to, addresses)}
               </p>
             </div>

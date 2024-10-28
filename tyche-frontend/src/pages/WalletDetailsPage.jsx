@@ -2,9 +2,19 @@ import DAppList from "../components/Content/DAppList";
 import Portfolio from "../components/Content/Portfolio";
 import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
+import { useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 
 function WalletDetailsPage() {
-  const currentAddress = "0xjhkjhasdygq9823421391802381823";
+  const { address, network } = useParams();
+  const location = useLocation();
+
+  useEffect(() => {
+    // This effect will run whenever the address parameter or location changes
+    // Add your data fetching logic here
+  }, [address, network, location.pathname]);
+
+  const currentAddress = address || "0xjhkjhasdygq9823421391802381823";
 
   const transactions = [
     {
@@ -136,7 +146,6 @@ function WalletDetailsPage() {
       basePrice: "300",
     },
   ];
-  const network = "solana";
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[80px]">

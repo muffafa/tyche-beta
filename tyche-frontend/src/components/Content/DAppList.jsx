@@ -22,7 +22,7 @@ function DAppList({ network }) {
         Decentralized Apps
       </p>
       <div className="px-[23px] py-[43px] bg-tycheLightGray shadow rounded-[20px]">
-        <div className={`space-y-4 overflow-y-auto max-h-[346px]`}>
+        <div className={`space-y-4 overflow-y-auto max-h-[290px]`}>
           {dApps.map((dapp, index) => (
             <DAppCard key={index} dapp={dapp} />
           ))}

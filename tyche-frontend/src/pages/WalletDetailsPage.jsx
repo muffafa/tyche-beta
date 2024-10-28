@@ -145,6 +145,26 @@ function WalletDetailsPage() {
       id: "1640",
       basePrice: "300",
     },
+    {
+      header: "NFT",
+      id: "1640",
+      basePrice: "300",
+    },
+    {
+      header: "NFT",
+      id: "1640",
+      basePrice: "300",
+    },
+    {
+      header: "NFT",
+      id: "1640",
+      basePrice: "300",
+    },
+    {
+      header: "NFT",
+      id: "1640",
+      basePrice: "300",
+    },
   ];
 
   return (

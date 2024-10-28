@@ -81,9 +81,11 @@ function Portfolio({ tokens, nfts }) {
           <div className="px-[25px] gap-[12px] h-[290px]">
             <div className={`overflow-y-auto ${consistentHeightClass}`}>
               {nfts.length > 0 ? (
-                <div className="flex flex-wrap gap-x-[20px] gap-y-[10px] justify-center pb-[10px]">
+                <div className="grid grid-cols-2 gap-x-[20px] gap-y-[10px] w-full">
                   {nfts.map((nft, index) => (
-                    <NftCard key={index} nft={nft} />
+                    <div key={index} className="flex justify-center w-full">
+                      <NftCard nft={nft} />
+                    </div>
                   ))}
                 </div>
               ) : (

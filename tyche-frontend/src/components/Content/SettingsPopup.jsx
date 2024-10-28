@@ -24,10 +24,10 @@ function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
   console.log(walletToEdit);
   return (
     <>
-      <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50">
-        <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
+      <div className="fixed inset-0 bg-black backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50 p-2 md:p-0">
+        <div className="fixed bg-tycheLightGray rounded-[30px] w-full md:w-[85%] lg:w-[75%] h-[85%] md:h-[75%] items-center overflow-hidden flex flex-col">
           {PopupTabs(activeTab, setActiveTab, onClose)}
-          <div className="flex flex-col w-full justify-top p-8">
+          <div className="flex flex-col w-full h-[calc(100%-70px)] md:h-[calc(100%-85px)] p-4 md:p-8">
             {activeTab === "settings" ? (
               <GeneralSettings />
             ) : (
@@ -48,13 +48,13 @@ function GeneralSettings() {
   const generalSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
   return (
-    <div className="flex flex-col gap-[45px]">
-      <div className="flex flex-row gap-4 items-center">
-        <p className="flex font-medium text-[20px]">Currency:</p>
+    <div className="flex flex-col gap-6 md:gap-[45px]">
+      <div className="flex flex-row gap-2 md:gap-4 items-center">
+        <p className="flex font-medium text-[16px] md:text-[18px]">Currency:</p>
         <select
           id="currency"
           name="currency"
-          className="flex items-center bg-tychePrimary text-white text-[20px] px-6 py-1 h-[50px] rounded-full w-fit focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+          className="flex items-center bg-tychePrimary text-white text-[14px] md:text-[16px] px-4 md:px-6 py-1 h-[40px] md:h-[50px] rounded-full w-fit focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
           onChange={(e) =>
             dispatch(
               updateSettings({
@@ -69,12 +69,14 @@ function GeneralSettings() {
           <option selected={generalSettings.currency === "GBP"}>GBP</option>
         </select>
       </div>
-      <div className="flex flex-row gap-4 items-center">
-        <p className="flex font-medium text-[20px]">Timezone:</p>
+      <div className="flex flex-row gap-2 md:gap-4 items-center">
+        <p className="flex font-medium text-[16px] md:text-[18px] whitespace-nowrap">
+          Timezone:
+        </p>
         <select
           id="timezone"
           name="timezone"
-          className="flex items-center bg-tychePrimary text-white text-[20px] px-6 py-1 h-[50px] w-fit rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+          className="flex items-center bg-tychePrimary text-white text-[12px] md:text-[14px] px-2 md:px-4 py-1 h-[40px] md:h-[50px] w-fit max-w-[200px] md:max-w-none rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
           onChange={(e) =>
             dispatch(
               updateSettings({
@@ -217,11 +219,12 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
 
   return (
     <>
-      <div className="flex flex-col gap-[35px] w-full">
+      <div className="flex flex-col h-full">
+        {/* Network selector */}
         <select
           id="currency"
           name="currency"
-          className="flex items-center bg-tychePrimary text-white text-[20px] py-[13px] w-fit px-[20px] h-[50px] rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
+          className="flex items-center bg-tychePrimary text-white text-[16px] md:text-[20px] py-[13px] w-fit px-[20px] h-[50px] rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen mb-4"
           onChange={handleNetworkChange}
         >
           <option>All Networks</option>
@@ -231,83 +234,117 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
             </option>
           ))}
         </select>
-        <div className="flex flex-col gap-[20px] w-full">
-          {/* Burası değişecek */}
+
+        {/* Table header and content */}
+        <div className="flex flex-col flex-grow min-h-0">
           {addresses.length === 0 ? (
-            <p className="flex font-bold text-[20px] w-full justify-center">
+            <p className="flex font-bold text-[16px] md:text-[20px] w-full justify-center">
               There is no saved address!
             </p>
           ) : (
-            <div className="flex flex-row gap-4 items-center justify-between w-full px-[29px]">
-              <p className="flex font-bold text-[20px] w-[130px]">Address</p>
-              <p className="flex font-bold text-[20px] w-[130px]">Tag</p>
-              <p className="flex font-bold text-[20px] w-[130px]">Network</p>
-              <p className="flex font-bold text-[20px] w-[130px] justify-end">
+            <div className="hidden md:flex flex-row gap-4 items-center w-full px-6 mb-4">
+              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+                Address
+              </p>
+              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+                Tag
+              </p>
+              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+                Network
+              </p>
+              <p className="flex font-bold text-[16px] md:text-[18px] w-[100px] justify-end">
                 Operations
               </p>
             </div>
           )}
-          <div className="flex flex-col gap-[20px] overflow-y-auto max-h-[250px]">
-            {addresses
-              .filter(
-                (wallet) =>
-                  selectedNetwork === "All Networks" ||
-                  wallet.network === selectedNetwork
-              )
-              .map((wallet, index) =>
-                editWalletId === wallet.id ? (
-                  <AddOrEditWallet
-                    key={index}
-                    wallet={wallet}
-                    onSave={handleSaveWallet}
-                    onCancel={() => setEditWalletId(null)}
-                  />
-                ) : (
-                  <div
-                    key={index}
-                    className="flex flex-row gap-4 items-center justify-between w-full min-h-[70px] max-h-[70px] rounded-[25px] px-[29px] bg-white"
-                  >
-                    <p className="text-[20px] w-[130px] overflow-hidden whitespace-nowrap text-ellipsis text-tycheDarkBlue">
-                      {wallet.address}
-                    </p>
-                    <p className="text-[20px] w-[130px] overflow-hidden whitespace-nowrap text-ellipsis">
-                      {wallet.tag}
-                    </p>
-                    <p className="text-[20px] w-[130px] overflow-hidden whitespace-nowrap text-ellipsis">
-                      {wallet.network}
-                    </p>
-                    <div className="flex flex-row gap-4 w-[130px] overflow-hidden whitespace-nowrap text-ellipsis justify-end">
-                      <button
-                        className="flex items-center justify-center"
-                        onClick={() => handleEditWallet(wallet)}
-                      >
-                        <img src={tagEditIcon} alt="Edit" />
-                      </button>
-                      <button
-                        className="flex items-center justify-center"
-                        onClick={() => handleDeleteWallet(wallet.id)}
-                      >
-                        <img src={tagDeleteIcon} alt="Delete" />
-                      </button>
-                    </div>
-                  </div>
+          
+          {/* Scrollable list */}
+          <div className="flex-grow overflow-y-auto min-h-0 mb-4">
+            <div className="flex flex-col gap-[20px]">
+              {addresses
+                .filter(
+                  (wallet) =>
+                    selectedNetwork === "All Networks" ||
+                    wallet.network === selectedNetwork
                 )
-              )}
+                .map((wallet, index) =>
+                  editWalletId === wallet.id ? (
+                    <AddOrEditWallet
+                      key={index}
+                      wallet={wallet}
+                      onSave={handleSaveWallet}
+                      onCancel={() => setEditWalletId(null)}
+                    />
+                  ) : (
+                    <div
+                      key={index}
+                      className="flex flex-col md:flex-row gap-3 items-start md:items-center w-full rounded-[25px] p-4 md:px-6 bg-white"
+                    >
+                      <div className="flex flex-col w-full md:w-[200px]">
+                        <span className="text-[14px] font-bold md:hidden">Address:</span>
+                        <span className="text-[14px] md:text-[16px] text-tycheDarkBlue break-words md:truncate">
+                          {wallet.address}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col w-full md:w-[200px]">
+                        <span className="text-[14px] font-bold md:hidden">Tag:</span>
+                        <span className="text-[14px] md:text-[16px] break-words md:truncate">
+                          {wallet.tag}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-col w-full md:w-[200px]">
+                        <span className="text-[14px] font-bold md:hidden">Network:</span>
+                        <span className="text-[14px] md:text-[16px]">
+                          {wallet.network}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-row gap-4 w-full md:w-[100px] justify-end md:justify-end mt-2 md:mt-0">
+                        <button
+                          className="p-2 hover:bg-gray-100 rounded-full"
+                          onClick={() => handleEditWallet(wallet)}
+                        >
+                          <img
+                            src={tagEditIcon}
+                            alt="Edit"
+                            className="w-5 h-5 md:w-6 md:h-6"
+                          />
+                        </button>
+                        <button
+                          className="p-2 hover:bg-gray-100 rounded-full"
+                          onClick={() => handleDeleteWallet(wallet.id)}
+                        >
+                          <img
+                            src={tagDeleteIcon}
+                            alt="Delete"
+                            className="w-5 h-5 md:w-6 md:h-6"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  )
+                )}
+            </div>
           </div>
-          {/* Save Wallet Button */}
-          {saveWalletButtonClicked ? (
-            <AddOrEditWallet
-              wallet={newWallet}
-              setSaveWalletButtonClicked={setSaveWalletButtonClicked}
-              setEditWalletId={setEditWalletId}
-              onSave={handleSaveWallet}
-              onCancel={() => setSaveWalletButtonClicked(false)}
-            />
-          ) : (
-            <AddWalletButton
-              setSaveWalletButtonClicked={setSaveWalletButtonClicked}
-            />
-          )}
+
+          {/* Save Wallet Button - Always at bottom */}
+          <div className="mt-auto">
+            {saveWalletButtonClicked ? (
+              <AddOrEditWallet
+                wallet={newWallet}
+                setSaveWalletButtonClicked={setSaveWalletButtonClicked}
+                setEditWalletId={setEditWalletId}
+                onSave={handleSaveWallet}
+                onCancel={() => setSaveWalletButtonClicked(false)}
+              />
+            ) : (
+              <AddWalletButton
+                setSaveWalletButtonClicked={setSaveWalletButtonClicked}
+              />
+            )}
+          </div>
         </div>
       </div>
     </>
@@ -320,7 +357,9 @@ function AddWalletButton({ setSaveWalletButtonClicked }) {
       <div className="flex flex-row gap-4 items-center justify-center w-full rounded-[25px] px-[29px] border-dashed border-tycheDarkBlue h-[49px] border-[2px]">
         <div className="flex flex-row items-center justify-center gap-[11px]">
           <img src={saveWalletIcon} alt="Save Wallet" />
-          <p className="flex text-[20px] text-tycheDarkBlue">Save Wallet</p>
+          <p className="flex text-[16px] md:text-[18px] text-tycheDarkBlue">
+            Save Wallet
+          </p>
         </div>
       </div>
     </button>
@@ -334,11 +373,9 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
     wallet ? wallet.network : getSupportedNetworks()[0]
   );
 
-  // Ref for tag input field
   const tagInputRef = useRef(null);
   const walletInputRef = useRef(null);
 
-  // Focus on tag input when component is mounted
   useEffect(() => {
     if (wallet && tagInputRef.current) {
       tagInputRef.current.focus();
@@ -360,67 +397,78 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
     };
     onSave(updatedWallet);
   };
-  return (
-    <div className="flex flex-row gap-4 items-center justify-between w-full min-h-[70px] max-h-[70px] rounded-[25px] px-[29px] bg-tycheDarkGray">
-      <input
-        type="text"
-        ref={walletInputRef}
-        placeholder="Wallet"
-        className="text-[20px] w-[130px] rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary px-1"
-        defaultValue={address}
-        onChange={(e) => setAddress(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSubmit();
-          }
-          if (e.key === "Escape") {
-            onCancel();
-          }
-        }}
-      />
-      <input
-        type="text"
-        ref={tagInputRef}
-        placeholder="Tag"
-        className="text-[20px] w-[130px] rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary px-1"
-        defaultValue={tag}
-        onChange={(e) => setTag(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleSubmit();
-          }
-          if (e.key === "Escape") {
-            onCancel();
-          }
-        }}
-      />
-      <select
-        id="network"
-        name="network"
-        className="flex items-center bg-tycheLightGray text-black text-[20px] py-1 border-dashed border-tycheDarkGray border-[2px] w-[130px] rounded-full focus:outline-none focus:border-tychePrimary"
-        onChange={(e) => setNewNetwork(e.target.value)}
-        value={newNetwork}
-      >
-        {getSupportedNetworks().map((network) => (
-          <option
-            key={network}
-            value={network}
-            defaultValue={network === newNetwork}
-          >
-            {network}
-          </option>
-        ))}
-      </select>
 
-      <div className="flex flex-row gap-4 w-[130px] overflow-hidden whitespace-nowrap text-ellipsis justify-end">
+  return (
+    <div className="flex flex-col md:flex-row gap-3 items-start md:items-center w-full rounded-[25px] p-4 md:px-6 bg-tycheDarkGray">
+      <div className="flex flex-col w-full md:w-[200px] gap-1">
+        <span className="text-[14px] font-bold md:hidden">Address:</span>
+        <input
+          type="text"
+          ref={walletInputRef}
+          placeholder="Wallet"
+          className="text-[14px] md:text-[16px] w-full rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary p-2"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSubmit();
+            if (e.key === "Escape") onCancel();
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col w-full md:w-[200px] gap-1">
+        <span className="text-[14px] font-bold md:hidden">Tag:</span>
+        <input
+          type="text"
+          ref={tagInputRef}
+          placeholder="Tag"
+          className="text-[14px] md:text-[16px] w-full rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary p-2"
+          value={tag}
+          onChange={(e) => setTag(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSubmit();
+            if (e.key === "Escape") onCancel();
+          }}
+        />
+      </div>
+
+      <div className="flex flex-col w-full md:w-[200px] gap-1">
+        <span className="text-[14px] font-bold md:hidden">Network:</span>
+        <select
+          id="network"
+          name="network"
+          className="text-[14px] md:text-[16px] w-full rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary p-2 bg-white"
+          onChange={(e) => setNewNetwork(e.target.value)}
+          value={newNetwork}
+        >
+          {getSupportedNetworks().map((network) => (
+            <option key={network} value={network}>
+              {network}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex flex-row gap-4 w-full md:w-[100px] justify-end mt-2 md:mt-0">
         <button
-          className="flex items-center justify-center"
+          className="p-2 hover:bg-gray-100 rounded-full"
           onClick={handleSubmit}
         >
-          <img src={tagConfirmIcon} alt="Confirm" />
+          <img
+            src={tagConfirmIcon}
+            alt="Confirm"
+            className="w-5 h-5 md:w-6 md:h-6"
+          />
         </button>
-        <button className="flex items-center justify-center" onClick={onCancel}>
-          <img src={tagCancelIcon} alt="Cancel" />
+        <button
+          className="p-2 hover:bg-gray-100 rounded-full"
+          onClick={onCancel}
+        >
+          <img
+            src={tagCancelIcon}
+            alt="Cancel"
+            className="w-5 h-5 md:w-6 md:h-6"
+          />
         </button>
       </div>
     </div>
@@ -429,16 +477,16 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
 
 function PopupTabs(activeTab, setActiveTab, onClose) {
   return (
-    <div className="flex flex-grow justify-between items-center h-[85px]">
+    <div className="flex w-full justify-between items-center h-[70px] md:h-[85px]">
       <button
         className={`${
           activeTab === "settings"
             ? "bg-tycheLightGray text-black"
             : "bg-tychePrimary text-white"
-        } p-1 rounded-tl-[40px] w-full h-full flex items-center justify-center`}
+        } p-1 rounded-tl-[30px] w-full h-full flex items-center justify-center`}
         onClick={() => setActiveTab("settings")}
       >
-        <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[24px]">
+        <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[16px] md:text-[20px]">
           General Settings
         </div>
       </button>
@@ -450,15 +498,15 @@ function PopupTabs(activeTab, setActiveTab, onClose) {
         } p-1 w-full h-full flex items-center justify-center`}
         onClick={() => setActiveTab("savedWallets")}
       >
-        <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[24px]">
+        <div className="flex items-center justify-center gap-2 p-2 w-full h-full font-bold text-[16px] md:text-[20px]">
           Saved Wallets
         </div>
       </button>
       <button
         onClick={onClose}
-        className="bg-tycheRed p-1 rounded-tr-[40px] flex min-w-[100px] h-full items-center justify-center"
+        className="bg-tycheRed p-1 rounded-tr-[30px] flex min-w-[70px] md:min-w-[100px] h-full items-center justify-center"
       >
-        <img src={popupCloseIcon} alt="Close" />
+        <img src={popupCloseIcon} alt="Close" className="w-6 md:w-8" />
       </button>
     </div>
   );

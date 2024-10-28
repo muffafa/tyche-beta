@@ -9,7 +9,11 @@ import { getSupportedNetworks } from "../../utils/NetworkManager";
 import { useSelector } from "react-redux";
 import { updateSettings } from "../../redux/slices/settingsSlice";
 import { useDispatch } from "react-redux";
-import { addAddress, deleteAddress, updateAddress } from "../../redux/slices/walletSlice";
+import {
+  addAddress,
+  deleteAddress,
+  updateAddress,
+} from "../../redux/slices/walletSlice";
 
 function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
   const [activeTab, setActiveTab] = useState(preferredTab || "settings");
@@ -24,7 +28,15 @@ function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
         <div className="fixed bg-tycheLightGray rounded-[40px] w-[50%] h-[80%] items-center">
           {PopupTabs(activeTab, setActiveTab, onClose)}
           <div className="flex flex-col w-full justify-top p-8">
-            {activeTab === "settings" ? <GeneralSettings /> : <SavedWallets newWallet={newWallet} walletToEdit={walletToEdit} onClose={onClose}/>}
+            {activeTab === "settings" ? (
+              <GeneralSettings />
+            ) : (
+              <SavedWallets
+                newWallet={newWallet}
+                walletToEdit={walletToEdit}
+                onClose={onClose}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -72,14 +84,86 @@ function GeneralSettings() {
             )
           }
         >
-          <option selected={generalSettings.timezone === "Europe/Berlin (CET)"}>
-            Europe/Berlin
+          <option
+            value="Pacific/Honolulu"
+            selected={generalSettings.timezone === "Pacific/Honolulu"}
+          >
+            Pacific/Honolulu (HST)
           </option>
-          <option selected={generalSettings.timezone === "Europe/London (GMT)"}>
-            Europe/London
+          <option
+            value="America/Anchorage"
+            selected={generalSettings.timezone === "America/Anchorage"}
+          >
+            America/Anchorage (AKST)
           </option>
-          <option selected={generalSettings.timezone === "Europe/Moscow (MSK)"}>
-            Europe/Moscow
+          <option
+            value="America/Los_Angeles"
+            selected={generalSettings.timezone === "America/Los_Angeles"}
+          >
+            America/Los Angeles (PST)
+          </option>
+          <option
+            value="America/Denver"
+            selected={generalSettings.timezone === "America/Denver"}
+          >
+            America/Denver (MST)
+          </option>
+          <option
+            value="America/Chicago"
+            selected={generalSettings.timezone === "America/Chicago"}
+          >
+            America/Chicago (CST)
+          </option>
+          <option
+            value="America/New_York"
+            selected={generalSettings.timezone === "America/New_York"}
+          >
+            America/New York (EST)
+          </option>
+          <option
+            value="Europe/London"
+            selected={generalSettings.timezone === "Europe/London"}
+          >
+            Europe/London (GMT+0)
+          </option>
+          <option
+            value="Europe/Paris"
+            selected={generalSettings.timezone === "Europe/Paris"}
+          >
+            Europe/Paris (CET)
+          </option>
+          <option
+            value="Europe/Berlin"
+            selected={generalSettings.timezone === "Europe/Berlin"}
+          >
+            Europe/Berlin (CET)
+          </option>
+          <option
+            value="Europe/Istanbul"
+            selected={generalSettings.timezone === "Europe/Istanbul"}
+          >
+            Europe/Istanbul (TRT)
+          </option>
+          <option selected={generalSettings.timezone === "Europe/Moscow"}>
+            Europe/Moscow (MSK)
+          </option>
+          <option
+            value="Asia/Dubai"
+            selected={generalSettings.timezone === "Asia/Dubai"}
+          >
+            Asia/Dubai (GST)
+          </option>
+          <option
+            value="Asia/Tokyo"
+            selected={generalSettings.timezone === "Asia/Tokyo"}
+          >
+            Asia/Tokyo (JST)
+          </option>
+          <option
+            value="Australia/Sydney"
+            selected={generalSettings.timezone === "Australia/Sydney"}
+          >
+            Australia/Sydney (AEST)
           </option>
         </select>
       </div>
@@ -129,8 +213,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
     if (walletToEdit) {
       setEditWalletId(walletToEdit.id);
     }
-  }
-  , [newWallet, walletToEdit]);
+  }, [newWallet, walletToEdit]);
 
   return (
     <>
@@ -150,16 +233,20 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
         </select>
         <div className="flex flex-col gap-[20px] w-full">
           {/* Burası değişecek */}
-          { addresses.length === 0 ? <p className="flex font-bold text-[20px] w-full justify-center">There is no saved address!</p>:
-            <div className="flex flex-row gap-4 items-center justify-between w-full px-[29px]">
-            <p className="flex font-bold text-[20px] w-[130px]">Address</p>
-            <p className="flex font-bold text-[20px] w-[130px]">Tag</p>
-            <p className="flex font-bold text-[20px] w-[130px]">Network</p>
-            <p className="flex font-bold text-[20px] w-[130px] justify-end">
-              Operations
+          {addresses.length === 0 ? (
+            <p className="flex font-bold text-[20px] w-full justify-center">
+              There is no saved address!
             </p>
-          </div>
-          }
+          ) : (
+            <div className="flex flex-row gap-4 items-center justify-between w-full px-[29px]">
+              <p className="flex font-bold text-[20px] w-[130px]">Address</p>
+              <p className="flex font-bold text-[20px] w-[130px]">Tag</p>
+              <p className="flex font-bold text-[20px] w-[130px]">Network</p>
+              <p className="flex font-bold text-[20px] w-[130px] justify-end">
+                Operations
+              </p>
+            </div>
+          )}
           <div className="flex flex-col gap-[20px] overflow-y-auto max-h-[250px]">
             {addresses
               .filter(
@@ -255,8 +342,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
   useEffect(() => {
     if (wallet && tagInputRef.current) {
       tagInputRef.current.focus();
-    }
-    else if (walletInputRef.current) {
+    } else if (walletInputRef.current) {
       walletInputRef.current.focus();
     }
   }, [wallet]);
@@ -290,8 +376,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           if (e.key === "Escape") {
             onCancel();
           }
-        }
-        }
+        }}
       />
       <input
         type="text"
@@ -307,8 +392,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           if (e.key === "Escape") {
             onCancel();
           }
-        }
-        }
+        }}
       />
       <select
         id="network"

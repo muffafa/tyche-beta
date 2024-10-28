@@ -19,7 +19,7 @@ function TxHistory({ transactions, currentNetwork, currentAddress }) {
           </button>
         </div>
         <div className="flex-grow overflow-y-auto min-h-[420px] max-h-[420px]">
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4">
             {transactions.map((tx, index) => {
               const txId = tx.attributes?.hash || `tx-${index}`;
               const transactionTime = tx.attributes?.mined_at || null;

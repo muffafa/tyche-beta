@@ -14,16 +14,15 @@ import QRCode from "react-qr-code";
 function TransactionDetailsPage() {
   const navigate = useNavigate();
   const [zoom, setZoom] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [shareSuccess, setShareSuccess] = useState(false);
   const addresses = useSelector((state) => state.wallet.addresses);
 
-  // Extract the transaction hash from the URL
-  const hash = window.location.pathname.split("/")[2];
+  const hash = window.location.pathname.split("/")[3];
 
-  //burası ileride tx den gelen bilgilerden alınacak
   const sent_from = "0xjhkjhasdygq9823421391802381823";
   const sent_to = "0xnsljnjwe283t7y7w78651fdfscfwet2";
 
-  // Example tokens array
   const tokens = [
     {
       symbol: "SOL",
@@ -33,6 +32,57 @@ function TransactionDetailsPage() {
     },
     // Add more tokens if needed
   ];
+
+  const handleCopyHash = () => {
+    const tempInput = document.createElement("input");
+    tempInput.value = hash;
+    document.body.appendChild(tempInput);
+
+    tempInput.select();
+    document.execCommand("copy");
+
+    document.body.removeChild(tempInput);
+
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Tyche Transaction Details',
+          text: 'Check out this transaction on Tyche',
+          url: shareUrl
+        });
+      } catch (err) {
+        console.log('Share failed:', err);
+        copyToClipboard(shareUrl);
+      }
+    } else {
+      copyToClipboard(shareUrl);
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      const tempInput = document.createElement('input');
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      
+      tempInput.select();
+      document.execCommand('copy');
+      
+      document.body.removeChild(tempInput);
+      
+      setShareSuccess(true);
+      setTimeout(() => setShareSuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[80px]">
@@ -61,12 +111,21 @@ function TransactionDetailsPage() {
                 <p className="text-[14px] text-tycheBlue font-[350]">
                   {shortenAddress(hash)}
                 </p>
-                <button onClick={() => navigator.clipboard.writeText(hash)}>
+                <button
+                  onClick={handleCopyHash}
+                  className="relative"
+                  title="Copy hash"
+                >
                   <img
                     src={copyIcon}
                     alt="Copy"
                     className="w-[15px] h-[15px] ml-2"
                   />
+                  {copySuccess && (
+                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded">
+                      Copied!
+                    </span>
+                  )}
                 </button>
               </div>
             </div>
@@ -113,14 +172,24 @@ function TransactionDetailsPage() {
                 Click and zoom to QR Code
               </p>
               <div className="h-[4px]" />
-              <button className="flex flex-row gap-[5px] items-center justify-center bg-tychePrimary font-[300] text-white text-[14px] px-[10px] py-[6px] tracking-wide rounded-[60px] w-full h-fit">
-                <p>Share</p>
-                <img
-                  src={shareIcon}
-                  alt="Share"
-                  className="w-[14px] h-[14px]"
-                />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={handleShare}
+                  className="flex flex-row gap-[5px] items-center justify-center bg-tychePrimary font-[300] text-white text-[14px] px-[10px] py-[6px] tracking-wide rounded-[60px] w-full h-fit"
+                >
+                  <p>Share</p>
+                  <img
+                    src={shareIcon}
+                    alt="Share"
+                    className="w-[14px] h-[14px]"
+                  />
+                </button>
+                {shareSuccess && (
+                  <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
+                    Link copied!
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>

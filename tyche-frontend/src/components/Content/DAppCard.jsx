@@ -22,7 +22,7 @@ function DAppCard({ dapp }) {
           <p className="text-[8px]">{dapp.description}</p>
         </div>
         <a href={dappLink} target="_blank" rel="noopener noreferrer">
-          <div className="flex flex-row items-center gap-[8px]">
+          <div className="flex flex-row items-center gap-[8px] mr-2">
             <p className="text-tycheBlue font-bold text-[12px]">Go</p>
             <img src={goLinkIcon} alt="Go Link" className="w-[12px] h-[12px]" />
           </div>

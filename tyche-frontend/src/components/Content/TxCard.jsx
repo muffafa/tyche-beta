@@ -56,23 +56,23 @@ function TxCard({ tx, currentAddress }) {
 
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
 
-  const handleClick = () => {
+  const handleHashClick = (e) => {
+    e.stopPropagation(); // Prevent event bubbling
     navigate(`/${selectedNetwork}/tx/${tx.attributes.hash}`);
   };
 
-
   return (
-    <div
-      className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px] cursor-pointer"
-      onClick={handleClick}
-    >
+    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px]">
       <div className="flex flex-col gap-[2px] text-[12px]">
         <p className="font-bold">
           {formattedTime.split(" ")[0]} {formattedTime.split(" ")[1]}{" "}
           {formattedTime.split(" ")[2]}
         </p>
         <p className="text-[12px] text-black">{formattedTime.split(" ")[3]}</p>
-        <p className="text-tycheBlue text-[16px] font-semibold">
+        <p 
+          className="text-tycheBlue text-[16px] font-semibold cursor-pointer hover:underline"
+          onClick={handleHashClick}
+        >
           {shortenAddress(tx.attributes.hash)}
         </p>
       </div>
@@ -112,6 +112,5 @@ function TxCard({ tx, currentAddress }) {
     </div>
   );
 }
-
 
 export default TxCard;

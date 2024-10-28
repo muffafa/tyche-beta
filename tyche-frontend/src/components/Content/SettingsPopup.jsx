@@ -14,7 +14,6 @@ import {
   deleteAddress,
   updateAddress,
 } from "../../redux/slices/walletSlice";
-import { useNavigate } from "react-router-dom";
 
 function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
   const [activeTab, setActiveTab] = useState(preferredTab || "settings");
@@ -181,7 +180,6 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
   const [editWalletId, setEditWalletId] = useState(null);
   const addresses = useSelector((state) => state.wallet.addresses);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const handleNetworkChange = (event) => {
     setSelectedNetwork(event.target.value);
@@ -212,7 +210,9 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
 
   const handleAddressClick = (wallet) => (e) => {
     e.stopPropagation();
-    window.location.href = `/${wallet.network.toLowerCase()}/address/${wallet.address}`;
+    window.location.href = `/${wallet.network.toLowerCase()}/address/${
+      wallet.address
+    }`;
   };
 
   useEffect(() => {
@@ -291,7 +291,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                         <span className="text-[14px] font-bold md:hidden">
                           Address:
                         </span>
-                        <span 
+                        <span
                           className="text-[14px] md:text-[16px] text-tycheDarkBlue break-words md:truncate cursor-pointer hover:underline"
                           onClick={handleAddressClick(wallet)}
                         >

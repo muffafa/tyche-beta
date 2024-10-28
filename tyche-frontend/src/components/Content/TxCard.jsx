@@ -70,53 +70,60 @@ function TxCard({ tx, currentAddress }) {
   };
 
   return (
-    <div className="flex flex-row items-center justify-between bg-white p-4 rounded-[20px]">
-      <div className="flex flex-col gap-[2px] text-[12px]">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-4 rounded-[20px] gap-4 md:gap-2">
+      {/* Timestamp and Hash Section */}
+      <div className="flex flex-col gap-[2px] text-[12px] w-full md:w-auto">
         <p className="font-bold">
           {formattedTime.split(" ")[0]} {formattedTime.split(" ")[1]}{" "}
           {formattedTime.split(" ")[2]}
         </p>
         <p className="text-[12px] text-black">{formattedTime.split(" ")[3]}</p>
         <p 
-          className="text-tycheBlue text-[16px] font-semibold cursor-pointer hover:underline"
+          className="text-tycheBlue text-[16px] font-semibold cursor-pointer hover:underline break-all"
           onClick={handleHashClick}
         >
           {shortenAddress(tx.attributes.hash)}
         </p>
       </div>
-      <div className="text-center gap-[26px] h-full flex flex-col">
-        <div className="flex flex-row gap-[5px]">
-          <p className="text-[12px] font-bold">From:</p>
+
+      {/* From/To Section */}
+      <div className="flex flex-col gap-[10px] md:gap-[26px] w-full md:w-auto">
+        <div className="flex flex-row gap-[5px] items-center flex-wrap">
+          <p className="text-[12px] font-bold whitespace-nowrap">From:</p>
           <span 
-            className="text-tycheBlue text-[12px] cursor-pointer hover:underline"
+            className="text-tycheBlue text-[12px] cursor-pointer hover:underline break-all"
             onClick={handleAddressClick(tx.attributes.sent_from)}
           >
             {convertWalletToTag(tx.attributes.sent_from, addresses)}
           </span>
         </div>
-        <div className="flex flex-row gap-[5px]">
-          <p className="text-[12px] font-bold">To:</p>
+        <div className="flex flex-row gap-[5px] items-center flex-wrap">
+          <p className="text-[12px] font-bold whitespace-nowrap">To:</p>
           <span 
-            className="text-tycheBlue text-[12px] cursor-pointer hover:underline"
+            className="text-tycheBlue text-[12px] cursor-pointer hover:underline break-all"
             onClick={handleAddressClick(tx.attributes.sent_to)}
           >
             {convertWalletToTag(tx.attributes.sent_to, addresses)}
           </span>
         </div>
       </div>
-      <div className="text-center gap-[26px] h-full flex flex-col">
-        <div className="flex flex-row gap-[5px]">
-          <p className="text-[12px] font-bold">Value:</p>
+
+      {/* Value/Amount Section */}
+      <div className="flex flex-col gap-[10px] md:gap-[26px] w-full md:w-auto">
+        <div className="flex flex-row gap-[5px] items-center flex-wrap">
+          <p className="text-[12px] font-bold whitespace-nowrap">Value:</p>
           <span className="text-black text-[12px]">{value} USD</span>
         </div>
-        <div className="flex flex-row gap-[5px]">
-          <p className="text-[12px] font-bold">Amount:</p>
+        <div className="flex flex-row gap-[5px] items-center flex-wrap">
+          <p className="text-[12px] font-bold whitespace-nowrap">Amount:</p>
           <span className="text-black text-[12px]">
             {amount} {symbol}
           </span>
         </div>
       </div>
-      <div>
+
+      {/* Icon Section */}
+      <div className="self-center md:self-auto order-first md:order-last">
         <img
           src={incoming ? incomingIcon : outgoingIcon}
           alt="icon"

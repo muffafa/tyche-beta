@@ -7,8 +7,12 @@ import ZoomQRCode from "./ZoomQRCode";
 import { useSelector } from "react-redux";
 import SettingsPopup from "./SettingsPopup";
 import QRCode from "react-qr-code";
+import { useParams } from "react-router-dom";
+import shortenAddress from "../../utils/shortenAddress";
 
 function WalletInfo() {
+  const { address } = useParams();
+
   return (
     <div className="flex flex-col gap-[8px] h-[234px] w-full">
       <p className="text-[24px] text-tychePrimary tracking-wide font-[350]">
@@ -16,15 +20,15 @@ function WalletInfo() {
       </p>
       <div className="flex flex-row justify-start items-center bg-tycheLightGray px-[30px] py-[25px] rounded-[20px] gap-[40px] h-full">
         <ShareWallet />
-        <Details walletAddress="0xjhkjhasdygq9823421391802381823" />
+        <Details walletAddress={address} />
       </div>
     </div>
   );
 }
 
-
 function Details({ walletAddress }) {
   const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const addresses = useSelector((state) => state.wallet.addresses);
   const network = useSelector((state) => state.global.selectedNetwork);
   const [SavedWallet, setSavedWallet] = useState({
@@ -35,11 +39,12 @@ function Details({ walletAddress }) {
   });
 
   useEffect(() => {
-    const savedWallet = addresses.find((address) => address.address === walletAddress);
+    const savedWallet = addresses.find(
+      (address) => address.address === walletAddress
+    );
     if (savedWallet) {
       setSavedWallet(savedWallet);
-    }
-    else {
+    } else {
       setSavedWallet({
         id: -1,
         address: walletAddress,
@@ -47,27 +52,49 @@ function Details({ walletAddress }) {
         tag: "",
       });
     }
-  }
-  , [addresses, walletAddress, network]);
-  
+  }, [addresses, walletAddress, network]);
+
+  const handleCopyAddress = () => {
+    // Create a temporary input element
+    const tempInput = document.createElement("input");
+    tempInput.value = walletAddress;
+    document.body.appendChild(tempInput);
+
+    // Select and copy the text
+    tempInput.select();
+    document.execCommand("copy");
+
+    // Remove the temporary element
+    document.body.removeChild(tempInput);
+
+    // Show feedback
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
+
   return (
     <div className="flex flex-col items-start gap-[24px]">
       <div className="flex flex-row gap-[15px]">
         <p className="text-black text-[14px] font-bold">Wallet Address:</p>
         <div className="flex flex-row items-center">
           <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
-            {walletAddress}
+            {shortenAddress(walletAddress)}
           </p>
           <button
-            onClick={() => {
-              navigator.clipboard.writeText(walletAddress);
-            }}
+            onClick={handleCopyAddress}
+            className="relative"
+            title="Copy address"
           >
             <img
               src={walletCopyIcon}
               alt="Copy"
               className="w-[15px] h-[15px]"
             />
+            {copySuccess && (
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded">
+                Copied!
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -79,7 +106,9 @@ function Details({ walletAddress }) {
               className="flex flex-row items-center gap-[10px]"
               onClick={() => setShowSettingsPopup(true)}
             >
-              <p className="text-[14px] text-tycheBlue font-[350]">{SavedWallet.tag}</p>
+              <p className="text-[14px] text-tycheBlue font-[350]">
+                {SavedWallet.tag}
+              </p>
               <img
                 src={tagEditBlueIcon}
                 alt="Edit"
@@ -130,7 +159,12 @@ function Details({ walletAddress }) {
         </div>
       </div>
       {showSettingsPopup && (
-        <SettingsPopup onClose={() => setShowSettingsPopup(false)} preferredTab={"savedWallets"} newWallet={SavedWallet.id === -1 ? SavedWallet : null} walletToEdit={SavedWallet.id !== -1 ? SavedWallet : null} />
+        <SettingsPopup
+          onClose={() => setShowSettingsPopup(false)}
+          preferredTab={"savedWallets"}
+          newWallet={SavedWallet.id === -1 ? SavedWallet : null}
+          walletToEdit={SavedWallet.id !== -1 ? SavedWallet : null}
+        />
       )}
     </div>
   );

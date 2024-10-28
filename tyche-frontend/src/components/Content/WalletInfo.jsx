@@ -12,11 +12,11 @@ import shortenAddress from "../../utils/shortenAddress";
 // eslint-disable-next-line no-unused-vars
 function WalletInfo({ currentAddress, currentNetwork }) {
   return (
-    <div className="flex flex-col gap-[8px] h-[234px] w-full">
+    <div className="flex flex-col gap-[8px] min-h-[234px] w-full">
       <p className="text-[24px] text-tychePrimary tracking-wide font-[350]">
         Wallet Information
       </p>
-      <div className="flex flex-row justify-start items-center bg-tycheLightGray px-[30px] py-[25px] rounded-[20px] gap-[40px] h-full">
+      <div className="flex flex-col md:flex-row justify-start items-center bg-tycheLightGray px-[30px] py-[25px] rounded-[20px] gap-[40px] min-h-full">
         <ShareWallet />
         <Details walletAddress={currentAddress} />
       </div>
@@ -71,16 +71,16 @@ function Details({ walletAddress }) {
   };
 
   return (
-    <div className="flex flex-col items-start gap-[24px]">
-      <div className="flex flex-row gap-[15px]">
-        <p className="text-black text-[14px] font-bold">Wallet Address:</p>
+    <div className="flex flex-col items-start gap-[24px] min-w-0">
+      <div className="flex flex-row gap-[15px] items-center flex-wrap">
+        <p className="text-black text-[14px] font-bold whitespace-nowrap">Wallet Address:</p>
         <div className="flex flex-row items-center">
           <p className="text-[14px] text-tycheBlue min-w-[90px] font-[350] max-w-[90px] text-ellipsis overflow-hidden whitespace-nowrap">
             {shortenAddress(walletAddress)}
           </p>
           <button
             onClick={handleCopyAddress}
-            className="relative"
+            className="relative w-[24px] h-[24px] flex items-center justify-center ml-1"
             title="Copy address"
           >
             <img
@@ -89,28 +89,28 @@ function Details({ walletAddress }) {
               className="w-[15px] h-[15px]"
             />
             {copySuccess && (
-              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded">
+              <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded whitespace-nowrap">
                 Copied!
               </span>
             )}
           </button>
         </div>
       </div>
-      <div className="flex flex-row gap-[15px]">
-        <p className="text-black text-[14px] font-bold">Private Name Tag:</p>
+      <div className="flex flex-row gap-[15px] items-center flex-wrap">
+        <p className="text-black text-[14px] font-bold whitespace-nowrap">Private Name Tag:</p>
         <div className="flex flex-row items-center gap-[10px]">
           {SavedWallet.id !== -1 ? (
             <button
               className="flex flex-row items-center gap-[10px]"
               onClick={() => setShowSettingsPopup(true)}
             >
-              <p className="text-[14px] text-tycheBlue font-[350]">
+              <p className="text-[14px] text-tycheBlue font-[350] max-w-[150px] text-ellipsis overflow-hidden whitespace-nowrap">
                 {SavedWallet.tag}
               </p>
               <img
                 src={tagEditBlueIcon}
                 alt="Edit"
-                className="flex w-[15px] h-[15px]"
+                className="w-[15px] h-[15px] flex-shrink-0"
               />
             </button>
           ) : (
@@ -132,13 +132,13 @@ function Details({ walletAddress }) {
           )}
         </div>
       </div>
-      <div className="flex flex-row gap-[15px]">
-        <p className="text-black text-[14px] font-bold">Wallet Balance:</p>
+      <div className="flex flex-row gap-[15px] items-center flex-wrap">
+        <p className="text-black text-[14px] font-bold whitespace-nowrap">Wallet Balance:</p>
         <p className="text-[14px] text-black font-[350]">263.4 USD</p>
       </div>
-      <div className="flex flex-row gap-[40px]">
-        <div className="flex flex-row gap-[15px]">
-          <p className="text-black text-[14px] font-bold">First tx:</p>
+      <div className="flex flex-row gap-[40px] flex-wrap">
+        <div className="flex flex-row gap-[15px] items-center">
+          <p className="text-black text-[14px] font-bold whitespace-nowrap">First tx:</p>
           <p
             className="text-[14px] text-tycheBlue font-[350] cursor-pointer"
             onClick={() => console.log("First tx clicked")}
@@ -146,8 +146,8 @@ function Details({ walletAddress }) {
             5 months ago
           </p>
         </div>
-        <div className="flex flex-row gap-[15px]">
-          <p className="text-black text-[14px] font-bold">Last tx:</p>
+        <div className="flex flex-row gap-[15px] items-center">
+          <p className="text-black text-[14px] font-bold whitespace-nowrap">Last tx:</p>
           <p
             className="text-[14px] text-tycheBlue font-[350] cursor-pointer"
             onClick={() => console.log("Last tx clicked")}

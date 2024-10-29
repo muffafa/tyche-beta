@@ -14,6 +14,8 @@ import {
   deleteAddress,
   updateAddress,
 } from "../../redux/slices/walletSlice";
+import CustomSelector from "./CustomSelector";
+import shortenAddress from "../../utils/shortenAddress";
 
 function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
   const [activeTab, setActiveTab] = useState(preferredTab || "settings");
@@ -47,134 +49,67 @@ function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
 function GeneralSettings() {
   const generalSettings = useSelector((state) => state.settings);
   const dispatch = useDispatch();
+
+  const handleCurrencyChange = (e) => {
+    dispatch(
+      updateSettings({
+        currency: e.target.value,
+        timezone: generalSettings.timezone,
+      })
+    );
+  }
+
+  const handleTimezoneChange = (e) => {
+    dispatch(
+      updateSettings({
+        currency: generalSettings.currency,
+        timezone: e.target.value,
+      })
+    );
+  }
   return (
     <div className="flex flex-col gap-6 md:gap-[45px]">
       <div className="flex flex-row gap-2 md:gap-4 items-center">
         <p className="flex font-medium text-[16px] md:text-[18px]">Currency:</p>
-        <select
-          id="currency"
-          name="currency"
-          className="flex items-center bg-tychePrimary text-white text-[14px] md:text-[16px] px-4 md:px-6 py-1 h-[40px] md:h-[50px] rounded-full w-fit focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
-          onChange={(e) =>
-            dispatch(
-              updateSettings({
-                currency: e.target.value,
-                timezone: generalSettings.timezone,
-              })
-            )
-          }
-        >
-          <option selected={generalSettings.currency === "USD"}>USD</option>
-          <option selected={generalSettings.currency === "EUR"}>EUR</option>
-          <option selected={generalSettings.currency === "GBP"}>GBP</option>
-        </select>
+        <CustomSelector
+          items={[{ USD: "USD" }, { EUR: "EUR" }, { GBP: "GBP" }]}
+          selected={generalSettings.currency}
+          onChange={handleCurrencyChange}
+        />
       </div>
       <div className="flex flex-row gap-2 md:gap-4 items-center">
         <p className="flex font-medium text-[16px] md:text-[18px] whitespace-nowrap">
           Timezone:
         </p>
-        <select
-          id="timezone"
-          name="timezone"
-          className="flex items-center bg-tychePrimary text-white text-[12px] md:text-[14px] px-2 md:px-4 py-1 h-[40px] md:h-[50px] w-fit max-w-[200px] md:max-w-none rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen"
-          onChange={(e) =>
-            dispatch(
-              updateSettings({
-                currency: generalSettings.currency,
-                timezone: e.target.value,
-              })
-            )
-          }
-        >
-          <option
-            value="Pacific/Honolulu"
-            selected={generalSettings.timezone === "Pacific/Honolulu"}
-          >
-            Pacific/Honolulu (HST)
-          </option>
-          <option
-            value="America/Anchorage"
-            selected={generalSettings.timezone === "America/Anchorage"}
-          >
-            America/Anchorage (AKST)
-          </option>
-          <option
-            value="America/Los_Angeles"
-            selected={generalSettings.timezone === "America/Los_Angeles"}
-          >
-            America/Los Angeles (PST)
-          </option>
-          <option
-            value="America/Denver"
-            selected={generalSettings.timezone === "America/Denver"}
-          >
-            America/Denver (MST)
-          </option>
-          <option
-            value="America/Chicago"
-            selected={generalSettings.timezone === "America/Chicago"}
-          >
-            America/Chicago (CST)
-          </option>
-          <option
-            value="America/New_York"
-            selected={generalSettings.timezone === "America/New_York"}
-          >
-            America/New York (EST)
-          </option>
-          <option
-            value="Europe/London"
-            selected={generalSettings.timezone === "Europe/London"}
-          >
-            Europe/London (GMT+0)
-          </option>
-          <option
-            value="Europe/Paris"
-            selected={generalSettings.timezone === "Europe/Paris"}
-          >
-            Europe/Paris (CET)
-          </option>
-          <option
-            value="Europe/Berlin"
-            selected={generalSettings.timezone === "Europe/Berlin"}
-          >
-            Europe/Berlin (CET)
-          </option>
-          <option
-            value="Europe/Istanbul"
-            selected={generalSettings.timezone === "Europe/Istanbul"}
-          >
-            Europe/Istanbul (TRT)
-          </option>
-          <option selected={generalSettings.timezone === "Europe/Moscow"}>
-            Europe/Moscow (MSK)
-          </option>
-          <option
-            value="Asia/Dubai"
-            selected={generalSettings.timezone === "Asia/Dubai"}
-          >
-            Asia/Dubai (GST)
-          </option>
-          <option
-            value="Asia/Tokyo"
-            selected={generalSettings.timezone === "Asia/Tokyo"}
-          >
-            Asia/Tokyo (JST)
-          </option>
-          <option
-            value="Australia/Sydney"
-            selected={generalSettings.timezone === "Australia/Sydney"}
-          >
-            Australia/Sydney (AEST)
-          </option>
-        </select>
+        <CustomSelector
+          items={[
+            { "Pacific/Honolulu": "Pacific/Honolulu (HST)" },
+            { "America/Anchorage": "America/Anchorage (AKST)" },
+            { "America/Los_Angeles": "America/Los Angeles (PST)" },
+            { "America/Denver": "America/Denver (MST)" },
+            { "America/Chicago": "America/Chicago (CST)" },
+            { "America/New_York": "America/New York (EST)" },
+            { "Europe/London": "Europe/London (GMT+0)" },
+            { "Europe/Paris": "Europe/Paris (CET)" },
+            { "Europe/Berlin": "Europe/Berlin (CET)" },
+            { "Europe/Istanbul": "Europe/Istanbul (TRT)" },
+            { "Europe/Moscow": "Europe/Moscow (MSK)" },
+            { "Asia/Dubai": "Asia/Dubai (GST)" },
+            { "Asia/Tokyo": "Asia/Tokyo (JST)" },
+            { "Australia/Sydney": "Australia/Sydney (AEST)" },
+          ]}
+          selected={generalSettings.timezone}
+          onChange={handleTimezoneChange}
+        />
       </div>
     </div>
   );
 }
 
+
+
 function SavedWallets({ newWallet, walletToEdit, onClose }) {
-  const networks = getSupportedNetworks();
+  const networks = ["All Networks", ...getSupportedNetworks()];
   const [selectedNetwork, setSelectedNetwork] = useState("All Networks");
   const [saveWalletButtonClicked, setSaveWalletButtonClicked] = useState(false);
   const [editWalletId, setEditWalletId] = useState(null);
@@ -228,38 +163,32 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
     <>
       <div className="flex flex-col h-full">
         {/* Network selector */}
-        <select
-          id="currency"
-          name="currency"
-          className="flex items-center bg-tychePrimary text-white text-[16px] md:text-[20px] py-[13px] w-fit px-[20px] h-[50px] rounded-full focus:outline-none focus:ring-tycheGreen focus:border-tycheGreen mb-4"
+        <CustomSelector
           onChange={handleNetworkChange}
-        >
-          <option>All Networks</option>
-          {networks.map((network) => (
-            <option key={network} value={network}>
-              {network}
-            </option>
-          ))}
-        </select>
-
+          items={networks.map((network) => ({ [network]: network }))}
+          selected={selectedNetwork}
+        />
         {/* Table header and content */}
-        <div className="flex flex-col flex-grow min-h-0">
-          {addresses.length === 0 ? (
+        <div className="flex flex-col flex-grow min-h-0 mt-4">
+          {addresses.filter(
+            (wallet) =>
+              selectedNetwork === "All Networks" || wallet.network === selectedNetwork
+          ).length === 0 ? (
             <p className="flex font-bold text-[16px] md:text-[20px] w-full justify-center">
               There is no saved address!
             </p>
           ) : (
             <div className="hidden md:flex flex-row gap-4 items-center w-full px-6 mb-4">
-              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+              <p className="flex font-bold text-[16px] md:text-[18px] w-full">
                 Address
               </p>
-              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+              <p className="flex font-bold text-[16px] md:text-[18px] w-full">
                 Tag
               </p>
-              <p className="flex font-bold text-[16px] md:text-[18px] w-[200px]">
+              <p className="flex font-bold text-[16px] md:text-[18px] w-full">
                 Network
               </p>
-              <p className="flex font-bold text-[16px] md:text-[18px] w-[100px] justify-end">
+              <p className="flex font-bold text-[16px] md:text-[18px] w-full justify-end">
                 Operations
               </p>
             </div>
@@ -287,7 +216,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                       key={index}
                       className="flex flex-col md:flex-row gap-3 items-start md:items-center w-full rounded-[25px] p-4 md:px-6 bg-white"
                     >
-                      <div className="flex flex-col w-full md:w-[200px]">
+                      <div className="flex flex-col w-full">
                         <span className="text-[14px] font-bold md:hidden">
                           Address:
                         </span>
@@ -295,11 +224,11 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                           className="text-[14px] md:text-[16px] text-tycheDarkBlue break-words md:truncate cursor-pointer hover:underline"
                           onClick={handleAddressClick(wallet)}
                         >
-                          {wallet.address}
+                          {shortenAddress(wallet.address)}
                         </span>
                       </div>
 
-                      <div className="flex flex-col w-full md:w-[200px]">
+                      <div className="flex flex-col w-full">
                         <span className="text-[14px] font-bold md:hidden">
                           Tag:
                         </span>
@@ -308,7 +237,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                         </span>
                       </div>
 
-                      <div className="flex flex-col w-full md:w-[200px]">
+                      <div className="flex flex-col w-full">
                         <span className="text-[14px] font-bold md:hidden">
                           Network:
                         </span>
@@ -317,7 +246,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                         </span>
                       </div>
 
-                      <div className="flex flex-row gap-4 w-full md:w-[100px] justify-end md:justify-end mt-2 md:mt-0">
+                      <div className="flex flex-row gap-4 w-full justify-end md:justify-end mt-2 md:mt-0">
                         <button
                           className="p-2 hover:bg-gray-100 rounded-full"
                           onClick={() => handleEditWallet(wallet)}
@@ -325,7 +254,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                           <img
                             src={tagEditIcon}
                             alt="Edit"
-                            className="w-5 h-5 md:w-6 md:h-6"
+                            className="max-w-5 max-h-5 min-w-5 min-h-5 md:max-w-6 md:max-h-6 md:min-w-6 md:min-h-6"
                           />
                         </button>
                         <button
@@ -335,7 +264,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                           <img
                             src={tagDeleteIcon}
                             alt="Delete"
-                            className="w-5 h-5 md:w-6 md:h-6"
+                            className="max-w-5 max-h-5 min-w-5 min-h-5 md:max-w-6 md:max-h-6 md:min-w-6 md:min-h-6"
                           />
                         </button>
                       </div>
@@ -512,7 +441,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           <img
             src={tagConfirmIcon}
             alt="Confirm"
-            className="w-5 h-5 md:w-6 md:h-6"
+            className="max-w-5 max-h-5 min-w-5 min-h-5 md:max-w-6 md:max-h-6 md:min-w-6 md:min-h-6"
           />
         </button>
         <button
@@ -522,7 +451,7 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           <img
             src={tagCancelIcon}
             alt="Cancel"
-            className="w-5 h-5 md:w-6 md:h-6"
+            className="max-w-5 max-h-5 min-w-5 min-h-5 md:max-w-6 md:max-h-6 md:min-w-6 md:min-h-6"
           />
         </button>
       </div>

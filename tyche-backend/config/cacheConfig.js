@@ -16,9 +16,9 @@ const cacheConfig = {
 	walletTokens: 60, // 1 minute
 	walletTransactions: 60, // 1 minute
 	// Ethereum
-	walletPortfolio: 60, // 1 minute
+	walletTransactions: 60, // 1 minute
 	walletPositions: 60, // 1 minute
-	fungiblePositions: 60, // 1 minute
+	nonFungiblePositions: 60, // 1 minute
 
 	// Categories for web3 utilities
 	fiatPrice: 60 * 2, // 2 minutes

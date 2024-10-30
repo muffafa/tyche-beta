@@ -14,24 +14,85 @@ class EthereumNetwork extends BaseNetwork {
 	}
 
 	/**
-	 * Fetches the wallet's portfolio including balance and token holdings.
+	 * Fetches the wallet's transactions including balance and token holdings.
 	 * @param {string} walletAddress - The Ethereum wallet address.
-	 * @returns {Object} - Portfolio details.
+	 * @param {string} chain_id - The chain ID, e.g., 'ethereum' for Ethereum mainnet.
+	 * @returns {Object} - Transactions details.
 	 */
-	async getWalletPortfolio(walletAddress) {
-		const cacheKey = generateCacheKey('walletPortfolio', { walletAddress, currency: this.currency });
+	async getWalletTransactions(walletAddress, chain_id) {
+		const cacheKey = generateCacheKey('walletTransactions', { walletAddress, chain_id, currency: this.currency });
 		const cachedData = await getCache(cacheKey);
 
 		if (cachedData) {
-			console.log('Cache hit for wallet portfolio');
+			console.log('Cache hit for wallet transactions');
 			return cachedData;
 		}
 
+		const parseResponseData = (response) => {
+			if (!response.data.data || !Array.isArray(response.data.data)) {
+				console.error('Invalid data formatt');
+				return { data: [] };
+			}
+
+			return {
+				data: Object.values(response.data.data).map(transaction => ({
+					//type: transaction.type || 'Unknown',
+					attributes: {
+						operation_type: transaction.attributes?.operation_type || '',
+						hash: transaction.attributes?.hash || '',
+						mined_at: transaction.attributes?.mined_at || '',
+						sent_from: transaction.attributes?.sent_from || '',
+						sent_to: transaction.attributes?.sent_to || '',
+						status: transaction.attributes?.status || '',
+						nonce: transaction.attributes?.nonce || '',
+						fee: {
+							fungible_info: {
+								name: transaction.attributes?.fee?.fungible_info?.name || '',
+								symbol: transaction.attributes?.fee?.fungible_info?.symbol || '',
+								icon: transaction.attributes?.fee?.fungible_info?.icon || {},
+								flags: transaction.attributes?.fee?.fungible_info?.flags || {}
+							},
+							quantity: {
+								decimals: transaction.attributes?.fee?.quantity?.decimals || 0,
+								float: parseFloat(transaction.attributes?.fee?.quantity?.numeric) || 0
+							},
+							price: transaction.attributes?.fee?.price || 0,
+							value: transaction.attributes?.fee?.value || 0
+						},
+						transfers: transaction.attributes?.transfers?.map(transfer => ({
+							fungible_info: {
+								name: transfer.fungible_info?.name || '',
+								symbol: transfer.fungible_info?.symbol || '',
+								icon: transfer.fungible_info?.icon?.url || '',
+								flags: transfer.fungible_info?.flags || {},
+							},
+							direction: transfer.direction || '',
+							quantity: {
+								decimals: transfer.quantity?.decimals || 0,
+								float: parseFloat(transfer.quantity?.numeric) || parseFloat(transfer.quantity?.float) || 0
+							},
+							value: transfer.value || null,
+							price: transfer.price || null,
+							sender: transfer.sender || '',
+							recipient: transfer.recipient || ''
+						})) || [],
+						approvals: transaction.attributes?.approvals || [],
+						application_metadata: transaction.attributes?.application_metadata || {},
+						flags: transaction.attributes?.flags || {}
+					}
+				}))
+			}
+		};
+
 		try {
 			const response = await this.axios.get(
-				`/v1/wallets/${walletAddress}/portfolio`,
+				`/v1/wallets/${walletAddress}/transactions`,
 				{
-					params: { currency: this.currency },
+					params: {
+						currency: this.currency,
+						"filter[chain_ids]": chain_id, // Chain ID, e.g., 'ethereum' for Ethereum mainnet
+						"filter[trash]": "only_non_trash",
+					},
 					headers: {
 						accept: "application/json",
 						authorization: `Basic ${this.apiKey}`,
@@ -39,17 +100,17 @@ class EthereumNetwork extends BaseNetwork {
 				}
 			);
 
-			const portfolio = response.data.data;
+			const transactions = parseResponseData(response);
 
 			// Cache the data for future use
-			await setCache(cacheKey, portfolio, 'walletPortfolio');
+			await setCache(cacheKey, transactions, 'walletTransactions');
 
 			return {
-				...portfolio,
+				transactions,
 			};
 		} catch (error) {
 			console.error(
-				"Error fetching Ethereum wallet balance:",
+				"Error fetching Ethereum wallet transactions:",
 				error.response?.data || error.message
 			);
 			throw error;
@@ -59,17 +120,49 @@ class EthereumNetwork extends BaseNetwork {
 	/**
 		 * Fetches the wallet's positions including DeFi and simple wallet positions.
 		 * @param {string} walletAddress - The Ethereum wallet address.
+		 * @param {string} chain_id - The chain ID, e.g., 'ethereum' for Ethereum mainnet.
 		 * @param {Object} [params] - Optional query parameters for filtering results.
 		 * @returns {Object} - Positions details.
 		 */
-	async getWalletPositions(walletAddress, params = {}) {
-		const cacheKey = generateCacheKey('walletPositions', { walletAddress, params: JSON.stringify(params), currency: this.currency });
+	async getWalletPositions(walletAddress, chain_id, params = {}) {
+		const cacheKey = generateCacheKey('walletPositions', { walletAddress, chain_id, params: JSON.stringify(params), currency: this.currency });
 		const cachedData = await getCache(cacheKey);
 
 		if (cachedData) {
 			console.log('Cache hit for wallet positions');
 			return cachedData;
 		}
+
+		const parseResponseData = (responseData) => {
+			if (!responseData.data.data || !Array.isArray(responseData.data.data)) {
+				console.error('Invalid data formatt');
+				return { data: [] };
+			}
+
+			return {
+				data: responseData.data.data.map(item => ({
+					attributes: {
+						quantity: {
+							decimals: item.attributes.quantity.decimals,
+							float: item.attributes.quantity.float
+						},
+						value: item.attributes.value,
+						price: item.attributes.price,
+						changes: item.attributes.changes,
+						fungible_info: {
+							name: item.attributes.fungible_info.name,
+							symbol: item.attributes.fungible_info.symbol,
+							icon: {
+								url: item.attributes.fungible_info.icon?.url || ''
+							},
+							flags: {
+								verified: item.attributes.fungible_info.flags.verified
+							}
+						}
+					}
+				}))
+			}
+		};
 
 		try {
 			let response;
@@ -82,6 +175,8 @@ class EthereumNetwork extends BaseNetwork {
 						params: {
 							currency: this.currency,
 							"filter[positions]": "only_simple",
+							"filter[chain_ids]": chain_id, // Chain ID, e.g., 'ethereum' for Ethereum mainnet
+							"filter[trash]": "only_non_trash",
 							...params
 						},
 						headers: {
@@ -98,8 +193,9 @@ class EthereumNetwork extends BaseNetwork {
 					retries--;
 				} else if (response.status === 200) {
 					// Cache the data for future use
-					await setCache(cacheKey, response.data.data, 'walletPositions');
-					return response.data.data;
+					const parsedData = parseResponseData(response);
+					await setCache(cacheKey, parsedData, chain_id, 'walletPositions');
+					return parsedData;
 				} else {
 					throw new Error(`Unexpected response status: ${response.status}`);
 				}
@@ -118,21 +214,50 @@ class EthereumNetwork extends BaseNetwork {
 	/**
 	 * Fetches the wallet's fungible positions.
 	 * @param {string} walletAddress - The Ethereum wallet address.
+	 * @param {string} chain_id - The chain ID, e.g., 'ethereum' for Ethereum mainnet.
 	 * @param {Object} [params] - Optional query parameters for filtering results.
-	 * @returns {Object} - Fungible positions details.
+	 * @returns {Object} - Non Fungible positions details.
 	 */
-	async getFungiblePositions(walletAddress, params = {}) {
-		const cacheKey = generateCacheKey('fungiblePositions', { walletAddress, params: JSON.stringify(params), currency: this.currency });
+	async getNonFungiblePositions(walletAddress, chain_id, params = {}) {
+		const cacheKey = generateCacheKey('nonFungiblePositions', { walletAddress, chain_id, params: JSON.stringify(params), currency: this.currency });
 		const cachedData = await getCache(cacheKey);
 
 		if (cachedData) {
-			console.log('Cache hit for fungible positions');
+			console.log('Cache hit for non fungible positions');
 			return cachedData;
 		}
 
 		const headers = {
 			accept: "application/json",
 			authorization: `Basic ${this.apiKey}`,
+		};
+
+		const parseResponseData = (responseData) => {
+			if (!responseData.data.data || !Array.isArray(responseData.data.data)) {
+				console.error('Invalid data format');
+				return { data: [] };
+			}
+
+			return {
+				data: responseData.data.data.map(item => ({
+					attributes: {
+						nfts_count: item.attributes.nfts_count,
+						total_floor_price: item.attributes.total_floor_price,
+						collection_info: {
+							name: item.attributes.collection_info.name,
+							description: item.attributes.collection_info.description,
+							content: {
+								icon: {
+									url: item.attributes.collection_info.content.icon.url
+								},
+								banner: item.attributes.collection_info.content.banner
+									? { url: item.attributes.collection_info.content.banner.url }
+									: {}
+							}
+						}
+					}
+				}))
+			};
 		};
 
 		try {
@@ -143,11 +268,11 @@ class EthereumNetwork extends BaseNetwork {
 			const startTime = Date.now();
 			do {
 				response = await this.axios.get(
-					`/v1/wallets/${walletAddress}/positions`,
+					`/v1/wallets/${walletAddress}/nft-collections`,
 					{
 						params: {
 							currency: this.currency,
-							"filter[positions]": "only_simple", // Default filter for simple wallet positions
+							"filter[chain_ids]": chain_id, // Chain ID, e.g., 'ethereum' for Ethereum mainnet
 							...params,
 						},
 						headers: headers,
@@ -160,17 +285,18 @@ class EthereumNetwork extends BaseNetwork {
 					retries--;
 				} else if (response.status === 200) {
 					// Cache the data
-					await setCache(cacheKey, response.data.data, 'fungiblePositions');
-					return response.data.data;
+					const parsedData = parseResponseData(response);
+					await setCache(cacheKey, parsedData, 'nonFungiblePositions');
+					return parsedData;
 				} else {
 					throw new Error(`Unexpected response status: ${response.status}`);
 				}
 			} while (retries > 0);
 
-			throw new Error("Failed to fetch fungible positions within the retry limit.");
+			throw new Error("Failed to fetch non fungible positions within the retry limit.");
 		} catch (error) {
 			console.error(
-				"Error fetching Ethereum fungible positions:",
+				"Error fetching Ethereum non-fungible positions:",
 				error.response?.data || error.message
 			);
 			throw error;

@@ -1,18 +1,18 @@
 import { Router } from "express";
 import {
-    getWalletPortfolio,
+    getWalletTransactions,
     getWalletPositions,
-    getFungiblePositions
+    getNonFungiblePositions
 } from "../../controllers/ethereum/wallet.js";
 
 const router = Router({ mergeParams: true }); // mergeParams to access :network
 
 /**
- * @route   GET /api/v1/wallets/ehtereum/portfolio?walletAddress=<address>
- * @desc    Get wallet portfolio for specified EVM wallet address
+ * @route   GET /api/v1/wallets/ehtereum/transactions?walletAddress=<address>&chain_id=<chain_id>
+ * @desc    Get wallet transactions for specified EVM wallet address
  * @access  Public
  */
-router.get("/portfolio", getWalletPortfolio);
+router.get("/transactions", getWalletTransactions);
 
 /**
  * @route   GET /api/v1/wallets/ehtereum/positions?walletAddress=<address>&filter[positions]=<filterType>
@@ -22,10 +22,10 @@ router.get("/portfolio", getWalletPortfolio);
 router.get("/positions", getWalletPositions);
 
 /**
- * @route   GET /api/v1/wallets/ehtereum/fungible-positions?walletAddress=<address>&filter[positions]=<filterType>
+ * @route   GET /api/v1/wallets/ehtereum/nonfungible-positions?walletAddress=<address>&filter[positions]=<filterType>
  * @desc    Get wallet fungible positions for specified EVM wallet address
  * @access  Public
  */
-router.get("/fungible-positions", getFungiblePositions);
+router.get("/nonfungible-positions", getNonFungiblePositions);
 
 export default router;

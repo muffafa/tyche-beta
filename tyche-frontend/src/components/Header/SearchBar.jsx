@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setNetwork } from "../../redux/slices/globalSlice";
 import NetworkSelect from "./NetworkSelect";
-import { getNetworkIcon } from "../../utils/NetworkManager";
+import { getNetworkIcon, getSupportedNetworks } from "../../utils/NetworkManager";
+import { useEffect } from "react";
 
 function SearchBar() {
   const navigate = useNavigate();
@@ -22,6 +23,23 @@ function SearchBar() {
       navigate(`/${selectedNetwork}/address/${searchTerm}`);
     }
   };
+
+  useEffect(() => {
+    //check current url contains address or tx
+    const isAddressPage = window.location.pathname.split("/")[2] === "address";
+    const isTxPage = window.location.pathname.split("/")[2] === "tx";
+    if (isAddressPage || isTxPage) {
+      const url_network = window.location.pathname.split("/")[1]; // get network from url
+      const networks = getSupportedNetworks();
+
+      // if network is not supported, redirect to 404
+      if (!networks.includes(url_network)) {
+        navigate("/404");
+      } else if (url_network && url_network !== selectedNetwork) {
+        dispatch(setNetwork(url_network));
+      }
+    }
+  } , []);
 
   return (
     <div className="flex items-center w-full relative">

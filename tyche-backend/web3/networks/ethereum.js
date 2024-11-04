@@ -194,7 +194,7 @@ class EthereumNetwork extends BaseNetwork {
 				} else if (response.status === 200) {
 					// Cache the data for future use
 					const parsedData = parseResponseData(response);
-					await setCache(cacheKey, parsedData, chain_id, 'walletPositions');
+					await setCache(cacheKey, parsedData, 'walletPositions');
 					return parsedData;
 				} else {
 					throw new Error(`Unexpected response status: ${response.status}`);

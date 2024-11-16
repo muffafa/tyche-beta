@@ -90,7 +90,7 @@ function TransactionDetailsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[80px]">
+    <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[50px]">
       <div className="w-full max-w-[915px] flex flex-col gap-4 md:gap-[11px]">
         <div className="flex flex-row items-center gap-[20px] w-full">
           <button

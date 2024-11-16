@@ -5,7 +5,7 @@ import rightArrow from "./../assets/images/rightArrow.svg";
 function LandingPage() {
   const navigate = useNavigate();
   return (
-    <div className="flex items-center justify-center mt-8 md:mt-[81px] px-4 md:px-0">
+    <div className="flex items-center justify-center mt-8 md:mt-[50px] px-4 md:px-0">
       <div className="flex flex-col md:flex-row w-full max-w-[915px] items-center justify-between gap-8 md:gap-[20px]">
         <div className="flex flex-col items-center md:items-start justify-center gap-6 md:gap-[50px]">
           <p className="text-2xl md:text-[36px] font-[550] text-tychePrimary text-center md:text-left">

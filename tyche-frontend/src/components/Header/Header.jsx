@@ -28,9 +28,11 @@ function Header() {
         currentRoute === "/login" ||
         currentRoute === "/register" ||
         currentRoute === "/register/username" ||
-        currentRoute === "/resetPassword" ? (
+        currentRoute === "/resetPassword" ||
+        currentRoute === "/notFound"
+        ? (
         <header className="flex items-center justify-center px-4 md:px-0">
-          <div className="flex flex-col md:flex-row bg-tycheLightGray w-full max-w-[915px] py-6 md:h-[152px] mt-4 md:mt-[71px] rounded-[30px] md:rounded-[60px] items-center px-4 md:px-[35px] justify-between">
+          <div className="flex flex-col md:flex-row bg-tycheLightGray w-full max-w-[915px] py-6 md:h-[152px] mt-4 md:mt-[40px] rounded-[30px] md:rounded-[60px] items-center px-4 md:px-[35px] justify-between">
             <div className="flex flex-col md:flex-row items-center md:w-full justify-between">
               <div
                 className="flex flex-col md:flex-row items-center cursor-pointer mb-4 md:mb-0"
@@ -62,7 +64,7 @@ function Header() {
           </div>
         </header>
       ) : (
-        <header className="flex flex-col md:flex-row items-center justify-between mt-4 md:mt-[71px] max-w-[915px] w-full mx-auto gap-4 md:gap-[20px] px-4 md:px-0">
+        <header className="flex flex-col md:flex-row items-center justify-between mt-4 md:mt-[40px] max-w-[915px] w-full mx-auto gap-4 md:gap-[20px] px-4 md:px-0">
           <div className="flex justify-between items-center w-full md:w-auto">
             {/* Logo */}
             <button

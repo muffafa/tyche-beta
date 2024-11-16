@@ -8,7 +8,7 @@ function LoginPage() {
     navigate("/home");
   }
   return (
-    <div className="flex flex-col items-center justify-center mt-4 md:mt-[76px] px-4 md:px-0">
+    <div className="flex flex-col items-center justify-center mt-4 md:mt-[45px] px-4 md:px-0">
       <p className="text-2xl md:text-[32px] font-[350] tracking-wide text-tycheGrayBlack text-center mb-4 md:mb-[15px]">
         Sign in to Tyche
       </p>

@@ -168,7 +168,7 @@ function WalletDetailsPage() {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[80px]">
+    <div className="flex flex-col items-center justify-center w-full px-4 md:px-0 mt-4 md:mt-[49px]">
       <div className="w-full max-w-[915px] flex flex-col md:flex-row justify-center gap-4 md:gap-[11px]">
         {/* Mobile layout (< md screens) */}
         <div className="md:hidden w-full flex flex-col gap-6">

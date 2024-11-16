@@ -58,7 +58,7 @@ function App() {
   return (
     <div className="app-container bg-white min-h-screen flex-grow w-full flex flex-col">
       <Header />
-      <main className="">
+      <main className="flex-grow">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<SearchPage />} />

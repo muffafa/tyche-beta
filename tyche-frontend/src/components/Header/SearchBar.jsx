@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { setNetwork } from "../../redux/slices/globalSlice";
 import NetworkSelect from "./NetworkSelect";
 import { getNetworkIcon, getSupportedNetworks } from "../../utils/NetworkManager";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function SearchBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
+  const [localNetwork, setLocalNetwork] = useState(selectedNetwork);
+
 
   let searchTerm = "";
   if (window.location.pathname.split("/")[2] === "address") {
@@ -20,7 +21,8 @@ function SearchBar() {
 
   const handleSearch = () => {
     if (searchTerm) {
-      navigate(`/${selectedNetwork}/address/${searchTerm}`);
+      dispatch(setNetwork(localNetwork));
+      navigate(`/${localNetwork}/address/${searchTerm}`);
     }
   };
 
@@ -37,6 +39,7 @@ function SearchBar() {
         navigate("/404");
       } else if (url_network && url_network !== selectedNetwork) {
         dispatch(setNetwork(url_network));
+        setLocalNetwork(url_network);
       }
     }
   } , []);
@@ -46,13 +49,13 @@ function SearchBar() {
       {/* Dropdown */}
       <div className="flex items-center h-[40px] md:h-[54px] rounded-full bg-tycheDarkGray p-[6px] md:p-[10px] absolute z-10">
         <img
-          src={getNetworkIcon(selectedNetwork)}
-          alt={selectedNetwork}
+          src={getNetworkIcon(localNetwork)}
+          alt={localNetwork}
           className="border-[2px] md:border-[4px] border-white rounded-full w-6 h-6 md:w-8 md:h-8"
         />
         <NetworkSelect
-          selectedNetwork={selectedNetwork}
-          onSelectNetwork={(network) => dispatch(setNetwork(network))}
+          selectedNetwork={localNetwork}
+          onSelectNetwork={(network) => setLocalNetwork(network)}
         />
       </div>
       {/* Search Field */}

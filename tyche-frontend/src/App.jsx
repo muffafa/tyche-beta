@@ -12,6 +12,8 @@ import RegisterPage from "./pages/RegisterPage";
 import UsernamePage from "./pages/UsernamePage";
 import PasswordResetPage from "./pages/PasswordResetPage";
 import TransactionDetailsPage from "./pages/TransactionDetailsPage";
+import axios from "axios";
+import { useEffect } from "react";
 
 // 1. Your WalletConnect Cloud project ID
 const projectId = "c0a936142eefd15c87ba99b12e710d39";
@@ -55,6 +57,14 @@ createWeb3Modal({
 });
 
 function App() {
+  //axios call to index
+  useEffect(() => {
+    axios.get("/api").then((response) => {
+      console.log("response", response);
+    });
+  }, []);
+
+
   return (
     <div className="app-container bg-white min-h-screen flex-grow w-full flex flex-col">
       <Header />

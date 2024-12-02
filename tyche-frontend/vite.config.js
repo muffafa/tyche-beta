@@ -7,7 +7,7 @@ export default defineConfig({
     open: true,
     proxy: {
       "/api": {
-        target: "https://api.zerion.io",
+        target: "http://localhost:5005",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

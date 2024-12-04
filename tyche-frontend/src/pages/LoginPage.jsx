@@ -2,14 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import useCustomAxios from "../hooks/useCustomAxios";
 import { loginUser } from "./../redux/slices/userSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 function LoginPage() {
   const navigate = useNavigate();
   const axios = useCustomAxios();
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.user);
-  console.log(currentUser);
   
   const formik = useFormik({
     initialValues: {
@@ -17,7 +15,7 @@ function LoginPage() {
       password: "",
     },
     onSubmit: async (values) => {
-      console.log("GİRDİK");
+      console.log("Form submitted with values:", values);
       try {
         const response = await axios.post("api/v1/auth/login", {
           email: values.email,
@@ -25,24 +23,31 @@ function LoginPage() {
         });
         const data = response.data;
         
-        if (data.success!==true) {
+        if (data.success !== true) {
           throw new Error(data.message);
         } else {
           localStorage.setItem("token", data.token);
+          const userData = await axios.get("/api/v1/auth/me");
+          //console.log("User data:", userData.data);
           dispatch(loginUser({
-            email: "data.email",
-            name: "data.name",
+            fullname: userData.data.data.fullname,
+            email: userData.data.data.email, 
+            wallets: userData.data.wallets,
+            preferredCurrency: userData.data.data.preferredCurrency
           }));
+          //console.log("Current user after dispatch:", currentUser);
+
+          console.log("Login success:", userData.data);
           navigate("/search");
         }
       } catch (error) {
+        console.error("Login failed:", error);
         alert(
           "Login failed: " + (error.response?.data?.message || error.message)
         );
       }
     },
   });
-
 
   return (
     <div className="flex flex-col items-center justify-center mt-4 md:mt-[45px] px-4 md:px-0">

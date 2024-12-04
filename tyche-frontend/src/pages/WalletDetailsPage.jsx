@@ -4,10 +4,26 @@ import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
 import { useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
+import useCustomAxios from "../hooks/useCustomAxios";
+import { useSelector } from "react-redux";
 
 function WalletDetailsPage() {
   const { address, network } = useParams();
   const location = useLocation();
+  const customAxios = useCustomAxios();
+  const currentUser = useSelector((state) => state.user);
+  useEffect(() => {
+    //check if user is logged in from backend with useCustomAxios
+    customAxios.get("/api/v1/auth/me").then((response) => {
+      console.log("response", response);
+    }
+    );
+    console.log(currentUser);
+
+
+
+    
+  }, []);
 
   useEffect(() => {
     // This effect will run whenever the address parameter or location changes
@@ -21,8 +37,8 @@ function WalletDetailsPage() {
       txId: "0x123",
       transactionTime: "2023-05-01T10:00:00Z",
       attributes: {
-        hash: "0x12ıjoıjoas3",
-        sent_from: "0x12fjbfnjf3",
+        hash: "0x12jojoas3",
+        sent_from: "0x1fjbfnjf3",
         sent_to: currentAddress, // You are the receiver
         mined_at: "2023-05-01T10:00:00Z",
         transfers: [
@@ -43,9 +59,9 @@ function WalletDetailsPage() {
       txId: "0x456",
       transactionTime: "2023-07-01T14:30:00Z",
       attributes: {
-        hash: "0x45ljxoıcjc6",
+        hash: "0x45ljxojc6",
         sent_from: currentAddress, // You are the sender
-        sent_to: "0x45kjncxjxjnjnjn6",
+        sent_to: "0x45kjncx88jnjn6",
         mined_at: "2023-07-01T14:30:00Z",
         transfers: [
           {
@@ -62,10 +78,10 @@ function WalletDetailsPage() {
       },
     },
     {
-      txId: "0x456",
+      txId: "0x56",
       transactionTime: "2023-07-01T14:30:00Z",
       attributes: {
-        hash: "0x45ljxoıcjc6",
+        hash: "0x45ljxomcjc6",
         sent_from: currentAddress, // You are the sender
         sent_to: "0x45kjncxjxjnjnjn6",
         mined_at: "2023-07-01T14:30:00Z",
@@ -89,7 +105,7 @@ function WalletDetailsPage() {
       attributes: {
         hash: "0x10dckjnbjksn1",
         sent_from: currentAddress, // You are the sender
-        sent_to: "0x456xcjnjn",
+        sent_to: "0x46xcjnjn",
         mined_at: "2023-08-25T11:00:00Z",
         transfers: [
           {
@@ -106,10 +122,10 @@ function WalletDetailsPage() {
       },
     },
     {
-      txId: "0x101",
+      txId: "0x11",
       transactionTime: "2023-09-01T12:00:00Z",
       attributes: {
-        hash: "0x10jhkhkh1",
+        hash: "0x109999kh1",
         sent_from: "0x12sss3",
         sent_to: currentAddress, // You are the receiver
         mined_at: "2023-09-01T12:00:00Z",

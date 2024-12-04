@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     fullname: "",
     email: "",
-    
+    wallets: [],
+    preferredCurrency: "USD"
 };
 
 const userSlice = createSlice({
@@ -29,3 +30,4 @@ const userSlice = createSlice({
 });
 
 export const { setuserStatus, loginUser, logoutUser, updateFullname } = userSlice.actions;
+export default userSlice.reducer;

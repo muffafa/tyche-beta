@@ -16,6 +16,7 @@ import {
 } from "../../redux/slices/walletSlice";
 import CustomSelector from "./CustomSelector";
 import shortenAddress from "../../utils/shortenAddress";
+import useCustomAxios from "../../hooks/useCustomAxios";
 
 function SettingsPopup({ onClose, preferredTab, newWallet, walletToEdit }) {
   const [activeTab, setActiveTab] = useState(preferredTab || "settings");
@@ -115,6 +116,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
   const [editWalletId, setEditWalletId] = useState(null);
   const addresses = useSelector((state) => state.wallet.addresses);
   const dispatch = useDispatch();
+  const customAxios = useCustomAxios();
 
   const handleNetworkChange = (event) => {
     setSelectedNetwork(event.target.value);
@@ -133,6 +135,19 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
     }
     setEditWalletId(null);
     setSaveWalletButtonClicked(false);
+
+    //TODO: backend 400 dönüyor
+    customAxios.post("/api/v1/wallets", {
+      address: updatedWallet.address,
+      network: updatedWallet.network,
+      nickname: updatedWallet.tag,
+    }).then((response) => {
+      console.log("Wallet saved successfully:", response.data);
+    }).catch((error) => {
+      console.error("Wallet save failed:", error);
+    });
+
+
     //düzenleme kısmı wallet informationdan açıldıysa kaydedildikten sonra popupu kapatır
     if (walletToEdit || newWallet) {
       onClose();
@@ -141,6 +156,8 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
 
   const handleDeleteWallet = (walletId) => {
     dispatch(deleteAddress(walletId));
+    //TODO: Backend'e kaydetme işlemi yapılacak
+
   };
 
   const handleAddressClick = (wallet) => (e) => {

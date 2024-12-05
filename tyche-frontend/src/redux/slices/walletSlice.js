@@ -47,8 +47,12 @@ const walletSlice = createSlice({
       );
       saveState(state);
     },
+    deleteAllAddresses(state) {
+      state.addresses = [];
+      saveState(state);
+    }
   },
 });
 
-export const { addAddress, updateAddress, deleteAddress } = walletSlice.actions;
+export const { addAddress, updateAddress, deleteAddress, deleteAllAddresses } = walletSlice.actions;
 export default walletSlice.reducer;

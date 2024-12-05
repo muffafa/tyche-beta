@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import useCustomAxios from "../hooks/useCustomAxios";
 import { loginUser } from "./../redux/slices/userSlice";
+import { addAddress, deleteAllAddresses } from "./../redux/slices/walletSlice";
 import { useDispatch } from "react-redux";
 
 function LoginPage() {
@@ -35,6 +36,17 @@ function LoginPage() {
             wallets: userData.data.wallets,
             preferredCurrency: userData.data.data.preferredCurrency
           }));
+          dispatch(deleteAllAddresses()); // Clear all addresses before adding new ones
+
+          userData.data.wallets.map(wallet => {
+            return {
+              id: wallet._id,
+              network: wallet.network,
+              address: wallet.address,
+              tag: wallet.nickname
+            }
+          }).forEach(wallet => dispatch(addAddress(wallet)));
+          
           //console.log("Current user after dispatch:", currentUser);
 
           console.log("Login success:", userData.data);

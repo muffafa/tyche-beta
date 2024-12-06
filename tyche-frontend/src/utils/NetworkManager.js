@@ -7,12 +7,12 @@ import bscIcon from "../assets/images/coin/bnb.svg";
 import baseIcon from "../assets/images/coin/base.svg";
 
 const networkMappings = {
-  solana: "sol",
-  ethereum: "eth",
-  "bnb smart chain": "bsc",
-  avalanche: "avaxc",
-  base: "base",
-  bitcoin: "btc",
+  sol: "Solana",
+  eth: "Ethereum",
+  bsc: "BNB Smart Chain",
+  avaxc: "Avalanche",
+  base: "Base",
+  btc: "Bitcoin",
   // Add other networks as needed
 };
 
@@ -43,12 +43,12 @@ export function getChainIdByNetwork(networkName) {
 }
 
 export function getNetworkIcon(networkName) {
-  const shortName = getNetworkShortName(networkName);
-  return networkIcons[shortName] || null;
+  //const shortName = getNetworkShortName(networkName);
+  return networkIcons[networkName] || null;
 }
 
-export function getSupportedNetworks() {
-  return Object.keys(networkMappings);
+export function getSupportedNetworkPairs() {
+  return Object.entries(networkMappings);
 }
 
 export function getDappsByNetwork(networkName, dappMetadata) {

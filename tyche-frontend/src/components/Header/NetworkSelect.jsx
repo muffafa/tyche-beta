@@ -1,8 +1,8 @@
-import { getSupportedNetworks } from "../../utils/NetworkManager";
+import { getSupportedNetworkPairs } from "../../utils/NetworkManager";
 
 function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
-  const networks = getSupportedNetworks();
-
+  const networks = getSupportedNetworkPairs();
+  console.log("selected", selectedNetwork);
   return (
     <div className="relative">
       <select
@@ -10,9 +10,9 @@ function NetworkSelect({ selectedNetwork, onSelectNetwork }) {
         onChange={(e) => onSelectNetwork(e.target.value)}
         className="flex items-center bg-tycheDarkGray text-[14px] md:text-[20px] px-2 md:px-4 py-1 h-[40px] md:h-[54px] text-ellipsis w-[100px] md:w-[150px] rounded-r-full focus:outline-none focus:ring-tychePrimary focus:border-tychePrimary text-black appearance-none pr-8"
       >
-        {networks.map((network) => (
-          <option key={network} value={network}>
-            {network}
+        {networks.map(([key,value]) => (
+          <option key={key} value={key}>
+            {value}
           </option>
         ))}
       </select>

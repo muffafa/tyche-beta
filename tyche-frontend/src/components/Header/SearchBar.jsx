@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setNetwork } from "../../redux/slices/globalSlice";
 import NetworkSelect from "./NetworkSelect";
-import { getNetworkIcon, getSupportedNetworks } from "../../utils/NetworkManager";
+import { getNetworkIcon, getSupportedNetworkPairs } from "../../utils/NetworkManager";
 import { useEffect, useState } from "react";
 
 function SearchBar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const supportedNetworks = getSupportedNetworkPairs();
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork);
   const [localNetwork, setLocalNetwork] = useState(selectedNetwork);
 
@@ -32,14 +33,15 @@ function SearchBar() {
     const isTxPage = window.location.pathname.split("/")[2] === "tx";
     if (isAddressPage || isTxPage) {
       const url_network = window.location.pathname.split("/")[1]; // get network from url
-      const networks = getSupportedNetworks();
-
       // if network is not supported, redirect to 404
-      if (!networks.includes(url_network)) {
+      const isSupportedNetwork = supportedNetworks.some(([key,]) => key === url_network);
+      //console.log("isSupportedNetwork", isSupportedNetwork);
+      if (!isSupportedNetwork) {
         navigate("/404");
-      } else if (url_network && url_network !== selectedNetwork) {
+      } else if (localNetwork !== url_network) {
         dispatch(setNetwork(url_network));
         setLocalNetwork(url_network);
+        navigate(`/${url_network}/address/${searchTerm}`);
       }
     }
   } , []);

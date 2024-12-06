@@ -5,7 +5,7 @@ import tagConfirmIcon from "./../../assets/images/icons/tagConfirmIcon.svg";
 import tagCancelIcon from "./../../assets/images/icons/tagCancelIcon.svg";
 import saveWalletIcon from "./../../assets/images/icons/saveWalletIcon.svg";
 import { useEffect, useRef, useState } from "react";
-import { getSupportedNetworks } from "../../utils/NetworkManager";
+import { getSupportedNetworkPairs } from "../../utils/NetworkManager";
 import { useSelector } from "react-redux";
 import { updateSettings } from "../../redux/slices/settingsSlice";
 import { useDispatch } from "react-redux";
@@ -110,8 +110,9 @@ function GeneralSettings() {
 
 
 function SavedWallets({ newWallet, walletToEdit, onClose }) {
-  const networks = ["All Networks", ...getSupportedNetworks()];
-  const [selectedNetwork, setSelectedNetwork] = useState("All Networks");
+  const supportedNetworks = getSupportedNetworkPairs();
+  const networks = [{allNetworks: "All Networks"}, ...supportedNetworks];
+  const [selectedNetwork, setSelectedNetwork] = useState("allNetworks");
   const [saveWalletButtonClicked, setSaveWalletButtonClicked] = useState(false);
   const [editWalletId, setEditWalletId] = useState(null);
   const addresses = useSelector((state) => state.wallet.addresses);
@@ -119,6 +120,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
   const customAxios = useCustomAxios();
 
   const handleNetworkChange = (event) => {
+    //console.log("Selected network:", event.target.value);
     setSelectedNetwork(event.target.value);
   };
 
@@ -136,10 +138,10 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
     setEditWalletId(null);
     setSaveWalletButtonClicked(false);
 
-    //TODO: backend 400 dönüyor
+    //TODO: backend 400 dönüyor, network sol, bsc, eth gibi olmalı bence
     customAxios.post("/api/v1/wallets", {
       address: updatedWallet.address,
-      network: updatedWallet.network,
+      network: supportedNetworks.find(([key,]) => key === updatedWallet.network)?.[1],
       nickname: updatedWallet.tag,
     }).then((response) => {
       console.log("Wallet saved successfully:", response.data);
@@ -182,14 +184,14 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
         {/* Network selector */}
         <CustomSelector
           onChange={handleNetworkChange}
-          items={networks.map((network) => ({ [network]: network }))}
+          items={networks}
           selected={selectedNetwork}
         />
         {/* Table header and content */}
         <div className="flex flex-col flex-grow min-h-0 mt-4">
           {addresses.filter(
             (wallet) =>
-              selectedNetwork === "All Networks" || wallet.network === selectedNetwork
+              selectedNetwork === "allNetworks" || wallet.network === selectedNetwork
           ).length === 0 ? (
             <p className="flex font-bold text-[16px] md:text-[20px] w-full justify-center">
               There is no saved address!
@@ -217,7 +219,7 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
               {addresses
                 .filter(
                   (wallet) =>
-                    selectedNetwork === "All Networks" ||
+                    selectedNetwork === "allNetworks" ||
                     wallet.network === selectedNetwork
                 )
                 .map((wallet, index) =>
@@ -259,7 +261,9 @@ function SavedWallets({ newWallet, walletToEdit, onClose }) {
                           Network:
                         </span>
                         <span className="text-[14px] md:text-[16px]">
-                          {wallet.network}
+                          {supportedNetworks.find(
+                            ([key,]) => key === wallet.network
+                          )?.[1]}
                         </span>
                       </div>
 
@@ -329,10 +333,11 @@ function AddWalletButton({ setSaveWalletButtonClicked }) {
 }
 
 function AddOrEditWallet({ wallet, onSave, onCancel }) {
+  const supportedNetworks = getSupportedNetworkPairs();
   const [address, setAddress] = useState(wallet ? wallet.address : "");
   const [tag, setTag] = useState(wallet ? wallet.tag : "");
   const [newNetwork, setNewNetwork] = useState(
-    wallet ? wallet.network : getSupportedNetworks()[0]
+    wallet ? wallet.network : "eth"
   );
   const addresses = useSelector((state) => state.wallet.addresses);
 
@@ -439,12 +444,15 @@ function AddOrEditWallet({ wallet, onSave, onCancel }) {
           id="network"
           name="network"
           className="text-[14px] md:text-[16px] w-full rounded-[16px] border-dashed border-tycheDarkGray border-[2px] focus:outline-none focus:border-tychePrimary p-2 bg-white"
-          onChange={(e) => setNewNetwork(e.target.value)}
+          onChange={(e) => {
+            console.log("New network:", e.target.value);
+            setNewNetwork(e.target.value);
+          }}
           value={newNetwork}
         >
-          {getSupportedNetworks().map((network) => (
-            <option key={network} value={network}>
-              {network}
+          {supportedNetworks.map(([key, value]) => (
+            <option key={key} value={key}>
+              {value}
             </option>
           ))}
         </select>

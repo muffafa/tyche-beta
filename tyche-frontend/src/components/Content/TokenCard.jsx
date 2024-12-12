@@ -7,7 +7,7 @@ function TokenCard({ token }) {
   const [formattedValue, setFormattedValue] = useState(null);
   const selectedCurrency = useSelector((state) => state.settings.currency);
   const selectedNetwork = useSelector((state) => state.global.selectedNetwork); // Fetching networkName from Redux store
-
+  console.log("TOKENCARD", token);
   useEffect(() => {
     const fetchTokenValue = async () => {
       try {
@@ -24,7 +24,7 @@ function TokenCard({ token }) {
 
     fetchTokenValue();
   }, [
-    token.holdingAmount,
+    token.amount,
     token.tokenContractAddress,
     token.valueUsd,
     selectedNetwork, // Using the selectedNetwork from Redux
@@ -50,14 +50,14 @@ function TokenCard({ token }) {
       {/* Token Info */}
       <div className="token-info flex items-center justify-start w-full">
         <p className="text-tycheGray text-[12px] justify-start">
-          {token.holdingAmount} {token.symbol}
+          {token.amount} {token.symbol}
         </p>
       </div>
 
       {/* Token Amount & Value */}
       <div className="token-amount flex items-center justify-end w-full">
         <span className="text-black text-[12px] justify-end">
-          {formattedValue || token.holdingAmount} {selectedCurrency}
+          {formattedValue || token.amount} {selectedCurrency}
         </span>
       </div>
     </div>

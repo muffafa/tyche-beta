@@ -4,7 +4,7 @@ import NftCard from "./NftCard";
 
 function Portfolio({ tokens, nfts }) {
   const [activeTab, setActiveTab] = useState("tokens");
-
+  console.log("TOKENS",tokens);
   // Determine the height to apply consistently to both tabs
   const consistentHeightClass =
     tokens.length > 3 || nfts.length > 3 ? "max-h-[290px]" : "min-h-[290px]";

@@ -2,16 +2,29 @@ import DAppList from "../components/Content/DAppList";
 import Portfolio from "../components/Content/Portfolio";
 import TxHistory from "../components/Content/TxHistory";
 import WalletInfo from "../components/Content/WalletInfo";
-import { useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import useCustomAxios from "../hooks/useCustomAxios";
 import { useSelector } from "react-redux";
+import axios from "axios";
 
 function WalletDetailsPage() {
   const { address, network } = useParams();
   const location = useLocation();
   const customAxios = useCustomAxios();
   const currentUser = useSelector((state) => state.user);
+  const [tokens, setTokens] = useState([]);
+  const navigate = useNavigate();
+  // const tokens = [
+  //   {
+  //     symbol: "SOL",
+  //     tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
+  //     holdingAmount: "1",
+  //     priceUsd: "145.59",
+  //     valueUsd: "145.59",
+  //     tokenId: "0xkdsjljsdjlsjdjsdj",
+  //   }
+  // ];
   useEffect(() => {
     //check if user is logged in from backend with useCustomAxios
     customAxios.get("/api/v1/auth/me").then((response) => {
@@ -19,18 +32,36 @@ function WalletDetailsPage() {
     }
     );
     console.log(currentUser);
-
-
-
-    
   }, []);
 
-  useEffect(() => {
+  useEffect(()  => {
     // This effect will run whenever the address parameter or location changes
     // Add your data fetching logic here
+
+    async function fetchData() {
+      try {
+        const searchNetwork = "solana";
+        const result = await axios.get(`/backend/api/v1/wallets/${searchNetwork}/balance?walletAddress=${address}`);
+        if (result.status !== 200) {
+          console.log("Error fetching wallet info: ", result.data.error);
+          return;
+        }
+        console.log("WALLET INFO: ", result);
+        setTokens([{
+          symbol: result.data.data.balance.symbol,
+          amount: result.data.data.balance.amount,
+          valueUsd: result.data.data.equivalents.USD.amount,
+        }]);
+      } catch (error) {
+        alert("Error fetching wallet info: " + error);
+        navigate("/404");
+      }
+    }
+    fetchData();
+
   }, [address, network, location.pathname]);
 
-  const currentAddress = address || "0xjhkjhasdygq9823421391802381823";
+  const currentAddress = address || "zGmof8SeyvHKnSEWv4i2mVv7MYe85D3zZqsTBjsKXSV";
 
   const transactions = [
     {
@@ -145,16 +176,7 @@ function WalletDetailsPage() {
     },
   ];
 
-  const tokens = [
-    {
-      symbol: "SOL",
-      tokenContractAddress: "0xkdsjljsdjlsjdjsdj",
-      holdingAmount: "1",
-      priceUsd: "145.59",
-      valueUsd: "145.59",
-      tokenId: "0xkdsjljsdjlsjdjsdj",
-    },
-  ];
+  
   const nfts = [
     {
       header: "NFT",

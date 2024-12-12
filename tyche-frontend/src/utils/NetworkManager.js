@@ -38,8 +38,8 @@ export function getNetworkShortName(networkName) {
 }
 
 export function getChainIdByNetwork(networkName) {
-  const shortName = getNetworkShortName(networkName);
-  return chainIdMappings[shortName] || null;
+  //const shortName = getNetworkShortName(networkName);
+  return chainIdMappings[networkName] || null;
 }
 
 export function getNetworkIcon(networkName) {
@@ -52,6 +52,6 @@ export function getSupportedNetworkPairs() {
 }
 
 export function getDappsByNetwork(networkName, dappMetadata) {
-  const networkShortName = getNetworkShortName(networkName);
-  return dappMetadata[networkShortName] || [];
+  //const networkShortName = getNetworkShortName(networkName);
+  return dappMetadata[networkName] || [];
 }
